@@ -23,7 +23,7 @@
 extern int fat_register_device(block_dev_desc_t *dev_desc, int part_no);
 /* Local variables */
 static block_dev_desc_t mmc_dev; 
-static	ulong	base_address = 0; 
+//static	ulong	base_address = 0; 
 static int mmc_ready = 0;
 block_dev_desc_t * mmc_get_dev(int dev)
 {
@@ -71,7 +71,7 @@ static ulong mmc_bread(int dev_num, ulong blknr, ulong blkcnt, ulong *dst);
 //*----------------------------------------------------------------------------
 void AT91F_MCIDeviceWaitReady(unsigned int timeout)
 {
-	volatile int status;
+	volatile unsigned int status;
 	
 	do
 	{
@@ -81,48 +81,7 @@ void AT91F_MCIDeviceWaitReady(unsigned int timeout)
 	while( !(status & AT91C_MCI_NOTBUSY)  && (timeout>0) );	
 }
 
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_Test
-//* \brief Test Functions
-//*----------------------------------------------------------------------------
-int AT91F_Test(void)
-{
-	int i;
-	unsigned int Max_Read_DataBlock_Length;
-	Max_Read_DataBlock_Length = MCI_Device.pMCI_DeviceFeatures->Max_Read_DataBlock_Length;
-	//* ReadBlock & WriteBlock Test -> Entire Block
 
-	//* Wait MCI Device Ready
-	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
-
-	//* Read Block 1
-	for(i=0;i<BUFFER_SIZE_MCI_DEVICE;i++) 	mmc_buf[i] = 0x00;	
-	AT91F_MCI_ReadBlock(&MCI_Device,(int)(1*Max_Read_DataBlock_Length),(unsigned int*) mmc_buf,Max_Read_DataBlock_Length);
-
-	//* Wait end of Read
-	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
-	
-	//* Write Page 1
-    sprintf(mmc_buf,"\n\rThis sentence is written in your device... Congratulations\n\r");
-	AT91F_MCI_WriteBlock(&MCI_Device,(1*Max_Read_DataBlock_Length),(unsigned int*) mmc_buf,Max_Read_DataBlock_Length);
-
-	//* Wait end of Write
-	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
-
-	//* Read Block 1
-	for(i=0;i<BUFFER_SIZE_MCI_DEVICE;i++) 	mmc_buf[i] = 0x00;	
-	AT91F_MCI_ReadBlock(&MCI_Device,(1*Max_Read_DataBlock_Length),(unsigned int*) mmc_buf,Max_Read_DataBlock_Length);
-	AT91F_MCI_ReadBlock(&MCI_Device,(1*Max_Read_DataBlock_Length),(unsigned int*) mmc_buf,Max_Read_DataBlock_Length);
-
-	//* Wait end of Read
-	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
-
-	//* End Of Test
-	AT91F_DBGU_Printk("\n\rTests Completed: !!!\n\r");
-	AT91F_DBGU_Printk(mmc_buf);
-
-	return TRUE;
-}
 
 //*----------------------------------------------------------------------------
 //* \fn    AT91F_CfgDevice
@@ -183,14 +142,14 @@ int AT91F_Test_MMC(void)
 	AT91F_DBGU_Printk("\n\rMMC Initialisation Successful:\n\r");
 
 	// Enter Main Tests	
-	return(AT91F_Test());
+	return 0; //return(AT91F_Test());
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_Test_SDCard
+//* \fn    AT91F_Init_SDCard
 //* \brief Configure MCI for SDCard and complete SDCard init, then jump to Test Functions
 //*----------------------------------------------------------------------------
-int AT91F_Test_SDCard(void)
+int AT91F_Init_SDCard(void)
 {
 	//////////////////////////////////////////////////////////
 	//* For SDCard Init
@@ -204,8 +163,6 @@ int AT91F_Test_SDCard(void)
 	if(AT91F_MCI_SDCard_Init(&MCI_Device) != AT91C_INIT_OK)
 		return FALSE;
 
-	AT91F_DBGU_Printk("\n\rSDCard Initialisation Successful: Enter Test\n\r");
-	mmc_ready = 1;
 	// Enter Main Tests	
 	//return(AT91F_Test());
 	return(TRUE);
@@ -220,7 +177,7 @@ void AT91F_MCI_Handler(void)
 	int status;
 
 	status = ( AT91C_BASE_MCI->MCI_SR & AT91C_BASE_MCI->MCI_IMR );
-	AT91F_DBGU_Printk("\n\rI am in MCI\n\r");
+	AT91F_DBGU_Printk("\rInterrupt being handled....\n\r");
 
 	AT91F_MCI_Device_Handler(&MCI_Device,status);
 }
@@ -232,18 +189,17 @@ void AT91F_MCI_Handler(void)
 int mmc_block_read(uchar *dst, ulong src, ulong len)
 {
 	unsigned int Max_Read_DataBlock_Length;
-	char buffertemp[100];
 	Max_Read_DataBlock_Length = MCI_Device.pMCI_DeviceFeatures->Max_Read_DataBlock_Length;
 
 	AT91S_MCIDeviceStatus status;
 	if (len > CFG_MMC_BLOCKSIZE) {
-		printf ("mmc_block_read: Error len (%u) > Blocksize \n",len);
+		printf ("mmc_block_read: Error len (%lu) > Blocksize \n",len);
 		return -1;
 	}
-
+	
 	//* Read Block 1
 
-	status = AT91F_MCI_ReadBlock(&MCI_Device, src ,(unsigned int*)dst,len);
+	status = AT91F_MCI_ReadBlock(&MCI_Device, src , (unsigned int *)dst,len);
 	if (status != AT91C_READ_OK) {
 		printf ("mmc_block_read: Error read %d to dst\n", status);
 		return -1;
@@ -330,9 +286,8 @@ mmc_block_write(ulong dst, uchar *src, int len)
 /****************************************************/
 {
 	
-	AT91S_MCIDeviceStatus status;
 	if (len > CFG_MMC_BLOCKSIZE) {
-		printf ("mmc_block_write: Error len (%lu) > Blocksize \n",len);
+		printf ("mmc_block_write: Error len (%d) > Blocksize \n",len);
 		return -1;
 	}
 
@@ -367,12 +322,15 @@ int mmc_init(int verbose)
 	mmc_dev.type = 0;
 	mmc_dev.blksz = MCI_Device.pMCI_DeviceFeatures[0].Max_Read_DataBlock_Length;
 	mmc_dev.lba = MCI_Device.pMCI_DeviceFeatures[0].Memory_Capacity >> 9;
-	sprintf(mmc_dev.vendor,"Man %02x%02x%02x Snr %02x%02x%02x", 0, 0,0,0,0,0);
+	sprintf((char *)mmc_dev.vendor,"Manu %2x%2x%2x SNr %2x%2x%2x\n\r",0,0,0,0,0,0);
 	AT91F_DBGU_Printk((char *)mmc_dev.vendor);
-	sprintf(mmc_dev.product,"%s","unknown");
+
+	sprintf((char *)mmc_dev.product,"Prod %s\n","unknown");
 	AT91F_DBGU_Printk((char *)mmc_dev.product);
-	sprintf(mmc_dev.revision,"%x %x",0, 0);
+
+	sprintf((char *)mmc_dev.revision,"\rRev %x %x",0, 0);
 	AT91F_DBGU_Printk((char *)mmc_dev.revision);
+
 	mmc_dev.removable = 0;
 	mmc_dev.block_read = mmc_bread;   //mmc_bread;  // this information will be used for FAT
 
@@ -564,6 +522,7 @@ int main()
 	// Enable MCI interrupt
 	AT91F_AIC_EnableIt(AT91C_BASE_AIC,AT91C_ID_MCI);
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //  Enter Test Menu
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -573,7 +532,7 @@ int main()
 
 	while(1)
 	{
-		AT91F_DBGU_Printk("\n\rTest MCI Device\n\r1:Test MMC\n\r2: Test SDCard\n\r");
+		AT91F_DBGU_Printk("\n\rTest MCI Device\n\r1:Test MMC\n\r2:Test SDCard\n\r");
 
 		// Wait for User Choice : 1 <=> Enter Test MMC , 2 <=> Enter Test SDCard
 		caractere = AT91F_DBGU_getc();
@@ -591,24 +550,28 @@ int main()
 				break;
 			
 			case '2':	
-				AT91F_DBGU_Printk("\n\rEnter Initialiation SDCard\n\r");
+				AT91F_DBGU_Printk("\n\rEnter Initialiation SDCard ......\n\r");
 				pUSART_vikas->US_CR = AT91C_US_RTSDIS;
-				if(AT91F_Test_SDCard() == TRUE)
+				if(AT91F_Init_SDCard() == TRUE)
 					{
-					AT91F_DBGU_Printk("\n\rINit SD card successful !!!\n\r");
+					AT91F_DBGU_Printk("Init SD card successful !!!\n\r");
+					mmc_ready = 1;
 					mmc_init(1);				// 1 = verbose
 					//mmc_bread(0,0,1,(ulong *)mmc_buf);     //  devnr = dummy, blknr = dummy, blkcnt=1 converts to 512 later, dst 
-					
-					sprintf(mmc_buf,"\n\rThis sentence will be written on your device\n\r");
+					AT91F_DBGU_Printk("\n\n\rWriting .................\n\r");
+					sprintf((char *)mmc_buf,"\n\r\"This sentence was written and read back\"");
+				
 					mmc_write(mmc_buf, CFG_MMC_BASE, CFG_MMC_BLOCKSIZE);
 					
-					sprintf(mmc_buf,"\n\rOverwriting buffer before reading back\n\r");			
-					AT91F_DBGU_Printk(mmc_buf);
+					sprintf((char *)mmc_buf,"\n\rOverwriting buffer before reading back\n\r");			
+					AT91F_DBGU_Printk((char *)mmc_buf);
+					AT91F_DBGU_Printk("\n\rReading .................\n\r");
 					
-					mmc_read(CFG_MMC_BASE, mmc_buf, CFG_MMC_BLOCKSIZE);		
+					
+					mmc_read(CFG_MMC_BASE, mmc_buf, CFG_MMC_BLOCKSIZE); 					
 					
 					//* End Of Test
-					AT91F_DBGU_Printk(mmc_buf);
+					AT91F_DBGU_Printk((char *)mmc_buf);
 					AT91F_DBGU_Printk("\n\rTests Completed: !!!\n\r");
 					}
 				else
