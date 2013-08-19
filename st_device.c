@@ -9,6 +9,8 @@
 #include "isr.h" 			// AT91F_ST_ASM_HANDLER()
 #include "init.h" 				// AT91F_DBGU_Printk
 #include "st_device.h"       // selber inc
+#include "led_device.h"
+
 //////////////////////////////////////////////////////////////////////////////
 // Externals
 //////////////////////////////////////////////////////////////////////////////
@@ -44,7 +46,8 @@ volatile int StStatus;
 	// Read the system timer status register 	
 	StStatus = *(AT91C_ST_SR);
 	StTick++;
-	if (StTick > 1000 )  StTick = 0; 
+	if (StTick > 100 )  StTick = 0; 
+	(getLed(YELLOW)) ? (resetLed(YELLOW)): (setLed(YELLOW));
 }
 
 //*----------------------------------------------------------------------------
@@ -82,7 +85,7 @@ void St_init()
 
 
 	//* System Timer initialization
-	AT91F_ST_SetPeriodIntervalTimer(AT91C_BASE_ST, 32);	// FFFF gives around 2 seconds
+	AT91F_ST_SetPeriodIntervalTimer(AT91C_BASE_ST, 327);	// FFFF gives around 2 seconds
 	AT91F_ST_EnableIt(AT91C_BASE_ST, AT91C_ST_PITS);
 }
 #endif

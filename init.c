@@ -15,13 +15,12 @@
 //*
 //*----------------------------------------------------------------------------
 #include "mci_type.h"
-#include "main.h"
-#include "mci_device.h"
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
+#include "main.h"
+#include "mci_device.h"
 
 #ifndef init_c
-
 extern void AT91F_DBGU_Printk(char *buffer);
 void AT91F_SpuriousHandler() 
 void AT91F_DataAbort() 

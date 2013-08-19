@@ -2,9 +2,9 @@
 #define mci_device_c
 
 #include "mci_type.h"
-#include "main.h"               //  structure typedef
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
+#include "main.h"               //  structure typedef
 #include "isr.h"    		// AT91F_ASM_MCI_Handler
 #include "mci_device.h"         // self include
 #include "init.h"				// AT91F_DBGU_Printk()
@@ -17,15 +17,11 @@ uint32 AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device, unsigned int relative_c
 extern void AT91F_MCI_Device_Handler(	AT91PS_MciDevice pMCI_Device,	unsigned int status);
 extern uint32 AT91F_MCI_ReadBlock(	AT91PS_MciDevice pMCI_Device,	int src,	unsigned int *dataBuffer,	int sizeToRead );
 extern uint32 AT91F_MCI_WriteBlock(	AT91PS_MciDevice pMCI_Device,	int dest,	unsigned int *dataBuffer,	int sizeToWrite );
-uint32 AT91F_MCI_MMC_SelectCard(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address);
 uint32 AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address , unsigned int * response);
 uint32 AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length);
-uint32 AT91F_MCI_MMC_GetAllOCR (AT91PS_MciDevice pMCI_Device);
-uint32 AT91F_MCI_MMC_GetAllCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
-uint32 AT91F_MCI_MMC_Init (AT91PS_MciDevice pMCI_Device);
 uint32 AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device);
 uint32 AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
-uint32 AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device);
+uint32 dAT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device);
 extern uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device);
 extern void AT91F_MCI_DeviceWaitReady(unsigned int timeout);
 extern int Mci_init(void);
@@ -128,24 +124,41 @@ void AT91F_MCI_Device_Handler(
 	unsigned int status)
 {
 	// If End of Tx Buffer Empty interrupt occurred
-	if ( status & AT91C_MCI_TXBUFE )
+	if ( status & AT91C_MCI_ENDTX )
     {
-		AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_TXBUFE;
+		AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_ENDTX;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_TXTDIS;
         AT91F_DBGU_Printk("\n\rTM\n\r");	
 		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
 	}	// End of if AT91C_MCI_TXBUFF		
-	
+
     // If End of Rx Buffer Full interrupt occurred
-    if ( status & AT91C_MCI_RXBUFF )
+    if ( (status & AT91C_MCI_RXBUFF ) && reader)
     {        
        	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_RXBUFF;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_RXTDIS;
-		AT91F_DBGU_Printk("\n\rRM\n\r");
+		AT91F_DBGU_Printk("\n\rRMR\n\r");
 		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
-	}	// End of if AT91C_MCI_RXBUFF
+	}	// End of if AT91C_MCI_RXBUFF 
 
-}
+	
+    // If End of Rx Buffer Full interrupt occurred
+    if (  (status & AT91C_MCI_ENDRX) && writer)
+    {        
+		AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_ENDRX;
+		readytowriteonSD = WRITE_NOW;
+		printBuffer = Bufferwechsler;
+		AT91C_BASE_PDC_MCI->PDC_RCR = 512;		
+		AT91F_DBGU_Printk("\n\rRMW\n\r");
+		globalj = 0;
+		(Bufferwechsler == mciBuffer1) ? (Bufferwechsler = mciBuffer2 ): (Bufferwechsler = mciBuffer1) ; 
+		AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDRX;
+		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
+	}// End of if AT91C_MCI_RXBUFF
+
+
+}//handler
+
 
 //*----------------------------------------------------------------------------
 //* \fn    AT91F_MCI_ReadBlock
@@ -220,25 +233,25 @@ uint32 AT91F_MCI_WriteBlock(
 {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	if( pMCI_Device->pMCI_DeviceDesc->state != AT91C_MCI_IDLE)
-    	return AT91C_WRITE_ERROR;
+    	return (AT91C_WRITE_ERROR_NOT_IDLE | AT91C_WRITE_ERROR );
     
     if( (AT91F_MCI_GetStatus(pMCI_Device,pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address) & AT91C_SR_READY_FOR_DATA) != AT91C_SR_READY_FOR_DATA)
-    	return AT91C_WRITE_ERROR;
+    	return (AT91C_WRITE_ERROR_DATA_LINE_BUSY | AT91C_WRITE_ERROR);
     	
     if ( (dest + sizeToWrite) > pMCI_Device->pMCI_DeviceFeatures->Memory_Capacity )
-		return AT91C_WRITE_ERROR;
+		return ( AT91C_WRITE_ERROR_MEMORY_FULL | AT91C_WRITE_ERROR);
 
     // If source does not fit a begin of a block
 	if ( (dest % pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length) != 0 )
-		return AT91C_WRITE_ERROR;
+		return (AT91C_WRITE_ERROR_ALIGNMENT|AT91C_WRITE_ERROR);
    
     // Test if the MMC supports Partial Write Block 
     if( (sizeToWrite < pMCI_Device->pMCI_DeviceFeatures->Max_Write_DataBlock_Length) 
     	&& (pMCI_Device->pMCI_DeviceFeatures->Write_Partial == 0x00) )
-   		return AT91C_WRITE_ERROR;
+   		return (AT91C_WRITE_ERROR_NO_PARTIAL|AT91C_WRITE_ERROR);
    		
    	if( sizeToWrite > pMCI_Device->pMCI_DeviceFeatures->Max_Write_DataBlock_Length )
-   		return AT91C_WRITE_ERROR;
+   		return (AT91C_WRITE_ERROR_MORE_THAN_BLOCK|AT91C_WRITE_ERROR);
     ////////////////////////////////////////////////////////////////////////////////////////////
   
     // Init Mode Register
@@ -250,18 +263,18 @@ uint32 AT91F_MCI_WriteBlock(
 		sizeToWrite = sizeToWrite/4;
 	
 	// Init PDC for write sequence
-    AT91C_BASE_PDC_MCI->PDC_PTCR = (AT91C_PDC_TXTDIS | AT91C_PDC_RXTDIS);  
+    AT91C_BASE_PDC_MCI->PDC_PTCR = (AT91C_PDC_TXTDIS );  
     AT91C_BASE_PDC_MCI->PDC_TPR = (unsigned int) dataBuffer;
     AT91C_BASE_PDC_MCI->PDC_TCR = sizeToWrite;
 
 	// Send the write single block command
     if ( AT91F_MCI_SendCommand(pMCI_Device, AT91C_WRITE_BLOCK_CMD, dest) != AT91C_CMD_SEND_OK)
-    	return AT91C_WRITE_ERROR;
+    	return (AT91C_WRITE_ERROR | AT91C_WRITE_ERROR_COMMANDSENDFAILED ) ;
 //24 | AT91C_MCI_SPCMD_NONE	| AT91C_MCI_RSPTYP_48	| AT91C_MCI_TRCMD_START	| (AT91C_MCI_TRTYP_BLOCK 	&  ~(AT91C_MCI_TRDIR))	| AT91C_MCI_MAXLAT
 	pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_TX_SINGLE_BLOCK;
 
 	// Enable AT91C_MCI_TXBUFE Interrupt
-    AT91C_BASE_MCI->MCI_IER = AT91C_MCI_TXBUFE;
+    AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDTX;
   
   	// Enables TX for PDC transfert requests
     AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_TXTEN; //  here exactly is the data sent !

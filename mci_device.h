@@ -181,6 +181,13 @@ extern void Mci_init(void);
 #define AT91C_READ_ERROR					5		// Read Failed
 #define AT91C_WRITE_OK						6		// Write Successfull
 #define AT91C_WRITE_ERROR					7		// Write Failed
+#define AT91C_WRITE_ERROR_NOT_IDLE					8		// Write Failed
+#define AT91C_WRITE_ERROR_DATA_LINE_BUSY					16		// Write Failed
+#define AT91C_WRITE_ERROR_MEMORY_FULL					32		// Write Failed
+#define AT91C_WRITE_ERROR_ALIGNMENT					64		// Write Failed
+#define AT91C_WRITE_ERROR_NO_PARTIAL					128		// Write Failed
+#define AT91C_WRITE_ERROR_MORE_THAN_BLOCK					256		// Write Failed
+#define AT91C_WRITE_ERROR_COMMANDSENDFAILED					512      // write failed
 #define AT91C_ERASE_OK						8		// Erase Successfull
 #define AT91C_ERASE_ERROR					9		// Erase Failed
 #define AT91C_CARD_SELECTED_OK				10		// Card Selection Successfull

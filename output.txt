@@ -138,3 +138,47 @@ PIO_ABSE shows which peripheral ( A or B ) enabled - A =0
 When driven by PIO controller :
 When the I/O line is controlled by the PIO controller, the pin can be configured to be driven. This
 is done by writing PIO_OER (Output Enable Register) and PIO_PDR (Output Disable Register).The results of these write operations are detected in PIO_OSR (Output Status Register). When a bit in this register is at 0, the corresponding I/O line is used as an input only. When the bit is at 1, the corresponding I/O line is driven by the PIO controller.
+
+
+
+
+		for ( i = 0; i < 512; i ++ )
+200015e4:	e3a03000 	mov	r3, #0	; 0x0
+200015e8:	e50b3010 	str	r3, [fp, #-16]
+200015ec:	ea000008 	b	20001614 <AT91F_MCI_Device_Handler+0xac>
+		Buffer2[i] = Buffer1[i];
+200015f0:	e51b1010 	ldr	r1, [fp, #-16]
+200015f4:	e51b2010 	ldr	r2, [fp, #-16]
+200015f8:	e59f3080 	ldr	r3, [pc, #128]	; 20001680 <.text+0x1680>
+200015fc:	e7d33002 	ldrb	r3, [r3, r2]
+20001600:	e59f207c 	ldr	r2, [pc, #124]	; 20001684 <.text+0x1684>
+20001604:	e7c23001 	strb	r3, [r2, r1]
+20001608:	e51b3010 	ldr	r3, [fp, #-16]
+2000160c:	e2833001 	add	r3, r3, #1	; 0x1
+20001610:	e50b3010 	str	r3, [fp, #-16]
+20001614:	e51b2010 	ldr	r2, [fp, #-16]
+20001618:	e59f3068 	ldr	r3, [pc, #104]	; 20001688 <.text+0x1688>
+2000161c:	e1520003 	cmp	r2, r3
+20001620:	dafffff2 	ble	200015f0 <AT91F_MCI_Device_Handler+0x88>
+
+
+
+
+		for ( i = 0; i < 512; i ++ )
+200015e4:	e3a03000 	mov	r3, #0	; 0x0
+200015e8:	e50b3010 	str	r3, [fp, #-16]
+200015ec:	ea000008 	b	20001614 <AT91F_MCI_Device_Handler+0xac>
+		Buffer2[i] = (unsigned int)Buffer1[i];
+200015f0:	e51b1010 	ldr	r1, [fp, #-16]
+200015f4:	e51b2010 	ldr	r2, [fp, #-16]
+200015f8:	e59f3080 	ldr	r3, [pc, #128]	; 20001680 <.text+0x1680>
+200015fc:	e7d33002 	ldrb	r3, [r3, r2]
+20001600:	e59f207c 	ldr	r2, [pc, #124]	; 20001684 <.text+0x1684>
+20001604:	e7c23001 	strb	r3, [r2, r1]
+20001608:	e51b3010 	ldr	r3, [fp, #-16]
+2000160c:	e2833001 	add	r3, r3, #1	; 0x1
+20001610:	e50b3010 	str	r3, [fp, #-16]
+20001614:	e51b2010 	ldr	r2, [fp, #-16]
+20001618:	e59f3068 	ldr	r3, [pc, #104]	; 20001688 <.text+0x1688>
+2000161c:	e1520003 	cmp	r2, r3
+20001620:	dafffff2 	ble	200015f0 <AT91F_MCI_Device_Handler+0x88>
