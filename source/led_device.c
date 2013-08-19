@@ -5,7 +5,7 @@
 #include "mci_type.h"
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
-#include "init.h"          // AT91F_DBGU_Printk()
+#include "init.h"          // Send_Stream_from_RS232_to_Terminal()
 #include "led_device.h"
 
 

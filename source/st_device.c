@@ -6,8 +6,8 @@
 #include "mci_type.h"
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
-#include "isr.h" 			// AT91F_ST_ASM_HANDLER()
-#include "init.h" 				// AT91F_DBGU_Printk
+#include "isr.h" 			// Interrupt_Handler_SysTimer_Lowlevel()
+#include "init.h" 				// Send_Stream_from_RS232_to_Terminal
 #include "st_device.h"       // selber inc
 #include "led_device.h"
 
@@ -16,7 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 //* Interrupt Handlers
-//extern void AT91F_ST_ASM_HANDLER(void);
+//extern void Interrupt_Handler_SysTimer_Lowlevel(void);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -28,19 +28,19 @@ unsigned int StTick = 0;
 
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_GetTickCount
+//* \fn    GetTickCount_fromST
 //* \brief This function returns the value of the system timer
 //*----------------------------------------------------------------------------
-unsigned int AT91F_GetTickCount(void)
+unsigned int GetTickCount_fromST(void)
 {
 	return(StTick);
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_ST_HANDLER
+//* \fn    Interrupt_Handler_SysTimer_Highlevel
 //* \brief This function is invoked by main
 //*----------------------------------------------------------------------------
-void AT91F_ST_HANDLER(void)
+void Interrupt_Handler_SysTimer_Highlevel(void)
 {
 volatile int StStatus;
 	// Read the system timer status register 	
@@ -51,10 +51,10 @@ volatile int StStatus;
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_ST_SetPeriodIntervalTimer
+//* \fn    SetPeriodicTimerCounter
 //* \brief Set Periodic Interval Interrupt (period min <=> 1/32768 s)
 //*----------------------------------------------------------------------------
-void AT91F_ST_SetPeriodIntervalTimer(
+void SetPeriodicTimerCounter(
 	AT91PS_ST pSt,
 	unsigned int period)
 {
@@ -73,19 +73,17 @@ void AT91F_ST_SetPeriodIntervalTimer(
 void St_init()
 {
 	
-
-	
 	AT91F_AIC_ConfigureIt (	AT91C_BASE_AIC,                        // AIC base address
 							AT91C_ID_SYS,                          // System peripheral ID
 							AT91C_AIC_PRIOR_HIGHEST,               // Max priority
 							AT91C_AIC_SRCTYPE_INT_LEVEL_SENSITIVE, // Level sensitive
-							AT91F_ST_ASM_HANDLER );						
+							Interrupt_Handler_SysTimer_Lowlevel );						
 	//* Enable ST interrupt
 	AT91F_AIC_EnableIt(AT91C_BASE_AIC, AT91C_ID_SYS);
 
 
 	//* System Timer initialization
-	AT91F_ST_SetPeriodIntervalTimer(AT91C_BASE_ST, 3276);	// FFFF gives around 2 seconds
+	SetPeriodicTimerCounter(AT91C_BASE_ST, 3276);	// FFFF gives around 2 seconds
 	AT91F_ST_EnableIt(AT91C_BASE_ST, AT91C_ST_PITS);
 }
 #endif

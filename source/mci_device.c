@@ -5,82 +5,56 @@
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
 #include "main.h"               //  structure typedef
-#include "isr.h"    		// AT91F_ASM_MCI_Handler
+#include "isr.h"    		// Interrupt_Handler_MCI_Lowlevel
 #include "mci_device.h"         // self include
-#include "init.h"				// AT91F_DBGU_Printk()
+#include "init.h"				// DBGU_Printk()
+#include "errm.h"
 
-#ifndef mci_device_c
-/*Functions*/ 
-uint32 AT91F_MCI_SendCommand (	AT91PS_MciDevice ,	unsigned int ,	unsigned int );
-uint32 AT91F_MCI_SDCard_SendAppCommand (AT91PS_MciDevice ,	unsigned int ,	unsigned int );
-uint32 AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address);
-extern void AT91F_MCI_Device_Handler(	AT91PS_MciDevice pMCI_Device,	unsigned int status);
-extern uint32 AT91F_MCI_ReadBlock(	AT91PS_MciDevice pMCI_Device,	int src,	unsigned int *dataBuffer,	int sizeToRead );
-extern uint32 AT91F_MCI_WriteBlock(	AT91PS_MciDevice pMCI_Device,	int dest,	unsigned int *dataBuffer,	int sizeToWrite );
-uint32 AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address , unsigned int * response);
-uint32 AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length);
-uint32 AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device);
-uint32 AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
-uint32 AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device);
-extern uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device);
-extern void AT91F_MCI_DeviceWaitReady(unsigned int timeout);
-extern int Mci_init(void);
-#endif
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_SendCommand
-//* \brief Generic function to send a command to the MMC or SDCard
-//*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SendCommand (
-	AT91PS_MciDevice pMCI_Device,
+//-----------------------------
+
+/* General command API */
+uint32 SendCommandtoSD (
+	SDCARD_PTR ptr_sdcard,
 	unsigned int Cmd,
 	unsigned int Arg)
 {
 	unsigned int	error,status;
-	//unsigned int	tick=0;
-
     // Send the command
     AT91C_BASE_MCI->MCI_ARGR = Arg;
     AT91C_BASE_MCI->MCI_CMDR = Cmd;
-
-	// wait for CMDRDY Status flag to read the response
+	// The CMDRDY flag in the status register means that the command is still being tested
 	do
 	{
 		status = AT91C_BASE_MCI->MCI_SR;
-		//tick++;
 	}
-	while( !(status & AT91C_MCI_CMDRDY) );//&& (tick<100) );
-
-    // Test error  ==> if crc error and response R3 ==> don't check error
-    error = (AT91C_BASE_MCI->MCI_SR) & AT91C_MCI_SR_ERROR;
+	while( !(status & AT91C_MCI_CMDRDY) ); // if Status of CMDRDY is not 1, then the pc would rotate here.
+    // All responses except for the type R3 are protected by a CRC. CMD1 and ACMD41 come in the picture.
+    error = (AT91C_BASE_MCI->MCI_SR) & ERROR_ALL_SR;
 	if(error != 0 )
 	{
-		// if the command is SEND_OP_COND the CRC error flag is always present (cf : R3 response)
-		if ( (Cmd != AT91C_SDCARD_APP_OP_COND_CMD) && (Cmd != AT91C_MMC_SEND_OP_COND_CMD) )
-			return ((AT91C_BASE_MCI->MCI_SR) & AT91C_MCI_SR_ERROR);
+		// if the command is to get OperatingCondition Status the CRC error flag is always present (cf : R3 response)
+		if  ((Cmd != ACMD41_SEND_APP_OP_COND) && ( Cmd != CMD1_SEND_OP_COND )) 
+			return ((AT91C_BASE_MCI->MCI_SR) & ERROR_ALL_SR);
 		else
 		{
 			if (error != AT91C_MCI_RCRCE)
-				return ((AT91C_BASE_MCI->MCI_SR) & AT91C_MCI_SR_ERROR);
+				return ((AT91C_BASE_MCI->MCI_SR) & ERROR_ALL_SR);
 		}
 	}
-    return AT91C_CMD_SEND_OK;
+    return SD_CMD_SENDNO_ERROR;
 }
 
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_SDCard_SendAppCommand
-//* \brief Specific function to send a specific command to the SDCard
-//*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SDCard_SendAppCommand (
-	AT91PS_MciDevice pMCI_Device,
+/* Specific Command API */
+
+uint32 SendAppCommandtoSD (
+	SDCARD_PTR ptr_sdcard,
 	unsigned int Cmd_App,
 	unsigned int Arg	)
 {
 	unsigned int status;
-	//unsigned int	tick=0;
-
 	// Send the CMD55 for application specific command
-    AT91C_BASE_MCI->MCI_ARGR = (pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address << 16 );
-    AT91C_BASE_MCI->MCI_CMDR = AT91C_APP_CMD;
+    AT91C_BASE_MCI->MCI_ARGR = (ptr_sdcard->ptr_sdcard_info->Relative_Card_Address << 16 );
+    AT91C_BASE_MCI->MCI_CMDR = ACMD55_NEXTCMD_APP_CMD;
 
 	// wait for CMDRDY Status flag to read the response
 	do
@@ -91,36 +65,35 @@ uint32 AT91F_MCI_SDCard_SendAppCommand (
 	while( !(status & AT91C_MCI_CMDRDY) );//&& (tick<100) );	
 
     // if an error occurs
-    if (((AT91C_BASE_MCI->MCI_SR) & AT91C_MCI_SR_ERROR) != 0 )
-		return ((AT91C_BASE_MCI->MCI_SR) & AT91C_MCI_SR_ERROR);
+    if (((AT91C_BASE_MCI->MCI_SR) & ERROR_ALL_SR) != 0 )
+		return ((AT91C_BASE_MCI->MCI_SR) & ERROR_ALL_SR);
 
     // check if it is a specific command and then send the command
-	if ( (Cmd_App && AT91C_SDCARD_APP_ALL_CMD) == 0)
-		return AT91C_CMD_SEND_ERROR;
+	if ( (Cmd_App && ACMD_ALL) == 0)
+		return SD_CMD_SEND_ERROR;
 
-   return( AT91F_MCI_SendCommand(pMCI_Device,Cmd_App,Arg) );
+   return( SendCommandtoSD(ptr_sdcard,Cmd_App,Arg) );
 }
 
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_GetStatus
-//* \brief Addressed card sends its status register
-//*----------------------------------------------------------------------------
-uint32 AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device,unsigned int relative_card_address)
+
+//* \fn    SDcard_GetStatus_CMD13_R2
+
+uint32 SDcard_GetStatus_CMD13_R2(SDCARD_PTR ptr_sdcard,unsigned int relative_card_address)
 {
-	if (AT91F_MCI_SendCommand(pMCI_Device,
-								AT91C_SEND_STATUS_CMD,
-								relative_card_address <<16) == AT91C_CMD_SEND_OK)
+	if (SendCommandtoSD(ptr_sdcard,
+								CMD13_SEND_STATUS,
+								relative_card_address <<16) == SD_CMD_SENDNO_ERROR)
     	return (AT91C_BASE_MCI->MCI_RSPR[0]);
 
-    return AT91C_CMD_SEND_ERROR;
+    return SD_CMD_SEND_ERROR;
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_Device_Handler
+//* \fn    Interrupt_Handler_SDcard_Highlevel
 //* \brief MCI C interrupt handler
 //*----------------------------------------------------------------------------
-void AT91F_MCI_Device_Handler(
-	AT91PS_MciDevice pMCI_Device,
+void Interrupt_Handler_SDcard_Highlevel(
+	SDCARD_PTR ptr_sdcard,
 	unsigned int status)
 {
 	// If End of Tx Buffer Empty interrupt occurred
@@ -128,8 +101,8 @@ void AT91F_MCI_Device_Handler(
     {
 		AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_ENDTX;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_TXTDIS;
-        AT91F_DBGU_Printk("\n\rTM\n\r");	
-		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
+        DBGU_Printk( "\n\rTM\n\r");	
+		ptr_sdcard->ptr_sdcard_desc->state = STATE_SDCARD_IDLE;
 	}	// End of if AT91C_MCI_TXBUFF		
 
     // If End of Rx Buffer Full interrupt occurred
@@ -137,8 +110,8 @@ void AT91F_MCI_Device_Handler(
     {        
        	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_ENDRX;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_RXTDIS;
-		AT91F_DBGU_Printk("\n\rRMR\n\r");
-		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
+		DBGU_Printk( "\n\rRMR\n\r");
+		ptr_sdcard->ptr_sdcard_desc->state = STATE_SDCARD_IDLE;
 	}	// End of if AT91C_MCI_RXBUFF 
 
 	
@@ -149,11 +122,11 @@ void AT91F_MCI_Device_Handler(
 		readytowriteonSD = WRITE_NOW;
 		printBuffer = Bufferwechsler;
 		AT91C_BASE_PDC_MCI->PDC_RCR = 512;		
-		AT91F_DBGU_Printk("\n\rRMW\n\r");
+		DBGU_Printk( "\n\rRMW\n\r");
 		globalj = 0;
-		(Bufferwechsler == mciBuffer1) ? (Bufferwechsler = mciBuffer2 ): (Bufferwechsler = mciBuffer1) ; 
+		(Bufferwechsler == SDBuffer1) ? (Bufferwechsler = SDBuffer2 ): (Bufferwechsler = SDBuffer1) ; 
 		AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDRX;
-		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
+		ptr_sdcard->ptr_sdcard_desc->state = STATE_SDCARD_IDLE;
 	}// End of if AT91C_MCI_RXBUFF
 
 
@@ -161,41 +134,41 @@ void AT91F_MCI_Device_Handler(
 
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_ReadBlock
+//* \fn    SDcard_ReadBlock_CMD17_R1
 //* \brief Read an ENTIRE block or PARTIAL block
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_ReadBlock(
-	AT91PS_MciDevice pMCI_Device,
+uint32 SDcard_ReadBlock_CMD17_R1(
+	SDCARD_PTR ptr_sdcard,
 	int src,
 	unsigned int *dataBuffer,
 	int sizeToRead )
 {
     ////////////////////////////////////////////////////////////////////////////////////////////
-    if(pMCI_Device->pMCI_DeviceDesc->state != AT91C_MCI_IDLE)
-    	{AT91F_DBGU_Printk("\n\r1\n\r"); return AT91C_READ_ERROR;}
+    if(ptr_sdcard->ptr_sdcard_desc->state != STATE_SDCARD_IDLE)
+    	return SD_READ_FOUND_ERROR;
     
-    if( (AT91F_MCI_GetStatus(pMCI_Device,pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address) & AT91C_SR_READY_FOR_DATA) != AT91C_SR_READY_FOR_DATA)
-    	{AT91F_DBGU_Printk("\n\r2 CMD Read not OK\n\r"); return AT91C_READ_ERROR;}
+    if( (SDcard_GetStatus_CMD13_R2(ptr_sdcard,ptr_sdcard->ptr_sdcard_info->Relative_Card_Address) & SDCARD_STATE_SR_READY_FOR_DATA) != SDCARD_STATE_SR_READY_FOR_DATA)
+    	return SD_READ_FOUND_ERROR;
     	
-    if ( (src + sizeToRead) > pMCI_Device->pMCI_DeviceFeatures->Memory_Capacity )
-		{AT91F_DBGU_Printk("\n\r3 CMD Read not OK\n\r"); return AT91C_READ_ERROR;}
+    if ( (src + sizeToRead) > ptr_sdcard->ptr_sdcard_info->Memory_Capacity )
+		return SD_READ_FOUND_ERROR;
 
     // If source does not fit a begin of a block
-	if ( (src % pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length) != 0 )
-		{AT91F_DBGU_Printk("\n\r4 CMD Read not OK\n\r"); return AT91C_READ_ERROR;}
+	if ( (src % ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length) != 0 )
+		return SD_READ_FOUND_ERROR;
    
      // Test if the MMC supports Partial Read Block
      // ALWAYS SUPPORTED IN SD Memory Card
-     if( (sizeToRead < pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length) 
-    	&& (pMCI_Device->pMCI_DeviceFeatures->Read_Partial == 0x00) )
-   		{AT91F_DBGU_Printk("\n\r5 CMD Read not OK\n\r"); return AT91C_READ_ERROR;}
+     if( (sizeToRead < ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length) 
+    	&& (ptr_sdcard->ptr_sdcard_info->Read_Partial == 0x00) )
+   		return SD_READ_FOUND_ERROR;
    		
-    if( sizeToRead > pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length)
-   		{AT91F_DBGU_Printk("\n\r6 CMD Read not OK\n\r"); return AT91C_READ_ERROR;}
+    if( sizeToRead > ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length)
+   		return SD_READ_FOUND_ERROR;
     ////////////////////////////////////////////////////////////////////////////////////////////
       
     // Init Mode Register
-	AT91C_BASE_MCI->MCI_MR |= ((pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length << 16) | AT91C_MCI_PDCMODE);
+	AT91C_BASE_MCI->MCI_MR |= ((ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length << 16) | AT91C_MCI_PDCMODE);
 	 
     if (sizeToRead %4)
 		sizeToRead = (sizeToRead /4)+1;
@@ -207,10 +180,10 @@ uint32 AT91F_MCI_ReadBlock(
     AT91C_BASE_PDC_MCI->PDC_RCR  = sizeToRead;
 
 	// Send the Read single block command
-    if ( AT91F_MCI_SendCommand(pMCI_Device, AT91C_READ_SINGLE_BLOCK_CMD, src) != AT91C_CMD_SEND_OK )
-    	{AT91F_DBGU_Printk("\n\r7 CMD Read not OK\n\r"); return AT91C_READ_ERROR;}
+    if ( SendCommandtoSD(ptr_sdcard, CMD17_READ_SINGLE_BLOCK, src) != SD_CMD_SENDNO_ERROR )
+    	return SD_READ_FOUND_ERROR;
 //(17 | AT91C_MCI_SPCMD_NONE	| AT91C_MCI_RSPTYP_48 	| AT91C_MCI_TRCMD_START	| AT91C_MCI_TRTYP_BLOCK	| AT91C_MCI_TRDIR	| AT91C_MCI_MAXLAT)
-	pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_RX_SINGLE_BLOCK;
+	ptr_sdcard->ptr_sdcard_desc->state = STATE_SDCARD_READ_SINGLE_BLOCK;
 
 	// Enable AT91C_MCI_RXBUFF Interrupt
     AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDRX;
@@ -218,44 +191,44 @@ uint32 AT91F_MCI_ReadBlock(
 	// (PDC) Receiver Transfer Enable
 	AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_RXTEN;  // here exactly is the data recieved.
 
-	return AT91C_READ_OK;
+	return SD_READ_NO_ERROR;
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_WriteBlock
+//* \fn    SDcard_WriteBlock_CMD24_R1
 //* \brief  Write an ENTIRE block but not always PARTIAL block !!!
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_WriteBlock(
-	AT91PS_MciDevice pMCI_Device,
+uint32 SDcard_WriteBlock_CMD24_R1(
+	SDCARD_PTR ptr_sdcard,
 	int dest,
 	unsigned int *dataBuffer,
 	int sizeToWrite )
 {
 	////////////////////////////////////////////////////////////////////////////////////////////
-	if( pMCI_Device->pMCI_DeviceDesc->state != AT91C_MCI_IDLE)
-    	return (AT91C_WRITE_ERROR_NOT_IDLE | AT91C_WRITE_ERROR );
+	if( ptr_sdcard->ptr_sdcard_desc->state != STATE_SDCARD_IDLE)
+    	return ( SD_WRITE_FOUND_ERROR );
     
-    if( (AT91F_MCI_GetStatus(pMCI_Device,pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address) & AT91C_SR_READY_FOR_DATA) != AT91C_SR_READY_FOR_DATA)
-    	return (AT91C_WRITE_ERROR_DATA_LINE_BUSY | AT91C_WRITE_ERROR);
+    if( (SDcard_GetStatus_CMD13_R2(ptr_sdcard,ptr_sdcard->ptr_sdcard_info->Relative_Card_Address) & SDCARD_STATE_SR_READY_FOR_DATA) != SDCARD_STATE_SR_READY_FOR_DATA)
+    	return (  SD_WRITE_FOUND_ERROR);
     	
-    if ( (dest + sizeToWrite) > pMCI_Device->pMCI_DeviceFeatures->Memory_Capacity )
-		return ( AT91C_WRITE_ERROR_MEMORY_FULL | AT91C_WRITE_ERROR);
+    if ( (dest + sizeToWrite) > ptr_sdcard->ptr_sdcard_info->Memory_Capacity )
+		return (  SD_WRITE_FOUND_ERROR);
 
     // If source does not fit a begin of a block
-	if ( (dest % pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length) != 0 )
-		return (AT91C_WRITE_ERROR_ALIGNMENT|AT91C_WRITE_ERROR);
+	if ( (dest % ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length) != 0 )
+		return (SD_WRITE_FOUND_ERROR);
    
     // Test if the MMC supports Partial Write Block 
-    if( (sizeToWrite < pMCI_Device->pMCI_DeviceFeatures->Max_Write_DataBlock_Length) 
-    	&& (pMCI_Device->pMCI_DeviceFeatures->Write_Partial == 0x00) )
-   		return (AT91C_WRITE_ERROR_NO_PARTIAL|AT91C_WRITE_ERROR);
+    if( (sizeToWrite < ptr_sdcard->ptr_sdcard_info->Max_Write_DataBlock_Length) 
+    	&& (ptr_sdcard->ptr_sdcard_info->Write_Partial == 0x00) )
+   		return (SD_WRITE_FOUND_ERROR);
    		
-   	if( sizeToWrite > pMCI_Device->pMCI_DeviceFeatures->Max_Write_DataBlock_Length )
-   		return (AT91C_WRITE_ERROR_MORE_THAN_BLOCK|AT91C_WRITE_ERROR);
+   	if( sizeToWrite > ptr_sdcard->ptr_sdcard_info->Max_Write_DataBlock_Length )
+   		return (SD_WRITE_FOUND_ERROR);
     ////////////////////////////////////////////////////////////////////////////////////////////
   
     // Init Mode Register
-	AT91C_BASE_MCI->MCI_MR |= ((pMCI_Device->pMCI_DeviceFeatures->Max_Write_DataBlock_Length << 16) | AT91C_MCI_PDCMODE | AT91C_MCI_PDCPADV);
+	AT91C_BASE_MCI->MCI_MR |= ((ptr_sdcard->ptr_sdcard_info->Max_Write_DataBlock_Length << 16) | AT91C_MCI_PDCMODE | AT91C_MCI_PDCPADV);
 	
 	if (sizeToWrite %4)
 		sizeToWrite = (sizeToWrite /4)+1;
@@ -268,10 +241,10 @@ uint32 AT91F_MCI_WriteBlock(
     AT91C_BASE_PDC_MCI->PDC_TCR = sizeToWrite;
 
 	// Send the write single block command
-    if ( AT91F_MCI_SendCommand(pMCI_Device, AT91C_WRITE_BLOCK_CMD, dest) != AT91C_CMD_SEND_OK)
-    	return (AT91C_WRITE_ERROR | AT91C_WRITE_ERROR_COMMANDSENDFAILED ) ;
-//24 | AT91C_MCI_SPCMD_NONE	| AT91C_MCI_RSPTYP_48	| AT91C_MCI_TRCMD_START	| (AT91C_MCI_TRTYP_BLOCK 	&  ~(AT91C_MCI_TRDIR))	| AT91C_MCI_MAXLAT
-	pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_TX_SINGLE_BLOCK;
+    if ( SendCommandtoSD(ptr_sdcard, CMD24_WRITE_BLOCK, dest) != SD_CMD_SENDNO_ERROR)
+    	return (SD_WRITE_FOUND_ERROR  ) ;
+//24 | AT91C_MCI_SPCMD_NONE	| AT91C_MCI_RSPTYP_48	| AT91C_MCI_TRCMD_START	| (AT91CAT91C_MCI_TRTYP_BLOCK 	&  ~(AT91C_MCI_TRDIR))	| AT91C_MCI_MAXLAT
+	ptr_sdcard->ptr_sdcard_desc->state = STATE_SDCARD_WRITE_SINGLE_BLOCK;
 
 	// Enable AT91C_MCI_TXBUFE Interrupt
     AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDTX;
@@ -279,56 +252,56 @@ uint32 AT91F_MCI_WriteBlock(
   	// Enables TX for PDC transfert requests
     AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_TXTEN; //  here exactly is the data sent !
 
-	return AT91C_WRITE_OK;
+	return SD_WRITE_NO_ERROR;
 }
 
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_GetCSD
+//* \fn    SDcard_GetCSD_CMD9_R2
 //* \brief Asks to the specified card to send its CSD
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address , unsigned int * response)
+uint32 SDcard_GetCSD_CMD9_R2 (SDCARD_PTR ptr_sdcard, unsigned int relative_card_address , unsigned int * response)
 {
- 	if(AT91F_MCI_SendCommand(pMCI_Device,
-								  AT91C_SEND_CSD_CMD,
-								  (relative_card_address << 16)) != AT91C_CMD_SEND_OK)
-		return AT91C_CMD_SEND_ERROR;
+ 	if(SendCommandtoSD(ptr_sdcard,
+								  CMD9_SEND_CSD,
+								  (relative_card_address << 16)) != SD_CMD_SENDNO_ERROR)
+		return SD_CMD_SEND_ERROR;
 	
     response[0] = AT91C_BASE_MCI->MCI_RSPR[0];
    	response[1] = AT91C_BASE_MCI->MCI_RSPR[1];
     response[2] = AT91C_BASE_MCI->MCI_RSPR[2];
     response[3] = AT91C_BASE_MCI->MCI_RSPR[3];
-    return AT91C_CMD_SEND_OK;
+    return SD_CMD_SENDNO_ERROR;
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_SetBlocklength
+//* \fn    SDcard_SetBlockLength_CMD16_R1
 //* \brief Select a block length for all following block commands (R/W)
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length)
+uint32 SDcard_SetBlockLength_CMD16_R1(SDCARD_PTR ptr_sdcard,unsigned int length)
 {
-    return( AT91F_MCI_SendCommand(pMCI_Device, AT91C_SET_BLOCKLEN_CMD, length) );
+    return( SendCommandtoSD(ptr_sdcard, CMD16_SET_BLOCKLEN, length) );
 }
 
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_SDCard_GetOCR
+//* \fn    SDcard_GetOCR_ACMD41_R3
 //* \brief Asks to all cards to send their operations conditions
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device)
+uint32 SDcard_GetOCR_ACMD41_R3 (SDCARD_PTR ptr_sdcard)
 {
 	unsigned int	response =0x0;
 
 	// The RCA to be used for CMD55 in Idle state shall be the card's default RCA=0x0000.
-	pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address = 0x0;
+	ptr_sdcard->ptr_sdcard_info->Relative_Card_Address = 0x0;
  	
- 	while( (response & AT91C_CARD_POWER_UP_BUSY) != AT91C_CARD_POWER_UP_BUSY )
+ 	while( (response & SDCARD_POWER_UP_BUSY) != SDCARD_POWER_UP_BUSY )
     {
-    	response = AT91F_MCI_SDCard_SendAppCommand(pMCI_Device,
-  										AT91C_SDCARD_APP_OP_COND_CMD,
-  										AT91C_MMC_HOST_VOLTAGE_RANGE);
-		if (response != AT91C_CMD_SEND_OK)
-			return AT91C_INIT_ERROR;
+    	response = SendAppCommandtoSD(ptr_sdcard,
+  										ACMD41_SEND_APP_OP_COND,
+  										ATMEL_AT91_SDSLOT_VOLTAGE_RANGE);
+		if (response != SD_CMD_SENDNO_ERROR)
+			return SD_INIT_FOUND_ERROR;
 		
 		response = AT91C_BASE_MCI->MCI_RSPR[0];
 	}
@@ -340,88 +313,98 @@ uint32 AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device)
 //* \fn    AT91F_MCI_SDCard_GetCID
 //* \brief Asks to the SDCard on the chosen slot to send its CID
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response)
+uint32 AT91F_MCI_SDCard_GetCID (SDCARD_PTR ptr_sdcard, unsigned int *response)
 {
- 	if(AT91F_MCI_SendCommand(pMCI_Device,
-							AT91C_ALL_SEND_CID_CMD,
-							AT91C_NO_ARGUMENT) != AT91C_CMD_SEND_OK)
-		return AT91C_CMD_SEND_ERROR;
+ 	if(SendCommandtoSD(ptr_sdcard,
+							CMD2_ALL_SEND_CID,
+							NO_ARGUMENT_REQUIRED) != SD_CMD_SENDNO_ERROR)
+		return SD_CMD_SEND_ERROR;
 	
     response[0] = AT91C_BASE_MCI->MCI_RSPR[0];
    	response[1] = AT91C_BASE_MCI->MCI_RSPR[1];
     response[2] = AT91C_BASE_MCI->MCI_RSPR[2];
     response[3] = AT91C_BASE_MCI->MCI_RSPR[3];
     
-    return AT91C_CMD_SEND_OK;
+    return SD_CMD_SENDNO_ERROR;
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_SDCard_SetBusWidth
+//* \fn    SDcard_SetBusWidth_CMD7_R1b
 //* \brief  Set bus width for SDCard
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device)
+uint32 SDcard_SetBusWidth_CMD7_R1b(SDCARD_PTR ptr_sdcard)
 {
 	volatile int	ret_value;
 	char			bus_width;
 
 	do
 	{
-		ret_value =AT91F_MCI_GetStatus(pMCI_Device,pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address);
+		ret_value =SDcard_GetStatus_CMD13_R2(ptr_sdcard,ptr_sdcard->ptr_sdcard_info->Relative_Card_Address);
 	}
-	while((ret_value > 0) && ((ret_value & AT91C_SR_READY_FOR_DATA) == 0));
+	while((ret_value > 0) && ((ret_value & SDCARD_STATE_SR_READY_FOR_DATA) == 0));
 
 	// Select Card
-    AT91F_MCI_SendCommand(pMCI_Device,
-    						AT91C_SEL_DESEL_CARD_CMD,
-    						(pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address)<<16);
+    SendCommandtoSD(ptr_sdcard,
+    						CMD7_SEL_DESEL_CARD,
+    						(ptr_sdcard->ptr_sdcard_info->Relative_Card_Address)<<16);
+
+/* The extended DAT lines (DAT1-DAT3) are input on power up. They start to operate as DAT lines after the
+SET_BUS_WIDTH command. It is the responsibility of the host designer to connect external pullup resistors to
+all data lines even if only DAT0 is to be used. Otherwise, non-expected high current consumption may occur due
+to the floating inputs of DAT1 & DAT2 (in case they are not used). 
+
+The extended DAT lines (DAT1-DAT3) are input on power up. They start to operate as DAT lines after the
+SET_BUS_WIDTH command. It is the responsibility of the host designer to connect external pullup resistors to
+all data lines even if only DAT0 is to be used. Otherwise, non-expected high current consumption may occur due
+to the floating inputs of DAT1 & DAT2 (in case they are not used).*/
 
 	// Set bus width for Sdcard
-	if(pMCI_Device->pMCI_DeviceDesc->SDCard_bus_width == AT91C_MCI_SCDBUS)
-		 	bus_width = AT91C_BUS_WIDTH_4BITS;
-	else	bus_width = AT91C_BUS_WIDTH_1BIT;
+	if(ptr_sdcard->ptr_sdcard_desc->SDCard_bus_width == AT91C_MCI_SCDBUS) // if buswidth == 4 bits
+		 	bus_width = ACMD6_BUS_WIDTH_4BIT;
+	else	bus_width = ACMD6_BUS_WIDTH_1BIT;
 
-	if (AT91F_MCI_SDCard_SendAppCommand(pMCI_Device,AT91C_SDCARD_SET_BUS_WIDTH_CMD,bus_width) != AT91C_CMD_SEND_OK)
-		return AT91C_CMD_SEND_ERROR;
+	if (SendAppCommandtoSD(ptr_sdcard,ACMD6_SET_BUS_WIDTH,bus_width) != SD_CMD_SENDNO_ERROR)
+		return SD_CMD_SEND_ERROR;
 
-	return AT91C_CMD_SEND_OK;
+	return SD_CMD_SENDNO_ERROR;
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_SDCard_Init
+//* \fn    SDDevice_Init_and_Cfg_Registers
 //* \brief Return the SDCard initialisation status
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device)
+uint32 SDDevice_Init_and_Cfg_Registers (SDCARD_PTR ptr_sdcard)
 {
     unsigned int	tab_response[4];
 	unsigned int	mult,blocknr;
 
-	AT91F_MCI_SendCommand(pMCI_Device, AT91C_GO_IDLE_STATE_CMD, AT91C_NO_ARGUMENT);
+	SendCommandtoSD(ptr_sdcard, CMD0_GO_IDLE_STATE, NO_ARGUMENT_REQUIRED);
 
-    if(AT91F_MCI_SDCard_GetOCR(pMCI_Device) == AT91C_INIT_ERROR)
-    	return AT91C_INIT_ERROR;
+    if(SDcard_GetOCR_ACMD41_R3(ptr_sdcard) == SD_INIT_FOUND_ERROR)
+    	return SD_INIT_FOUND_ERROR;
 /* Register OCR , 32 bit Register, Operation Condition Register. */
-	if (AT91F_MCI_SDCard_GetCID(pMCI_Device,tab_response) == AT91C_CMD_SEND_OK) 
+	if (AT91F_MCI_SDCard_GetCID(ptr_sdcard,tab_response) == SD_CMD_SENDNO_ERROR) 
 /* Register CID width 128 .. Card identification number: individual card number for identification. */
 
 	{
-	    pMCI_Device->pMCI_DeviceFeatures->Card_Inserted = AT91C_SD_CARD_INSERTED;
+	    ptr_sdcard->ptr_sdcard_info->Card_Inserted = STATE_SDCARD_INSERTED;
 
-	    if (AT91F_MCI_SendCommand(pMCI_Device, AT91C_SET_RELATIVE_ADDR_CMD, 0) == AT91C_CMD_SEND_OK)
+	    if (SendCommandtoSD(ptr_sdcard, CMD3_SET_RELATIVE_ADDR, 0) == SD_CMD_SENDNO_ERROR)
 		{
 /* Register RCA width 16 .. Relative card address: local system address of a card, dynamically
 suggested by the card and approved by the host during initialization.  */
-			pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address = (AT91C_BASE_MCI->MCI_RSPR[0] >> 16);
-			if (AT91F_MCI_GetCSD(pMCI_Device,pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address,tab_response) == AT91C_CMD_SEND_OK)
+			ptr_sdcard->ptr_sdcard_info->Relative_Card_Address = (AT91C_BASE_MCI->MCI_RSPR[0] >> 16);
+			if (SDcard_GetCSD_CMD9_R2(ptr_sdcard,ptr_sdcard->ptr_sdcard_info->Relative_Card_Address,tab_response) == SD_CMD_SENDNO_ERROR)
 			{
 /* Register CSD width 128 .. Card specific data: information about the card operation condition  */
-		  		pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length = 1 << ((tab_response[1] >> AT91C_CSD_RD_B_LEN_S) & AT91C_CSD_RD_B_LEN_M );
-	 			pMCI_Device->pMCI_DeviceFeatures->Max_Write_DataBlock_Length =	1 << ((tab_response[3] >> AT91C_CSD_WBLEN_S) & AT91C_CSD_WBLEN_M );
-				pMCI_Device->pMCI_DeviceFeatures->Sector_Size = 1 + ((tab_response[2] >> AT91C_CSD_v21_SECT_SIZE_S) & AT91C_CSD_v21_SECT_SIZE_M );
-		  		pMCI_Device->pMCI_DeviceFeatures->Read_Partial = (tab_response[1] >> AT91C_CSD_RD_B_PAR_S) & AT91C_CSD_RD_B_PAR_M;
-				pMCI_Device->pMCI_DeviceFeatures->Write_Partial = (tab_response[3] >> AT91C_CSD_WBLOCK_P_S) & AT91C_CSD_WBLOCK_P_M;
-				pMCI_Device->pMCI_DeviceFeatures->Erase_Block_Enable = (tab_response[3] >> AT91C_CSD_v21_ER_BLEN_EN_S) & AT91C_CSD_v21_ER_BLEN_EN_M;
-				pMCI_Device->pMCI_DeviceFeatures->Read_Block_Misalignment = (tab_response[1] >> AT91C_CSD_RD_B_MIS_S) & AT91C_CSD_RD_B_MIS_M;
-				pMCI_Device->pMCI_DeviceFeatures->Write_Block_Misalignment = (tab_response[1] >> AT91C_CSD_WR_B_MIS_S) & AT91C_CSD_WR_B_MIS_M;
+		  		ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length = 1 << ((tab_response[1] >> R2_CSD_MAXREADBLKLEN_S) & R2_CSD_MAXREADBLKLEN_M );
+	 			ptr_sdcard->ptr_sdcard_info->Max_Write_DataBlock_Length =	1 << ((tab_response[3] >> R2_CSD_MAXWRITEBLKLEN_S) & R2_CSD_MAXWRITEBLKLEN_M );
+				ptr_sdcard->ptr_sdcard_info->Sector_Size = 1 + ((tab_response[2] >> R2_CSD_v21_SECTSIZE_S) & R2_CSD_v21_SECTSIZE_M );
+		  		ptr_sdcard->ptr_sdcard_info->Read_Partial = (tab_response[1] >> R2_CSD_READPARBLK_S) & R2_CSD_READPARBLK_M;
+				ptr_sdcard->ptr_sdcard_info->Write_Partial = (tab_response[3] >> R2_CSD_WRITEPARBLK_S) & R2_CSD_WRITEPARBLK_M;
+				ptr_sdcard->ptr_sdcard_info->Erase_Block_Enable = (tab_response[3] >> R2_CSD_v21_ERASEBLKEN_S) & R2_CSD_v21_ERASEBLKEN_M;
+				ptr_sdcard->ptr_sdcard_info->Read_Block_Misalignment = (tab_response[1] >> R2_CSD_READBLKMIS_S) & R2_CSD_READBLKMIS_M;
+				ptr_sdcard->ptr_sdcard_info->Write_Block_Misalignment = (tab_response[1] >> R2_CSD_WRITEBLKMIS_S) & R2_CSD_WRITEBLKMIS_M;
 
 				//// Compute Memory Capacity
 					// compute MULT          
@@ -436,35 +419,35 @@ BLOCK_LEN = 2^READ_BL_LEN        -- (READ_BL_LEN < 12)
 Therefore, the maximum capacity that can be coded is 4096*512*2048=4 GB. For
 example, a 4-MB card with BLOCK_LEN = 512 can be coded with C_SIZE_MULT =
 0 and C_SIZE = 2047.*/
-					mult = 1 << ( ((tab_response[2] >> AT91C_CSD_C_SIZE_M_S) & AT91C_CSD_C_SIZE_M_M) + 2 );   //2^(C_SIZE_MULT+2)
+					mult = 1 << ( ((tab_response[2] >> R2_CSD_CSIZE_MULT_S) & R2_CSD_CSIZE_MULT_M) + 2 );   //2^(C_SIZE_MULT+2)
 					// compute MSB of C_SIZE
-					blocknr = ((tab_response[1] >> AT91C_CSD_CSIZE_H_S) & AT91C_CSD_CSIZE_H_M) << 2; 
+					blocknr = ((tab_response[1] >> R2_CSD_CSIZE_H_S) & R2_CSD_CSIZE_H_M) << 2; 
 					// compute MULT * (LSB of C-SIZE + MSB already computed + 1) = BLOCKNR
-					blocknr = mult * ( ( blocknr + ( (tab_response[2] >> AT91C_CSD_CSIZE_L_S) & AT91C_CSD_CSIZE_L_M) ) + 1 ); 
+					blocknr = mult * ( ( blocknr + ( (tab_response[2] >> R2_CSD_CSIZE_L_S) & R2_CSD_CSIZE_L_M) ) + 1 ); 
 																				// 2^(C_SIZE_MULT+2)*(C_SIZE+1)
 
-					pMCI_Device->pMCI_DeviceFeatures->Memory_Capacity =  pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length * blocknr;
+					ptr_sdcard->ptr_sdcard_info->Memory_Capacity =  ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length * blocknr;
 			  	//// End of Compute Memory Capacity
 
-		  		if( AT91F_MCI_SDCard_SetBusWidth(pMCI_Device) == AT91C_CMD_SEND_OK )
+		  		if( SDcard_SetBusWidth_CMD7_R1b(ptr_sdcard) == SD_CMD_SENDNO_ERROR )
 				{	
-					 if (AT91F_MCI_SetBlocklength(pMCI_Device,pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length) == AT91C_CMD_SEND_OK)
-					return AT91C_INIT_OK;
+					 if (SDcard_SetBlockLength_CMD16_R1(ptr_sdcard,ptr_sdcard->ptr_sdcard_info->Max_Read_DataBlock_Length) == SD_CMD_SENDNO_ERROR)
+					return SD_INIT_NO_ERROR;
 				}
 			}
 		}
 	}
-    return AT91C_INIT_ERROR;
+    return SD_INIT_FOUND_ERROR;
 }
 
 
 //porting starts
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_DeviceWaitReady
+//* \fn    SDcard_Poll_AT91CMCINOTBUSY_flag
 //* \brief Wait for MCI Device ready
 //*----------------------------------------------------------------------------
-void AT91F_MCI_DeviceWaitReady(unsigned int timeout)
+void SDcard_Poll_AT91CMCINOTBUSY_flag(unsigned int timeout)
 {
 	volatile unsigned int status;
 	
@@ -508,7 +491,7 @@ MCDA2	(AT91C_PB4_MCDA2 )	PIOB Periph: B Bit: 4	Multimedia Card A Data 2     */
 						 AT91C_ID_MCI,
 						 AT91C_AIC_PRIOR_HIGHEST,
 						 AT91C_AIC_SRCTYPE_INT_LEVEL_SENSITIVE,
-						 AT91F_ASM_MCI_Handler);
+						 Interrupt_Handler_MCI_Lowlevel);
 
 	// Enable MCI interrupt
 	AT91F_AIC_EnableIt(AT91C_BASE_AIC,AT91C_ID_MCI);

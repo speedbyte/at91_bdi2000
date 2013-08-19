@@ -1,19 +1,17 @@
 #ifndef main_h
 #define main_h
 
-extern void AT91F_MCI_Handler(void);  // to isr.S
-extern int main(void);     // to cstartup.S
-extern char AT91F_DBGU_getc(void);
-extern int readytowriteonSD;
-extern char usartBuffer1[512];
-extern char usartBuffer2[512];
-extern char *Bufferwechsler;
-extern char *printBuffer;
-extern char mciBuffer1[512];
-extern char mciBuffer2[512];
-extern int globalj, RCR_recirculated;
-extern int reader, writer;
-#define ACTIVE 1
+extern void 	Interrupt_Handler_MCI_Highlevel(void) ; // to isr.S
+extern int 	main(void);     // to cstartup.S
+extern int 	readytowriteonSD;
+extern char 	usartBuffer1[1024];
+extern char 	*Bufferwechsler;
+extern char 	*printBuffer;
+extern char 	SDBuffer1[512];
+extern char 	SDBuffer2[512];
+extern int 	globalj, RCR_recirculated;
+extern int 	reader, writer;
+
 // REal time clock : 
 union _calendar {
 unsigned int cal_data;
@@ -48,13 +46,6 @@ unsigned int        : 8;
 
 typedef union _time TIME;
 
-/*typedef struct _led{
-char green : 1;
-char yellow: 1;
-char red   : 1;
-char pad   : 5;
-} LED; */
-
 extern CALENDAR rtc_cal;
 extern TIME     rtc_time;
 
@@ -62,28 +53,22 @@ extern TIME     rtc_time;
 #define WRITE_IN_NEXT_CYCLE 1
 #define WRITE_NOW 2
 
-
-
-/*enum {
-NOT_ACTIVE,
-WRITE_IN_NEXT_CYCLE,
-WRITE_NOW
-};*/
-
+#define ACTIVE 1
+#define NOT_ACTIVE 0
 /*-----------------------------------------------*/
 /* SDCard Device Descriptor Structure Definition */
 /*-----------------------------------------------*/
-typedef struct	_AT91S_MciDeviceDesc
+typedef struct	_SDCARD_DESC
 {
     volatile unsigned char	state;
 	unsigned char			SDCard_bus_width;
 
-} AT91S_MciDeviceDesc, *AT91PS_MciDeviceDesc;
+} SDCARD_DESC, *SDCARD_DESC_PTR;
 
 /*---------------------------------------------*/
 /* MMC & SDCard Structure Device Features	   */
 /*---------------------------------------------*/
-typedef struct	_AT91S_MciDeviceFeatures
+typedef struct	_SDCARD_INFO
 {
     unsigned char	Card_Inserted;				// (0=AT91C_CARD_REMOVED) (1=AT91C_MMC_CARD_INSERTED) (2=AT91C_SD_CARD_INSERTED)
     unsigned int 	Relative_Card_Address;		// RCA
@@ -97,16 +82,16 @@ typedef struct	_AT91S_MciDeviceFeatures
 	unsigned char	Sector_Size;				// SECTOR_SIZE
 	unsigned int	Memory_Capacity;			// Size in bits of the device
 	
-}	AT91S_MciDeviceFeatures, *AT91PS_MciDeviceFeatures ;
+}	SDCARD_INFO, *SDCARD_INFO_PTR ;
 
 /*---------------------------------------------*/
 /* MCI Device Structure Definition 			   */
 /*---------------------------------------------*/
-typedef struct _AT91S_MciDevice
+typedef struct _SDCARD
 {
-	AT91PS_MciDeviceDesc		 	pMCI_DeviceDesc;	// MCI device descriptor
-	AT91PS_MciDeviceFeatures		pMCI_DeviceFeatures;// Pointer on a MCI device features array  
-}AT91S_MciDevice, *AT91PS_MciDevice;
+	SDCARD_DESC_PTR		 	ptr_sdcard_desc;	// MCI device descriptor
+	SDCARD_INFO_PTR			ptr_sdcard_info;// Pointer on a MCI device features array  
+}SDCARD, *SDCARD_PTR;
 
 /*-----------------------------------------------
 -------------------------------------------------*/

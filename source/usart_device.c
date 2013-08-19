@@ -5,33 +5,26 @@
 #include "mci_type.h"
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
-#include "isr.h" 			// usart_asm_irq_handler()
-#include "init.h" 				// AT91F_DBGU_Printk
+#include "isr.h" 			// Interrupt_Handler_USART_Lowlevel()
+#include "init.h" 				// Send_Stream_from_RS232_to_Terminal
 #include "usart_device.h"       // selber inc
 #include "main.h"         // readytowriteonSD
 #include "st_device.h"      // AT91F_GetTickCount
 
 #ifndef usart_device_c
-extern void Usart_c_irq_handler(AT91PS_USART USART_pt);      // to isr_usart.s
-extern void AT91F_US_Print_2_frame(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2);
+extern void Interrupt_Handler_USART_Highlevel(AT91PS_USART USART_pt);      // to isr_usart.s
+extern void Configure_USART_RX_PDC(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2);
 extern void Usart_init ( void );
-extern void AT91F_US_PutFrame(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2); 
+extern void Configure_USART_TX_PDC(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2); 
 #endif
 
-char message[80];
-
-
-//*------------------------- Internal Function --------------------------------
-//*------------------------- Interrupt Function -------------------------------
 
 //*----------------------------------------------------------------------------
-//* Function Name       : Usart_c_irq_handler
+//* Function Name       : Interrupt_Handler_USART_Highlevel
 //* Object              : C handler interrupt function called by the interrupts 
 //*                       assembling routine
-//* Input Parameters    : <RTC_pt> time rtc descriptor
-//* Output Parameters   : increment count_timer0_interrupt
 //*----------------------------------------------------------------------------
-void Usart_c_irq_handler(AT91PS_USART USART_pt)
+void Interrupt_Handler_USART_Highlevel(AT91PS_USART USART_pt)
 {
 	unsigned int status;
 	//* get Usart status register
@@ -47,7 +40,7 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 	if (( status & AT91C_US_ENDRX) & (USART_pt->US_IMR & AT91C_US_ENDRX)){ //* Acknowledge Interrupt by reading the status register.
    				//* Acknowledge Interrupt
 			AT91F_US_DisableIt(USART_pt, AT91C_US_ENDRX );  // Disable it to avoid regeneration.
-			AT91F_US_PutFrame(USART_pt,(char *)(usartBuffer1),(1024),0,0); 
+			Configure_USART_RX_PDC(USART_pt,(char *)(usartBuffer1),(1024),0,0); 
 			AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX);			
     		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'R');
 			RCR_recirculated = 1;
@@ -78,16 +71,12 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 
 	}
 
-	//* Reset the satus bit
-	 USART_pt->US_CR = AT91C_US_RSTSTA;  //Resets the status bits PARE, FRAME, OVRE and RXBRK in the US_CSR.
+	//* Reset the status bit
+	USART_pt->US_CR = AT91C_US_RSTSTA;  //Resets the status bits PARE, FRAME, OVRE and RXBRK in the US_CSR.
 }
-//*-------------------------- External Function -------------------------------
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_US_Print_2_frame
-//* \brief This function is used to send a Frame through the US1 channel 
-//* (Very low level debugging)
-//*----------------------------------------------------------------------------
-void AT91F_US_Print_2_frame(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2) // \arg pointer to a string ending by \0
+
+
+void Configure_USART_TX_PDC(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2) // \arg pointer to a string ending by \0
 {
     //* Enable USART IT error and AT91C_US_ENDTX
  	AT91F_US_SendFrame(USART_pt,buffer,counter,buffer2,counter2);
@@ -95,13 +84,15 @@ void AT91F_US_Print_2_frame(AT91PS_USART USART_pt, char *buffer, unsigned short 
  	AT91F_US_EnableIt(USART_pt, AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE  | AT91C_US_ENDTX );
 }
 
-void AT91F_US_PutFrame(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2) 
+void Configure_USART_RX_PDC(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2) 
 {
     //* Enable USART IT error and AT91C_US_ENDRX
  	AT91F_US_ReceiveFrame(USART_pt,buffer,counter,buffer2,counter2);
  	//* enable IT
  	AT91F_US_EnableIt(USART_pt, AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE   );
 }
+
+
 
 //*----------------------------------------------------------------------------
 //* Function Name       : Usart_init
@@ -140,7 +131,7 @@ void Usart_init ( void )
 	// Enable transmit and recieve ( this has nothing to do with PDC which is PDC_RXTEN ..
     AT91F_US_EnableRx(USART_pt);
 	AT91F_US_EnableTx(USART_pt);	//* open Usart 1 interrupt
-	AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_US1, USART_INTERRUPT_LEVEL,AT91C_AIC_SRCTYPE_INT_LEVEL_SENSITIVE, usart_asm_irq_handler); 
+	AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_US1, USART_INTERRUPT_LEVEL,AT91C_AIC_SRCTYPE_INT_LEVEL_SENSITIVE, Interrupt_Handler_USART_Lowlevel); 
 	AT91F_AIC_EnableIt (AT91C_BASE_AIC, AT91C_ID_US1); 
 
     //* Enable USART IT error

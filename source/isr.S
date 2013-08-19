@@ -132,20 +132,20 @@
 	    
 
 @------------------------------------------------------------------------------
-@- Function             : usart_asm_irq_handler
+@- Function             : Interrupt_Handler_USART_Lowlevel
 @- Treatments           : USART Controller Interrupt Handler.
-@- Called Functions     : Usart_c_irq_handler
+@- Called Functions     : Interrupt_Handler_USART_Highlevel
 @- Called Macros        : IRQ_ENTRY, IRQ_EXIT
 @------------------------------------------------------------------------------
-    .global usart_asm_irq_handler
-usart_asm_irq_handler:
-            .extern      Usart_c_irq_handler
+    .global Interrupt_Handler_USART_Lowlevel
+Interrupt_Handler_USART_Lowlevel:
+            .extern      Interrupt_Handler_USART_Highlevel
 
 @- Manage Exception Entry
         IRQ_ENTRY
 @- Call the PIO Interrupt C handler
             ldr         r0, =AT91C_BASE_US1
-            ldr         r1, =Usart_c_irq_handler
+            ldr         r1, =Interrupt_Handler_USART_Highlevel
             mov         r14, pc
             bx          r1
 @- Irq exit
@@ -153,12 +153,12 @@ exit_irq:
 @- Manage Exception Exit
         IRQ_EXIT
 
-@    .type   usart_asm_irq_handler,$function
-@    .size   usart_asm_irq_handler,.-usart_asm_irq_handler
+@    .type   Interrupt_Handler_USART_Lowlevel,$function
+@    .size   Interrupt_Handler_USART_Lowlevel,.-Interrupt_Handler_USART_Lowlevel
 
 @------------------------------------------------------------------------------
 @------------------------------------------------------------------------------
-@ AT91F_ASM_MCI_Handler
+@ Interrupt_Handler_MCI_Lowlevel
 @ ---------------------
 @       Handler called by the AIC
 @       
@@ -166,13 +166,13 @@ exit_irq:
 @       Call C handler
 @ 	Restore context
 @------------------------------------------------------------------------------
-	.global AT91F_ASM_MCI_Handler
-	.extern AT91F_MCI_Handler
+	.global Interrupt_Handler_MCI_Lowlevel
+	.extern Interrupt_Handler_MCI_Highlevel
 	
-AT91F_ASM_MCI_Handler:
+Interrupt_Handler_MCI_Lowlevel:
 	IRQ_ENTRY
 
-	ldr     r1, =AT91F_MCI_Handler
+	ldr     r1, =Interrupt_Handler_MCI_Highlevel
 	mov     r14, pc
 	bx      r1
 
@@ -180,7 +180,7 @@ AT91F_ASM_MCI_Handler:
 @------------------------------------------------------------------------------
 
 @------------------------------------------------------------------------------
-@ AT91F_ST_ASM_HANDLER
+@ Interrupt_Handler_SysTimer_Lowlevel
 @ ---------------------
 @       Handler called by the AIC
 @       
@@ -188,13 +188,13 @@ AT91F_ASM_MCI_Handler:
 @       Call C handler
 @ 	Restore context
 @------------------------------------------------------------------------------
-	.global AT91F_ST_ASM_HANDLER
-	.extern AT91F_ST_HANDLER
+	.global Interrupt_Handler_SysTimer_Lowlevel
+	.extern Interrupt_Handler_SysTimer_Highlevel
 
-AT91F_ST_ASM_HANDLER:
+Interrupt_Handler_SysTimer_Lowlevel:
 	IRQ_ENTRY
 
-	ldr     r1, =AT91F_ST_HANDLER
+	ldr     r1, =Interrupt_Handler_SysTimer_Highlevel
 	mov     r14, pc
 	bx      r1
 

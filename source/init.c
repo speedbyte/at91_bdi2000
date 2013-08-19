@@ -21,7 +21,7 @@
 #include "mci_device.h"
 
 #ifndef init_c
-extern void AT91F_DBGU_Printk(char *buffer);
+extern void DBGU_Printk(char *buffer);
 void AT91F_SpuriousHandler() 
 void AT91F_DataAbort() 
 void AT91F_FetchAbort()
@@ -35,10 +35,10 @@ void AT91F_LowLevelInit()
 #define BAUDRATE		115200
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_DBGU_Printk
+//* \fn    DBGU_Printk
 //* \brief This function is used to send a string through the DBGU channel (Very low level debugging)
 //*----------------------------------------------------------------------------
-void AT91F_DBGU_Printk(	char *buffer) // \arg pointer to a string ending by \0
+void DBGU_Printk(char *buffer) // \arg pointer to a string ending by \0
 {
 	while(*buffer != '\0') {
 		while (!AT91F_US_TxReady((AT91PS_USART)AT91C_BASE_DBGU));
@@ -46,13 +46,20 @@ void AT91F_DBGU_Printk(	char *buffer) // \arg pointer to a string ending by \0
 	}
 }
 
+void USART_Printk(char *buffer) // \arg pointer to a string ending by \0
+{
+	while(*buffer != '\0') {
+		while (!AT91F_US_TxReady((AT91PS_USART)AT91C_BASE_US1));
+		AT91F_US_PutChar((AT91PS_USART)AT91C_BASE_US1, *buffer++);
+	}
+}
 //*----------------------------------------------------------------------------
 //* \fn    AT91F_DataAbort
 //* \brief This function reports an Abort
 //*----------------------------------------------------------------------------
 void AT91F_SpuriousHandler() 
 {
-	AT91F_DBGU_Printk("\n\rSpurious Interrupt detected\n\r");
+	DBGU_Printk("\n\rSpurious Interrupt detected\n\r");
 	while (1);
 }
 
@@ -63,7 +70,7 @@ void AT91F_SpuriousHandler()
 //*----------------------------------------------------------------------------
 void AT91F_DataAbort() 
 {
-	AT91F_DBGU_Printk("\n\rData Abort detected\n\r");
+	DBGU_Printk("\n\rData Abort detected\n\r");
 	while (1);
 }
 
@@ -73,7 +80,7 @@ void AT91F_DataAbort()
 //*----------------------------------------------------------------------------
 void AT91F_FetchAbort()
 {
-	AT91F_DBGU_Printk("\n\rPrefetch Abort detected\n\r");
+	DBGU_Printk("\n\rPrefetch Abort detected\n\r");
 	while (1);
 }
 
@@ -83,7 +90,7 @@ void AT91F_FetchAbort()
 //*----------------------------------------------------------------------------
 void AT91F_Undef() 
 {
-	AT91F_DBGU_Printk("\n\rUndef detected\n\r");
+	DBGU_Printk("\n\rUndef detected\n\r");
 	while (1);
 }
 
@@ -93,7 +100,7 @@ void AT91F_Undef()
 //*----------------------------------------------------------------------------
 void AT91F_UndefHandler() 
 {
-	AT91F_DBGU_Printk("\n\rUndef detected\n\r");
+	DBGU_Printk("\n\rUndef detected\n\r");
 	while (1);
 }
 
@@ -112,7 +119,30 @@ void AT91F_LowLevelInit()
 		AT91F_UndefHandler,      // AIC default handler
 		AT91F_SpuriousHandler,   // AIC spurious handler
 		0);                      // Protect mode
+/*#define AT91C_AIC_BRANCH_OPCODE ((void (*) ()) 0xE51FFF20) // ldr, pc, [pc, #-&F20]
 
+//*----------------------------------------------------------------------------
+//* \fn    AT91F_AIC_SetExceptionVector
+//* \brief Configure vector handler
+//*----------------------------------------------------------------------------
+__inline static unsigned int  AT91F_AIC_SetExceptionVector (
+	unsigned int *pVector, // \arg pointer to the AIC registers
+	void (*Handler) () )   // \arg Interrupt Handler
+{
+	unsigned int oldVector = *pVector;
+
+	if ((unsigned int) Handler == (unsigned int) AT91C_AIC_BRANCH_OPCODE)
+		*pVector = (unsigned int) AT91C_AIC_BRANCH_OPCODE;
+	else
+		*pVector = (((((unsigned int) Handler) - ((unsigned int) pVector) - 0x8) >> 2) & 0x00FFFFFF) | 0xEA000000;
+
+	return oldVector;
+}
+	// Set the IRQ exception vector
+	AT91F_AIC_SetExceptionVector((unsigned int *) 0x18, IrqHandler);
+	// Set the Fast Interrupt exception vector
+	AT91F_AIC_SetExceptionVector((unsigned int *) 0x1C, FiqHandler);
+*/
 	// Perform 8 End Of Interrupt Command to make sýre AIC will not Lock out nIRQ 
 	AT91F_AIC_AcknowledgeIt(AT91C_BASE_AIC);
 	AT91F_AIC_AcknowledgeIt(AT91C_BASE_AIC);
@@ -143,7 +173,7 @@ void AT91F_LowLevelInit()
 	// Enable Receiver
 	AT91F_US_EnableRx((AT91PS_USART) AT91C_BASE_DBGU);
 	
-	AT91F_DBGU_Printk("\n\r\nAT91F_LowLevelInit() done\n\r");
+	DBGU_Printk("\n\r\nAT91F_LowLevelInit() done\n\r");
 	
 }
 

@@ -22,25 +22,18 @@ REv 1.2 : Integrated USART function calls
 */
 
 #include <stdio.h>
-#include <string.h>
+#include <unistd.h>
 #include "mci_type.h"
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
 #include "main.h"
-#include "mci_device.h"    // AT91F_MCI_SDCard_Init() , Mci_init() , AT91F_MCI_DeviceWaitReady(), AT91F_MCI_ReadBlock(), AT91F_MCI_WriteBlock()
-#include "init.h"          // AT91F_DBGU_Printk()
+#include "mci_device.h"    // SDDevice_Init_and_Cfg_Registers() , Mci_init() , SDcard_Poll_AT91CMCINOTBUSY_flag(), SDcard_ReadBlock_CMD17_R1(), SDcard_WriteBlock_CMD24_R1()
+#include "init.h"          // DBGU_Printk()
 #include "usart_device.h"  // AT91F_US_Print_frame(), Usart_init(), AT91F_US_Printk(), AT91F_US_Print_2_frame()
 #include "st_device.h"
 #include "led_device.h"
-#ifndef main_c
+#include "errm.h"
 
-//* Functions
-void Led_glow();
-extern char AT91F_DBGU_getc(void);
-int AT91F_InitDeviceStructure(void);
-extern void AT91F_MCI_Handler(void);  // to isr.S
-extern int main(void);     // to cstartup.S
-#endif
 
 //* Global Variables
 CALENDAR 				rtc_cal;
@@ -48,22 +41,27 @@ TIME     				rtc_time;
 int 					reader, writer;
 AT91PS_USART 			USART_pt = AT91C_BASE_US1;
 AT91PS_MCI 				MCI_pt = AT91C_BASE_MCI;
-static int 			MciBeginBlock = 100;
-AT91S_MciDeviceFeatures		MCI_Device_Features;
-AT91S_MciDeviceDesc			MCI_Device_Desc;
-AT91S_MciDevice				MCI_Device;
-char					usartBuffer1[BUFFER_SIZE_MCI_DEVICE];
-char					usartBuffer2[BUFFER_SIZE_MCI_DEVICE];
+int			 			SDBeginBlock;
+SDCARD_INFO				mci_sdcard_info;
+SDCARD_DESC				mci_sdcard_desc;
+SDCARD					mci_sdcard;
+char					usartBuffer1[1024];
 int 					readytowriteonSD;
 char 					*Bufferwechsler;
 char					*printBuffer;
 int 					errorstatus;
 int 					globalj;
 int 					globali;
-char 					mciBuffer1[512];
-char 					mciBuffer2[512];
+char 					SDBuffer1[512];
+char 					SDBuffer2[512];
 int						RCR_recirculated; 
 // Local Functions
+void Print_LineonSD(char *buffer)
+{
+	while(*buffer != '\0') 
+		Bufferwechsler[globalj++] = *buffer++;
+}
+
 void Rtc_init(void)
 {
 	AT91C_BASE_RTC->RTC_CR = (AT91C_RTC_UPDTIM | AT91C_RTC_UPDCAL);         // step RTC
@@ -82,7 +80,8 @@ void Rtc_init(void)
 	AT91C_BASE_RTC->RTC_CALR = (uint32)rtc_cal.cal_data;
 	AT91C_BASE_RTC->RTC_CR 		= 0; 			// start timer.		
 }
-	
+
+
 inline void __ascii1(unsigned char value)
 {
 	Bufferwechsler[globalj++] = ((value & 0xF0) >> 4 ) + 48 ; 
@@ -119,8 +118,8 @@ void PutTimeStamp()
 	__format(':');
 	__ascii2(rtc_time.time_bits.second);
 	__format( '.');
-	//__dec_to_ascii2((char)(AT91F_GetTickCount()) );
-	Bufferwechsler[globalj++] = (char)(AT91F_GetTickCount()) + 48 ; 
+	//__dec_to_ascii2((char)(GetTickCount_fromST()) );
+	Bufferwechsler[globalj++] = (char)(GetTickCount_fromST()) + 48 ; 
 	AT91C_BASE_PDC_MCI->PDC_RCR--;	
 	Bufferwechsler[globalj++] = '-';
 	AT91C_BASE_PDC_MCI->PDC_RCR--;
@@ -139,27 +138,40 @@ void PutCalStamp()
 
 void PutCalTimeHeader(void)
 {
-	int i;
+	Print_LineonSD("|-------------------");
 	PutCalStamp();
-	for(i=0;i<10;i++) Bufferwechsler[globalj++] = '-';
+	Print_LineonSD("-------------------|");
+	Print_LineonSD("|-------------------");
 	PutTimeStamp();
-	for(i=0;i<10;i++) Bufferwechsler[globalj++] = '-';
+	Print_LineonSD("-------------------|");	
 	Bufferwechsler[globalj++] = '\r';
 	Bufferwechsler[globalj++] = '\n';
 	Bufferwechsler[510] = '\r';
 	Bufferwechsler[511] = '\n';
 }
+
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_DBGU_getc
-//* \brief This function is used to receive a character to the DBGU channel
+//* \fn    DBGU_GetChar
+//* \brief This function is used to receive a character to the "DEVICE"
 //*----------------------------------------------------------------------------
-char AT91F_DBGU_getc(void)
+char DBGU_GetChar(void)
 {
-	
-	AT91F_DBGU_Printk("\n\rbefore while");
+	DBGU_Printk("\n\rbefore while");
 	while (!AT91F_US_RxReady((AT91PS_USART)AT91C_BASE_DBGU));  // RXRDY goes high
-	AT91F_DBGU_Printk("\n\rafter while");
-	return AT91F_US_GetChar((AT91PS_USART) AT91C_BASE_DBGU);  // RXRDY goes low ( by reading the status->RHR reg )
+	DBGU_Printk("\n\rafter while");
+	return AT91F_US_GetChar((AT91PS_USART)AT91C_BASE_DBGU);  // RXRDY goes low ( by reading the status->RHR reg )
+}
+
+//*----------------------------------------------------------------------------
+//* \fn    Get_Char_from_Terminal_to_RS232
+//* \brief This function is used to receive a character to the "DEVICE"
+//*----------------------------------------------------------------------------
+char USART_GetChar(void)
+{
+	DBGU_Printk("\n\rbefore while");
+	while (!AT91F_US_RxReady((AT91PS_USART)AT91C_BASE_US1));  // RXRDY goes high
+	DBGU_Printk("\n\rafter while");
+	return AT91F_US_GetChar((AT91PS_USART) AT91C_BASE_US1);  // RXRDY goes low ( by reading the status->RHR reg )
 }
 
 
@@ -167,38 +179,38 @@ char AT91F_DBGU_getc(void)
 //* \fn    AT91F_CfgDevice
 //* \brief This function is used to initialise MMC or SDCard Features
 //*----------------------------------------------------------------------------
-int AT91F_InitDeviceStructure(void)
+int Sdcard_init(void)
 {
 	int x;
-	MCI_Device_Features.Relative_Card_Address 		= 0;
-	MCI_Device_Features.Card_Inserted 				= AT91C_CARD_REMOVED;
-	MCI_Device_Features.Max_Read_DataBlock_Length	= 0;
-	MCI_Device_Features.Max_Write_DataBlock_Length 	= 0;
-	MCI_Device_Features.Read_Partial 				= 0;
-	MCI_Device_Features.Write_Partial 				= 0;
-	MCI_Device_Features.Erase_Block_Enable 			= 0;
-	MCI_Device_Features.Sector_Size 				= 0;
-	MCI_Device_Features.Memory_Capacity 			= 0;
+	mci_sdcard_info.Relative_Card_Address 		= 0;
+	mci_sdcard_info.Card_Inserted 				= STATE_SDCARD_REMOVED;
+	mci_sdcard_info.Max_Read_DataBlock_Length	= 0;
+	mci_sdcard_info.Max_Write_DataBlock_Length 	= 0;
+	mci_sdcard_info.Read_Partial 				= 0;
+	mci_sdcard_info.Write_Partial 				= 0;
+	mci_sdcard_info.Erase_Block_Enable 			= 0;
+	mci_sdcard_info.Sector_Size 				= 0;
+	mci_sdcard_info.Memory_Capacity 			= 0;
 	
-	MCI_Device_Desc.state							= AT91C_MCI_IDLE;
-	MCI_Device_Desc.SDCard_bus_width				= AT91C_MCI_SCDBUS;
+	mci_sdcard_desc.state							= STATE_SDCARD_IDLE;
+	mci_sdcard_desc.SDCard_bus_width				= AT91C_MCI_SCDBUS;
 	
 	// Init AT91S_DataFlash Global Structure, by default AT45DB choosen !!!
-	MCI_Device.pMCI_DeviceDesc 			= &MCI_Device_Desc;
-	MCI_Device.pMCI_DeviceFeatures 		= &MCI_Device_Features;
-	x = AT91F_MCI_SDCard_Init(&MCI_Device);
+	mci_sdcard.ptr_sdcard_desc 			= &mci_sdcard_desc;
+	mci_sdcard.ptr_sdcard_info 			= &mci_sdcard_info;
+	x = SDDevice_Init_and_Cfg_Registers(&mci_sdcard);
 	return(x);
 }
 	
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_Handler
+//* \fn    Interrupt_Handler_MCI_Highlevel
 //* \brief MCI Handler
 //*----------------------------------------------------------------------------
-void AT91F_MCI_Handler(void)
+void Interrupt_Handler_MCI_Highlevel(void)
 {
 	int status;
 	status = ( AT91C_BASE_MCI->MCI_SR & AT91C_BASE_MCI->MCI_IMR );
-	AT91F_MCI_Device_Handler(&MCI_Device,status);
+	Interrupt_Handler_SDcard_Highlevel(&mci_sdcard,status);
 }
 
 
@@ -209,7 +221,7 @@ void AT91F_MCI_Handler(void)
 int main()
 {
 	unsigned char	character;
-	int j;
+	int j, SDCurrentBlock,SDLastBlock, quitflag;
 	uint32 Max_Read_DataBlock_Length;
 	Mci_init();
 	Usart_init();
@@ -217,16 +229,16 @@ int main()
 	Led_init();
 	Rtc_init();
 	globalj=0;
-	if(AT91F_InitDeviceStructure() != AT91C_INIT_OK) {
-		AT91F_DBGU_Printk("\n\r	SDcARD Initialisation failed\n\r");
+	if(Sdcard_init() != SD_INIT_NO_ERROR) {
+		DBGU_Printk( "\n\r	SDcARD Initialisation failed\n\r");
 		return FALSE;}
-
+	SDBeginBlock = 100;
+	SDLastBlock = SDBeginBlock;
 	for (j=0;j<1024;j++) usartBuffer1[j] = 'A';
-	for (j=0;j<512;j++) mciBuffer1[j] = ' ';
-	for (j=0;j<512;j++) mciBuffer2[j] = ' ';
-	Max_Read_DataBlock_Length = MCI_Device.pMCI_DeviceFeatures->Max_Read_DataBlock_Length;
-	AT91F_DBGU_Printk("\n\r0) Write to SD 1 Read from SD\n\r");
-
+	for (j=0;j<512;j++) SDBuffer1[j] = ' ';
+	for (j=0;j<512;j++) SDBuffer2[j] = ' ';
+	Max_Read_DataBlock_Length = mci_sdcard.ptr_sdcard_info->Max_Read_DataBlock_Length;
+	DBGU_Printk( "\n\r0) Write to SD 1 Read from SD\n\r");
 	// MCI
 	MCI_pt->MCI_PTCR = AT91C_PDC_RXTEN;
 	MCI_pt->MCI_PTCR = AT91C_PDC_TXTEN;	
@@ -237,42 +249,58 @@ int main()
 	resetLed(GREEN | RED | YELLOW );
 	while(1)
 	{
-		MciBeginBlock = 100;
-		character = AT91F_DBGU_getc();      //also done by PDC.. this is the place where the user will also start. like a ON button
+	character = DBGU_GetChar();      //also done by PDC.. this is the place where the user will also start. like a ON button
+	AT91F_US_PutChar((AT91PS_USART)AT91C_BASE_DBGU, character);
 		switch(character)
 		{
 			case '0':
+				SDCurrentBlock = SDBeginBlock;
 				AT91F_US_EnableRx(USART_pt);  // we need the receiver 
 				USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
-				Bufferwechsler = mciBuffer1;
+				Bufferwechsler = SDBuffer1;
 				writer = ACTIVE; reader = NOT_ACTIVE;
 				AT91C_BASE_PDC_MCI->PDC_RCR = 512;
 				AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_TXBUFE | AT91C_MCI_ENDTX; 
 				AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDRX; 
 				globalj = 0; globali = 0; RCR_recirculated = 0;
+				Print_LineonSD("\r\nWelcome to the RS232 to SDCard Datalogger\r\n");
 				PutCalTimeHeader();
-				AT91F_US_PutFrame(USART_pt,(char *)(usartBuffer1),(1024),0,0); 
+				AT91C_BASE_PDC_MCI->PDC_RCR = 0;   //  Here goes the first Block.	
+
+				Configure_USART_RX_PDC(USART_pt,(char *)(usartBuffer1),(1024),0,0); 
 				AT91F_US_EnableIt(USART_pt,AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE | AT91C_US_PARE);
 				AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX ); // interrupt only after 1024 bytes.
 				while (!AT91F_US_RxReady(USART_pt));
+				character = (char)USART_pt->US_RHR;
 				USART_pt->US_PTCR = AT91C_PDC_RXTEN;
+
+
 				PutTimeStamp();
-				Bufferwechsler[globalj++] = (char)(USART_pt->US_RHR);
-				if(character == '\n')
+				Bufferwechsler[globalj++] = character;
+				AT91C_BASE_PDC_MCI->PDC_RCR--;	
+				/*if(character == '\n')
 				{
 					PutTimeStamp();
-				}
-				AT91C_BASE_PDC_MCI->PDC_RCR = 0;   //  Here goes the first Block.
+				}*/
+				
 				do 
 				{
+				if(AT91C_BASE_DBGU->DBGU_RHR == 'q') break;
 					if ( readytowriteonSD == WRITE_NOW )
 					{
-						setLed(RED);
-						errorstatus = AT91F_MCI_WriteBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (uint32 *)printBuffer,Max_Read_DataBlock_Length);		
-						if (errorstatus != AT91C_WRITE_OK)	AT91F_DBGU_Printk("\n\rWrite not OK\n\r");
+						errorstatus = SDcard_WriteBlock_CMD24_R1(&mci_sdcard,(SDCurrentBlock*Max_Read_DataBlock_Length), (uint32 *)printBuffer,Max_Read_DataBlock_Length);		
 						//* Wait end of Write
-						AT91F_MCI_DeviceWaitReady(AT91C_MCI_TIMEOUT); 
-						MciBeginBlock++;
+						SDcard_Poll_AT91CMCINOTBUSY_flag(AT91C_MCI_TIMEOUT); 
+						if (errorstatus != SD_WRITE_NO_ERROR)	
+						{ 
+							DBGU_Printk( "\n\rWrite not OK\n\r");
+							if (errorstatus == (SD_WRITE_MEMFULL_ERROR | SD_WRITE_FOUND_ERROR) )
+							{
+								setLed(RED);
+								break;
+							}
+						}
+						SDCurrentBlock++;
 						readytowriteonSD = NOT_ACTIVE;
 					}
 					if( RCR_recirculated || ((USART_pt->US_RCR) < (1024-globali)) )
@@ -290,36 +318,68 @@ int main()
 					resetLed(GREEN); // shows no messages are currently coming on USART.
 				}
 				while(1);
+				SDLastBlock = SDCurrentBlock; // to be used for the stop transmission button.
 				break;
 
 			case '1': //* Print in pooling
+				quitflag = 0;
+				AT91C_BASE_MCI->MCI_IDR = (AT91C_MCI_RXBUFF | AT91C_MCI_TXBUFE);				
+				SDCurrentBlock = SDBeginBlock;
 				AT91F_US_EnableTx(USART_pt);  // We need transmitter for making the device act as a reader. 
 				USART_pt->US_PTCR = AT91C_PDC_TXTDIS;      
-				reader = 1; writer=0;
-				AT91C_BASE_MCI->MCI_IDR = (AT91C_MCI_RXBUFF | AT91C_MCI_TXBUFE );				
-				for (MciBeginBlock=100;MciBeginBlock<300;MciBeginBlock++) {
-				if ((AT91F_MCI_ReadBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (unsigned int *)mciBuffer1,Max_Read_DataBlock_Length)) != AT91C_READ_OK)		
-					AT91F_DBGU_Printk("\n\rRead not OK\n\r");
-				//* Wait end of Read
-				// glow Yellow LED
-				AT91F_MCI_DeviceWaitReady(AT91C_MCI_TIMEOUT);
-				
-				AT91F_US_Print_2_frame(USART_pt,(char *)mciBuffer1,512,0,0);
-				while(!((USART_pt->US_CSR) & AT91C_US_TXRDY));  // wait till the US_THR is clear
-				USART_pt->US_PTCR = AT91C_PDC_TXTEN;        // start sending data to USART
-				// Glow Green LED ( sending to USART )
-				while(!((USART_pt->US_CSR) & AT91C_US_ENDTX));
-				USART_pt->US_PTCR = AT91C_PDC_TXTDIS;	
-				AT91F_DBGU_Printk("\n\rnext\n\r");
+				reader = ACTIVE; writer=NOT_ACTIVE;
+				USART_Printk("Welcome to reading form SD card\r\n");
+				USART_Printk(" i> to get information about the card\r\n n> to read SD card one by one\r\n a> to read from the starting block to last block saved\r\n q> to quit tests\r\n");
+				while (quitflag == 0 )
+				{ 
+					character = DBGU_GetChar();
+					switch (character)
+					{
+						case 'i':
+							USART_Printk("Total SD CARD Size : ");
+							break;
+						case 'n':
+							Configure_USART_TX_PDC(USART_pt,(char *)SDBuffer1,512,0,0);
+							if ((SDcard_ReadBlock_CMD17_R1(&mci_sdcard,(SDCurrentBlock*Max_Read_DataBlock_Length), (unsigned int *)SDBuffer1,Max_Read_DataBlock_Length)) != SD_READ_NO_ERROR)		
+								DBGU_Printk( "\n\rRead not OK\n\r");
+							//* Wait end of Read
+							SDcard_Poll_AT91CMCINOTBUSY_flag(AT91C_MCI_TIMEOUT);
+							while(!((USART_pt->US_CSR) & AT91C_US_TXRDY));  // wait till the US_THR is clear
+							USART_pt->US_PTCR = AT91C_PDC_TXTEN;        // start sending data to USART
+							// Glow Green LED ( sending to USART )
+							while(!((USART_pt->US_CSR) & AT91C_US_ENDTX));
+							USART_pt->US_PTCR = AT91C_PDC_TXTDIS;	
+							SDCurrentBlock++;
+							break;
+						case 'a':
+						//USART_pt->US_PTCR = AT91C_PDC_TXTDIS;
+						for (SDCurrentBlock=SDBeginBlock;SDCurrentBlock<SDLastBlock;SDCurrentBlock++) 
+						{
+							Configure_USART_TX_PDC(USART_pt,(char *)SDBuffer1,512,0,0);
+							if ((SDcard_ReadBlock_CMD17_R1(&mci_sdcard,(SDCurrentBlock*Max_Read_DataBlock_Length), (unsigned int *)SDBuffer1,Max_Read_DataBlock_Length)) != SD_READ_NO_ERROR)		
+							DBGU_Printk("\n\rRead not OK\n\r");
+							//* Wait end of Read
+							SDcard_Poll_AT91CMCINOTBUSY_flag(AT91C_MCI_TIMEOUT);
+							while(!((USART_pt->US_CSR) & AT91C_US_TXRDY));  // wait till the US_THR is clear
+							USART_pt->US_PTCR = AT91C_PDC_TXTEN;        // start sending data to USART
+							// Glow Green LED ( sending to USART )
+							while(!((USART_pt->US_CSR) & AT91C_US_ENDTX));
+							USART_pt->US_PTCR = AT91C_PDC_TXTDIS;							
+						}
+						break;
+						case 'q':
+							quitflag = 1;
+							break;
+						default:
+							USART_Printk("\r\nBad choice, Retry please\r\n");
+							break;		
+					}
 				}
-//				}
-				break;
-					
 			default:
-				AT91F_DBGU_Printk("\n\rBad choice, Retry please\n\r");
+				DBGU_Printk( "\n\rBad choice, Retry please\n\r");
 				break;		
 		}
-	}
+	}	
 return 0;
 }
 #endif

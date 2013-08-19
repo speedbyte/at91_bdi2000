@@ -17,7 +17,8 @@
 #ifndef init_h
 #define init_h
 
-extern void 					AT91F_DBGU_Printk(char *);
+extern void 					DBGU_Printk(char *);
+extern void 					USART_Printk(char *);
 extern void 					AT91F_LowLevelInit(void);
 
 
