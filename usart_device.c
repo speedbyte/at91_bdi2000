@@ -38,7 +38,7 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 	if (( status & AT91C_US_ENDRX) & (USART_pt->US_IMR & AT91C_US_ENDRX)){ //* Acknowledge Interrupt by reading the status register.
    				//* Acknowledge Interrupt
 			AT91F_US_DisableIt(USART_pt, AT91C_US_ENDRX );  // Disable it for the moment to avoid nested int
-			readytowriteonSD = 1;
+			readytowriteonSD++;
     		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'R');
 	}
 	// check if interrupt is present and available 
