@@ -458,8 +458,7 @@ void Mci_init(void)
 {
     // Set up PIO SDC_TYPE to switch on MMC/SDCard and not DataFlash Card
 	AT91F_PIO_CfgOutput(AT91C_BASE_PIOB,AT91C_PIO_PB7);     // 	Enable PIO in output mode - Timer Counter 3 Multipurpose Timer I/O Pin B
-	AT91F_PIO_SetOutput(AT91C_BASE_PIOB,AT91C_PIO_PB7);     // Set to 1 Output AT91C_PB7_TIOB3 ( both are same ) 1<<7
-	
+	AT91F_PIO_SetOutput(AT91C_BASE_PIOB,AT91C_PIO_PB7);     // This register is used to set PIO output data. It affects the pin only if the corresponding PIO output line is enabled and if the pin is controlled by the PIO. Otherwise, the information is stored.
 	// Init MCI for MMC and SDCard interface
 	AT91F_MCI_CfgPIO();	//Configure PIO to peripheral mode for MCI - both PIOA PA27,PA28,PA29 and PIOB PB3,PB4,PB5
 /*Signal	Symbol	PIO controller	Description

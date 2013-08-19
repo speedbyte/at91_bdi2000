@@ -47,7 +47,6 @@ typedef struct _AT91S_MciDevice
 
 #define AT91C_MCI_TIMEOUT			1000000   /* For AT91F_MCIDeviceWaitReady */
 #define BUFFER_SIZE_MCI_DEVICE		512
-#define MASTER_CLOCK				60000000
 #define 	AT91DKC_SDRAM_BASE_ADDRESS	(( char *)(0x20100000))
 #define 	BLOCK_SIZE	(1024 * 10)
 

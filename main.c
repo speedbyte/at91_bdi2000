@@ -39,8 +39,8 @@ AT91PS_USART pUSART_vikas;
 // Local Functions
 void Led_glow()
 {
-	pUSART_vikas = AT91C_BASE_US3; 	
-	pUSART_vikas->US_CR = AT91C_US_RTSEN;  // to disable use RTSDIS
+	AT91C_BASE_PIOB->PIO_PER = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;
+	AT91C_BASE_PIOB->PIO_OER = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;;   // a 1 at the relevant pin would pull it down
 }
 
 //*----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ int main()
 	unsigned char	caractere;
 	Mci_init();
 	Usart_init();
-	Led_init();
+	//Led_init();
 	int i,x = 33,j;
 	unsigned int Max_Read_DataBlock_Length;
 	if(AT91F_InitDeviceStructure() != AT91C_INIT_OK) {
@@ -123,8 +123,10 @@ int main()
 	AT91F_DBGU_Printk("\n\r0) Write to SD 1) Read from SD\n\r");
 	
 	//Interrupt Enable USART:
-	AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX | AT91C_US_ENDTX | AT91C_US_ENDTX | AT91C_US_TXBUFE); // All PDC related
+	AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX | AT91C_US_ENDTX | AT91C_US_RXBUFF | AT91C_US_TXBUFE ); // All PDC related
 													// Error related done in INIT
+	AT91F_US_EnableIt(USART_pt , AT91C_US_RXRDY);
+	
 	// Disable all PDC related
 	USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
 	USART_pt->US_PTCR = AT91C_PDC_TXTDIS;      

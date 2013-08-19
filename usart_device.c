@@ -7,9 +7,7 @@
 #include "lib_AT91RM9200.h"
 #include "isr_usart.h" 			// usart_asm_irq_handler()
 #include "init.h" 				// AT91F_DBGU_Printk
-
-#define	MCK	60000000
-#define USART_INTERRUPT_LEVEL		7
+#include "usart_device.h"       // selber inc
 
 #ifndef usart_device_c
 extern void Usart_c_irq_handler(AT91PS_USART USART_pt);      // to isr_usart.s
@@ -35,9 +33,13 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 	unsigned int status;
 	//* get Usart status register
 	status = USART_pt->US_CSR;
-	if ( status & AT91C_US_ENDRX){ //* Acknowledge Interrupt by reading the status register.
+	if ((status & AT91C_US_RXRDY ) && ( USART_pt->US_IMR & AT91C_US_RXRDY ) ) {
+		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "RXRDY\n\r",7,0,0);
+		}
+		
+	if ( status & AT91C_US_ENDRX) { //* Acknowledge Interrupt by reading the status register.
    				//* Acknowledge Interrupt
-		 AT91F_US_ReceiveFrame(USART_pt,(char *)message,10,0,0);         
+		 AT91F_US_ReceiveFrame(USART_pt,(char *)message,10,0,0);        // if this line is omitted the interrupt is nt acknoledged 
 		//* Get byte and send	
    		//* Trace on DBGU
 //* Trace on DBGU
@@ -118,8 +120,20 @@ void Usart_init ( void )
     	AT91F_PMC_EnablePeriphClock ( AT91C_BASE_PMC, 1<<AT91C_ID_US1 ) ;
 	
 	// Usart Configure
-	AT91F_US_Configure (USART_pt, MCK,AT91C_US_ASYNC_MODE, 115200, 0);
-	
+	AT91F_US_Configure (USART_pt, MASTER_CLOCK ,AT91C_US_ASYNC_MODE, 115200, 0); // time guard TTGR =0 , opp of RTOR
+/*                        mode = AT91C_US_USMODE_NORMAL + stopbit = {AT91C_US_NBSTOP_1_BIT} + \
+                        no parity = {AT91C_US_PAR_NONE} + \
+                        characterlength ( apart from par, stop,){AT91C_US_CHRL_8_BITS} + \
+                        clock selection - {AT91C_US_CLKS_CLOCK} )
+*/	
+/*
+	unsigned int baud_value = ((main_clock*10)/(baud_rate * 16));
+	if ((baud_value % 10) >= 5)
+		baud_value = (baud_value / 10) + 1;
+	else
+		baud_value /= 10;
+		*/
+		
 	// Enable usart 
 	USART_pt->US_CR = AT91C_US_RXEN | AT91C_US_TXEN;    // Enable transmit and recieve ( this has nothing to do with PDC which is PDC_RXTEN ..
     	
