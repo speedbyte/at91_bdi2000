@@ -15,15 +15,15 @@ REv 1.2 : Integrated USART function calls
 #include "mci_device.h"    // AT91F_MCI_SDCard_Init() , Mci_init() , AT91F_MCI_DeviceWaitReady(), AT91F_MCI_ReadBlock(), AT91F_MCI_WriteBlock()
 #include "init.h"          // AT91F_DBGU_Printk()
 #include "usart_device.h"  // AT91F_US_Print_frame(), Usart_init(), AT91F_US_Printk(), AT91F_US_Print_2_frame()
+#include "st_device.h"
 
 #ifndef main_c
 //* Functions
 void Led_glow();
-void Led_init();
 extern char AT91F_DBGU_getc(void);
 int AT91F_InitDeviceStructure(void);
-extern void AT91F_MCI_Handler(void);  // to isr_mci.s
-extern int main(void);     // to cstartup.s
+extern void AT91F_MCI_Handler(void);  // to isr.S
+extern int main(void);     // to cstartup.S
 #endif
 
 //* Global Variables
@@ -40,7 +40,8 @@ AT91PS_USART pUSART_vikas;
 void Led_glow()
 {
 	AT91C_BASE_PIOB->PIO_PER = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;
-	AT91C_BASE_PIOB->PIO_OER = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;;   // a 1 at the relevant pin would pull it down
+	AT91C_BASE_PIOB->PIO_OER = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;   // a 1 at the relevant pin would pull it down
+	
 }
 
 //*----------------------------------------------------------------------------
@@ -49,19 +50,12 @@ void Led_glow()
 //*----------------------------------------------------------------------------
 char AT91F_DBGU_getc(void)
 {
+	AT91F_DBGU_Printk("\n\rbefore while");
 	while (!AT91F_US_RxReady((AT91PS_USART)AT91C_BASE_DBGU));
+	AT91F_DBGU_Printk("\n\rafter while");
 	return AT91F_US_GetChar((AT91PS_USART) AT91C_BASE_DBGU);
 }
 
-void Led_init()
-{
-	// Configure PIO controllers to periph mode
-	AT91F_PIO_CfgPeriph(
-		AT91C_BASE_PIOB, // PIO controller base address
-		0,
-		((unsigned int) AT91C_PIO_PB0)
-		); // Peripheral B
-}
 
 //*----------------------------------------------------------------------------
 //* \fn    AT91F_CfgDevice
@@ -110,15 +104,19 @@ void AT91F_MCI_Handler(void)
 int main()
 {
 	unsigned char	caractere;
+	unsigned int initialtimeout = 1;
+	int i = 0,x = 33,j;
+	unsigned int Max_Read_DataBlock_Length;
+	
+	
 	Mci_init();
 	Usart_init();
-	//Led_init();
-	int i,x = 33,j;
-	unsigned int Max_Read_DataBlock_Length;
+	St_init();	
 	if(AT91F_InitDeviceStructure() != AT91C_INIT_OK) {
 		AT91F_DBGU_Printk("\n\rSDcARD Initialisation failed\n\r");
 		return FALSE;}
 	Led_glow();
+	
 	Max_Read_DataBlock_Length = MCI_Device.pMCI_DeviceFeatures->Max_Read_DataBlock_Length;
 	AT91F_DBGU_Printk("\n\r0) Write to SD 1) Read from SD\n\r");
 	
@@ -127,21 +125,23 @@ int main()
 													// Error related done in INIT
 	AT91F_US_EnableIt(USART_pt , AT91C_US_RXRDY);
 	
-	// Disable all PDC related
+	// Disable all PDC related	
 	USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
 	USART_pt->US_PTCR = AT91C_PDC_TXTDIS;      
 	MCI_pt->MCI_PTCR = AT91C_PDC_RXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard read 
 	MCI_pt->MCI_PTCR = AT91C_PDC_TXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard write
-	
+
 	while(1)
 	{
 		USART_pt->US_PTCR = AT91C_PDC_RXTEN;
 		caractere = AT91F_DBGU_getc();      // also done by PDC
+		
 		switch(caractere)
 		{
+			
 			case '0':			
 //				while(1){
-				
+				//initialtimeout = AT91F_GetTickCount();
 				for (MciBeginBlock=0;MciBeginBlock<4;MciBeginBlock++)  
 				{
 				for (j=0;j<512;j++) {Buffer[j] = 33+x; if ( x==123 ) x=33;} x++;
@@ -149,7 +149,7 @@ int main()
 				while(!((USART_pt->US_CSR) & AT91C_US_RXRDY));    // wait till the first char arrives.
 				USART_pt->US_PTCR = AT91C_PDC_RXTEN;        // start receiving the data from USART
 				// Glow Green LED ( reading from USART )
-				while(!((USART_pt->US_CSR) & AT91C_US_ENDRX));*/
+				while(!((USART_pt->US_CSR) & AT91C_US_ENDRX)); */
 				USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
 				
 				if ((AT91F_MCI_WriteBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (unsigned int *)Buffer,Max_Read_DataBlock_Length)) != AT91C_WRITE_OK)		

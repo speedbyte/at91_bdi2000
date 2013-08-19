@@ -1,8 +1,8 @@
 #ifndef main_h
 #define main_h
 
-extern void AT91F_MCI_Handler(void);  // to isr_mci.s
-extern int main(void);     // to cstartup.s
+extern void AT91F_MCI_Handler(void);  // to isr.S
+extern int main(void);     // to cstartup.S
 extern char AT91F_DBGU_getc(void);
 /*-----------------------------------------------*/
 /* SDCard Device Descriptor Structure Definition */

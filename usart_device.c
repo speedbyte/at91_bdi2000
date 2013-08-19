@@ -5,7 +5,7 @@
 #include "mci_type.h"
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
-#include "isr_usart.h" 			// usart_asm_irq_handler()
+#include "isr.h" 			// usart_asm_irq_handler()
 #include "init.h" 				// AT91F_DBGU_Printk
 #include "usart_device.h"       // selber inc
 
@@ -37,9 +37,9 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "RXRDY\n\r",7,0,0);
 		}
 		
-	if ( status & AT91C_US_ENDRX) { //* Acknowledge Interrupt by reading the status register.
+	if (( status & AT91C_US_ENDRX) & (USART_pt->US_IMR & AT91C_US_ENDRX)){ //* Acknowledge Interrupt by reading the status register.
    				//* Acknowledge Interrupt
-		 AT91F_US_ReceiveFrame(USART_pt,(char *)message,10,0,0);        // if this line is omitted the interrupt is nt acknoledged 
+		 AT91F_US_ReceiveFrame(USART_pt,(char *)message,10,0,0);         
 		//* Get byte and send	
    		//* Trace on DBGU
 //* Trace on DBGU

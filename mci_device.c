@@ -5,7 +5,7 @@
 #include "main.h"               //  structure typedef
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
-#include "isr_mci.h"    		// AT91F_ASM_MCI_Handler
+#include "isr.h"    		// AT91F_ASM_MCI_Handler
 #include "mci_device.h"         // self include
 #include "init.h"				// AT91F_DBGU_Printk()
 

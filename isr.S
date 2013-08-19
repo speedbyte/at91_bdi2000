@@ -1,13 +1,3 @@
-@------------------------------------------------------------------------------
-@-         ATMEL Microcontroller Software Support  -  ROUSSET  -
-@------------------------------------------------------------------------------
-@ The software is delivered "AS IS" without warranty or condition of any
-@ kind, either express, implied or statutory. This includes without
-@ limitation any warranty or condition with respect to merchantability or
-@ fitness for any particular purpose, or against the infringements of
-@ intellectual property rights of others.
-@------------------------------------------------------------------------------
-@- File source          : irq_ghs.mac
 @- Object               : Entry and Exit Macro for IRQ and FIQ.
 @-
 @- 1.0 01/04/00 JCZ     : Creation
@@ -26,8 +16,6 @@
 @------------------------------------------------------------------------------
     .text
     .align  4
-
-@include "AT91RM9200_inc.h"
 
 
 #define AT91C_BASE_AIC 0xFFFFF000 
@@ -168,6 +156,53 @@ exit_irq:
 @    .type   usart_asm_irq_handler,$function
 @    .size   usart_asm_irq_handler,.-usart_asm_irq_handler
 
-    .end
+@------------------------------------------------------------------------------
+@------------------------------------------------------------------------------
+@ AT91F_ASM_MCI_Handler
+@ ---------------------
+@       Handler called by the AIC
+@       
+@	Save context
+@       Call C handler
+@ 	Restore context
+@------------------------------------------------------------------------------
+	.global AT91F_ASM_MCI_Handler
+	.extern AT91F_MCI_Handler
+	
+AT91F_ASM_MCI_Handler:
+	IRQ_ENTRY
+
+	ldr     r1, =AT91F_MCI_Handler
+	mov     r14, pc
+	bx      r1
+
+	IRQ_EXIT
+@------------------------------------------------------------------------------
 
 @------------------------------------------------------------------------------
+@ AT91F_ST_ASM_HANDLER
+@ ---------------------
+@       Handler called by the AIC
+@       
+@	Save context
+@       Call C handler
+@ 	Restore context
+@------------------------------------------------------------------------------
+	.global AT91F_ST_ASM_HANDLER
+	.extern AT91F_ST_HANDLER
+
+AT91F_ST_ASM_HANDLER:
+	IRQ_ENTRY
+
+	ldr     r1, =AT91F_ST_HANDLER
+	mov     r14, pc
+	bx      r1
+
+	IRQ_EXIT
+
+
+@------------------------------------------------------------
+
+    .end
+
+

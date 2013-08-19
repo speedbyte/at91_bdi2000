@@ -21,9 +21,9 @@ FORMAT = binary
 #Target File name
 TARGET = main
 
-SRCARM = $(TARGET).c init.c mci_device.c usart_device.c
+SRCARM = $(TARGET).c init.c mci_device.c usart_device.c st_device.c
 # List Assembler source files here which must be assembled in ARM-Mode..
-ASRCARM = cstartup_gnu.S isr_mci.S isr_usart.S
+ASRCARM = cstartup_gnu.S isr.S
 
 # Optimization level, can be [0, 1, 2, 3, s]. 
 # 0 = turn off optimization. s = optimize for size.

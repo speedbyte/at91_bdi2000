@@ -109,3 +109,32 @@ When TXTDY signal is sent to the PDC from the peripheral, the PDC starts to reue
 
 
 AT91F_PDC_IsRxEmpty() checks for RCR ( if the counter register has ran )
+
+find the use of TIOB
+
+PIO
+
+An input change interrupt enabling level change on any I/O line.
+Synchronous Output, Provides Set and Clear of Several I/O lines in a Single Write
+When
+an I/O line is general-purpose only, i.e. not multiplexed with any peripheral I/O, programming of
+the PIO Controller regarding the assignment to a peripheral has no effect and only the PIO Controller
+can control how the pin is driven by the product.
+
+Power Management : AT91F_PMC_EnablePeriphClock(pmc, id)
+Reading a 1 in
+PIO_PUSR means the pull-up is disabled and reading a 0 means the pull-up is enabled. PIO_PUSR resets at the value 0x0. ( all pulled up - 3.3 V except few SDRAM related ). Program PIO_PUDR to pull the pin low.
+
+When a pin is multiplexed with one or two peripheral functions, the selection is controlled with
+the registers PIO_PER (PIO Enable Register) and PIO_PDR (PIO Disable Register). - Scenarios where multiplexing of a single pin ( if one needs both peripheral on that pin )
+PIO or Peripheral :
+Use PDR to disable peripheral fn ( rem it is automatically disabled at reset ) . Use PUDR to pull the pin low or high. .A value of 0 indicates that the pin is controlled by the corresponding on-chip peripheral selected in the
+PIO_ABSR (AB Select Status Register). A value of 1 indicates the pin is controlled by the PIO
+controller.
+If a pin is used as a general purpose I/O line (not multiplexed with an on-chip peripheral),
+PIO_PER and PIO_PDR have no effect and PIO_PSR returns 1 for the corresponding bit. So PIO_PER is only valid in the case of multiplexing and when the line corresponding pin has to be run by the peripheral
+PIO_PSR shows which functionlaity ( Per or PIO )
+PIO_ABSE shows which peripheral ( A or B ) enabled - A =0
+When driven by PIO controller :
+When the I/O line is controlled by the PIO controller, the pin can be configured to be driven. This
+is done by writing PIO_OER (Output Enable Register) and PIO_PDR (Output Disable Register).The results of these write operations are detected in PIO_OSR (Output Status Register). When a bit in this register is at 0, the corresponding I/O line is used as an input only. When the bit is at 1, the corresponding I/O line is driven by the PIO controller.

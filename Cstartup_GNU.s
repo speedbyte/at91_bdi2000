@@ -26,12 +26,12 @@
 @-
 @------------------------------------------------------------------------------
 
-.equ IRQ_STACK_SIZE , 0x08
-.equ FIQ_STACK_SIZE , 0x08
-.equ ABT_STACK_SIZE , 0x08
-.equ UND_STACK_SIZE , 0x08
-.equ SVC_STACK_SIZE , 0x08
-.equ USER_STACK_SIZE , 0x100
+.equ IRQ_STACK_SIZE , 0x200
+.equ FIQ_STACK_SIZE , 0x10
+.equ ABT_STACK_SIZE , 0x10
+.equ UND_STACK_SIZE , 0x10
+.equ SVC_STACK_SIZE , 0x800
+.equ USER_STACK_SIZE , 0x200
 
 @- IRQ stack definition
 AT91_IRQ_Stack_End: 
