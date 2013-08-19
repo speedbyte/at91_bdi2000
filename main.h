@@ -11,7 +11,7 @@ extern char *Bufferwechsler;
 extern char *printBuffer;
 extern char mciBuffer1[512];
 extern char mciBuffer2[512];
-extern int globalj;
+extern int globalj, RCR_recirculated;
 extern int reader, writer;
 #define ACTIVE 1
 // REal time clock : 
@@ -39,10 +39,10 @@ unsigned int second : 7;
 unsigned int        : 1;
 unsigned int minute : 7;
 unsigned int        : 1;
-unsigned int hour   : 5;
-unsigned int        : 1;  // this is not required but for the sake of uniformity.
+unsigned int hour   : 6;
 unsigned int merid  : 1;
-unsigned int        : 9;
+unsigned int        : 1;  // this is not required but for the sake of uniformity.
+unsigned int        : 8;
 } time_bits;
 };
 

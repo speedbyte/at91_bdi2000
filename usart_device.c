@@ -20,38 +20,6 @@ extern void AT91F_US_PutFrame(AT91PS_USART USART_pt, char *buffer, unsigned shor
 
 char message[80];
 
-inline void Puttimestamp(char *temp)
-{
-	int y, bcd_millisecond;
-		// Store Time info
-	rtc_time.time_data = (uint32)AT91C_BASE_RTC->RTC_TIMR;
-	y = AT91F_GetTickCount();
-	bcd_millisecond = ((y/100)<<8)+(((y/10)%10)<<4)+y%10;				
-	*(temp+0) = (char)rtc_time.time_bits.merid;
-	*(temp+1) = ':';
-	*(temp+2) = (char)rtc_time.time_bits.hour;
-	*(temp+3) = ':';
-	*(temp+4) = (char)rtc_time.time_bits.minute;
-	*(temp+5) = '.';
-	*(temp+6) = (char)rtc_time.time_bits.second;
-	*(temp+7) = '.';
-	*(temp+8) = (char)((bcd_millisecond >> 8) & 0xFF);
-	*(temp+9) = (char)((bcd_millisecond) & 0xFF);
-	
-	
-	// Store Calendar info
-	*(temp+10) = (char)rtc_cal.cal_bits.day;
-	*(temp+11) = ',';				
-	*(temp+12) = (char)rtc_cal.cal_bits.date;
-	*(temp+13) = ',';				
-	*(temp+14) = (char)rtc_cal.cal_bits.month;
-	*(temp+15) = ',';				
-	*(temp+16) = (char)rtc_cal.cal_bits.century;
-	*(temp+17) = (char)rtc_cal.cal_bits.year;
-	*(temp+18) = '-';
-	*(temp+19) = '-';
-}
-
 
 //*------------------------- Internal Function --------------------------------
 //*------------------------- Interrupt Function -------------------------------
@@ -69,12 +37,20 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 	//* get Usart status register
 	status = USART_pt->US_CSR;
 	
-	if (( status & AT91C_US_RXBUFF) & (USART_pt->US_IMR & AT91C_US_RXBUFF)){ //* Acknowledge Interrupt by reading the status register.
+	if ( (status & AT91C_US_ENDTX) &  (USART_pt->US_IMR & AT91C_US_ENDTX) ){
+		 //*  Acknowledge Interrupt by mask for next send
+		 AT91F_US_DisableIt(USART_pt, AT91C_US_ENDTX );
+   		//* Trace on DBGU
+    		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'S');
+	}
+	
+	if (( status & AT91C_US_ENDRX) & (USART_pt->US_IMR & AT91C_US_ENDRX)){ //* Acknowledge Interrupt by reading the status register.
    				//* Acknowledge Interrupt
-			AT91F_US_DisableIt(USART_pt, AT91C_US_RXBUFF );  // Disable it to avoid regeneration.
-			AT91F_US_PutFrame(USART_pt,(char *)(usartBuffer1),(512),(char *)(usartBuffer2),(512)); 
-			AT91F_US_EnableIt(USART_pt, AT91C_US_RXBUFF);			
+			AT91F_US_DisableIt(USART_pt, AT91C_US_ENDRX );  // Disable it to avoid regeneration.
+			AT91F_US_PutFrame(USART_pt,(char *)(usartBuffer1),(1024),0,0); 
+			AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX);			
     		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'R');
+			RCR_recirculated = 1;
 	}
 
 	if ( status & AT91C_US_OVRE) {
@@ -124,7 +100,7 @@ void AT91F_US_PutFrame(AT91PS_USART USART_pt, char *buffer, unsigned short count
     //* Enable USART IT error and AT91C_US_ENDRX
  	AT91F_US_ReceiveFrame(USART_pt,buffer,counter,buffer2,counter2);
  	//* enable IT
- 	//AT91F_US_EnableIt(USART_pt, AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE   );
+ 	AT91F_US_EnableIt(USART_pt, AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE   );
 }
 
 //*----------------------------------------------------------------------------

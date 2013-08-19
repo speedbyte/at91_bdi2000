@@ -15,7 +15,7 @@ PLATFORM_RELFLAGS +=$(call cc-option,-mshort-load-bytes,$(call cc-option,-malign
 
 MCU      = arm920t
 SUBMDL   = AT91RM9200
-THUMB_IW = -mthumb-interwork
+#THUMB_IW = -mthumb-interwork
 
 ## Create ROM-Image (final)
 #RUN_MODE=ROM_RUN
@@ -116,14 +116,14 @@ LDFLAGS +=-T$(SUBMDL)-RAM.ld
 else 
 LDFLAGS +=-T$(SUBMDL)-ROM.ld
 endif
-
+TOOLCHAIN = elf
 # Define programs and commands.
 SHELL = sh
-CC = arm-elf-gcc
-OBJCOPY = arm-elf-objcopy
-OBJDUMP = arm-elf-objdump
-SIZE = arm-elf-size
-NM = arm-elf-nm
+CC = arm-$(TOOLCHAIN)-gcc
+OBJCOPY = arm-$(TOOLCHAIN)-objcopy
+OBJDUMP = arm-$(TOOLCHAIN)-objdump
+SIZE = arm-$(TOOLCHAIN)-size
+NM = arm-$(TOOLCHAIN)-nm
 REMOVE = rm -f
 COPY = cp
 
@@ -133,7 +133,7 @@ MSG_ERRORS_NONE = Errors: none
 MSG_BEGIN = "-------- begin (mode: $(RUN_MODE)) --------"
 MSG_END = --------  end  --------
 MSG_SIZE_BEFORE = Size before: 
-MSG_SIZE_AFTER = Size after:
+MSG_SIZE_AFTsER = Size after:
 MSG_FLASH = Creating load file for Flash:
 MSG_EXTENDED_LISTING = Creating Extended Listing:
 MSG_SYMBOL_TABLE = Creating Symbol Table:

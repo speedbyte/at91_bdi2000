@@ -10,7 +10,7 @@
 #include "init.h"				// AT91F_DBGU_Printk()
 
 #ifndef mci_device_c
-/*Functions*/
+/*Functions*/ 
 uint32 AT91F_MCI_SendCommand (	AT91PS_MciDevice ,	unsigned int ,	unsigned int );
 uint32 AT91F_MCI_SDCard_SendAppCommand (AT91PS_MciDevice ,	unsigned int ,	unsigned int );
 uint32 AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address);
@@ -21,7 +21,7 @@ uint32 AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_car
 uint32 AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length);
 uint32 AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device);
 uint32 AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
-uint32 dAT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device);
+uint32 AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device);
 extern uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device);
 extern void AT91F_MCI_DeviceWaitReady(unsigned int timeout);
 extern int Mci_init(void);
@@ -133,9 +133,9 @@ void AT91F_MCI_Device_Handler(
 	}	// End of if AT91C_MCI_TXBUFF		
 
     // If End of Rx Buffer Full interrupt occurred
-    if ( (status & AT91C_MCI_RXBUFF ) && reader)
+    if ( (status & AT91C_MCI_ENDRX ) && reader)
     {        
-       	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_RXBUFF;
+       	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_ENDRX;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_RXTDIS;
 		AT91F_DBGU_Printk("\n\rRMR\n\r");
 		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
@@ -213,7 +213,7 @@ uint32 AT91F_MCI_ReadBlock(
 	pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_RX_SINGLE_BLOCK;
 
 	// Enable AT91C_MCI_RXBUFF Interrupt
-    AT91C_BASE_MCI->MCI_IER = AT91C_MCI_RXBUFF;
+    AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDRX;
 
 	// (PDC) Receiver Transfer Enable
 	AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_RXTEN;  // here exactly is the data recieved.
@@ -399,16 +399,21 @@ uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device)
 
     if(AT91F_MCI_SDCard_GetOCR(pMCI_Device) == AT91C_INIT_ERROR)
     	return AT91C_INIT_ERROR;
+/* Register OCR , 32 bit Register, Operation Condition Register. */
+	if (AT91F_MCI_SDCard_GetCID(pMCI_Device,tab_response) == AT91C_CMD_SEND_OK) 
+/* Register CID width 128 .. Card identification number: individual card number for identification. */
 
-	if (AT91F_MCI_SDCard_GetCID(pMCI_Device,tab_response) == AT91C_CMD_SEND_OK)
 	{
 	    pMCI_Device->pMCI_DeviceFeatures->Card_Inserted = AT91C_SD_CARD_INSERTED;
 
 	    if (AT91F_MCI_SendCommand(pMCI_Device, AT91C_SET_RELATIVE_ADDR_CMD, 0) == AT91C_CMD_SEND_OK)
 		{
+/* Register RCA width 16 .. Relative card address: local system address of a card, dynamically
+suggested by the card and approved by the host during initialization.  */
 			pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address = (AT91C_BASE_MCI->MCI_RSPR[0] >> 16);
 			if (AT91F_MCI_GetCSD(pMCI_Device,pMCI_Device->pMCI_DeviceFeatures->Relative_Card_Address,tab_response) == AT91C_CMD_SEND_OK)
 			{
+/* Register CSD width 128 .. Card specific data: information about the card operation condition  */
 		  		pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length = 1 << ((tab_response[1] >> AT91C_CSD_RD_B_LEN_S) & AT91C_CSD_RD_B_LEN_M );
 	 			pMCI_Device->pMCI_DeviceFeatures->Max_Write_DataBlock_Length =	1 << ((tab_response[3] >> AT91C_CSD_WBLEN_S) & AT91C_CSD_WBLEN_M );
 				pMCI_Device->pMCI_DeviceFeatures->Sector_Size = 1 + ((tab_response[2] >> AT91C_CSD_v21_SECT_SIZE_S) & AT91C_CSD_v21_SECT_SIZE_M );
@@ -419,12 +424,24 @@ uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device)
 				pMCI_Device->pMCI_DeviceFeatures->Write_Block_Misalignment = (tab_response[1] >> AT91C_CSD_WR_B_MIS_S) & AT91C_CSD_WR_B_MIS_M;
 
 				//// Compute Memory Capacity
-					// compute MULT
-					mult = 1 << ( ((tab_response[2] >> AT91C_CSD_C_SIZE_M_S) & AT91C_CSD_C_SIZE_M_M) + 2 );
+					// compute MULT          
+/* There are two fields within this CSD that indicate the number of blocks available: C_SIZE and C_SIZE_MULT. You can interpret these two values as mantissa and exponent, where C_SIZE is a 12bit value with an offset of 1, and C_SIZE_MULT is a 3bit value with an offset of 2: 
+
+C_SIZE (Device Size)—computes the card capacity. The memory capacity of the card is computed from the entries C_SIZE, C_SIZE_MULT and READ_BL_LEN as follows:
+memory capacity = BLOCKNR * BLOCK_LEN
+Where:
+BLOCKNR = (C_SIZE+1) * MULT
+MULT = 2^(C_SIZE_MULT+2)         -- (C_SIZE_MULT < 8)
+BLOCK_LEN = 2^READ_BL_LEN        -- (READ_BL_LEN < 12)
+Therefore, the maximum capacity that can be coded is 4096*512*2048=4 GB. For
+example, a 4-MB card with BLOCK_LEN = 512 can be coded with C_SIZE_MULT =
+0 and C_SIZE = 2047.*/
+					mult = 1 << ( ((tab_response[2] >> AT91C_CSD_C_SIZE_M_S) & AT91C_CSD_C_SIZE_M_M) + 2 );   //2^(C_SIZE_MULT+2)
 					// compute MSB of C_SIZE
-					blocknr = ((tab_response[1] >> AT91C_CSD_CSIZE_H_S) & AT91C_CSD_CSIZE_H_M) << 2;
+					blocknr = ((tab_response[1] >> AT91C_CSD_CSIZE_H_S) & AT91C_CSD_CSIZE_H_M) << 2; 
 					// compute MULT * (LSB of C-SIZE + MSB already computed + 1) = BLOCKNR
-					blocknr = mult * ( ( blocknr + ( (tab_response[2] >> AT91C_CSD_CSIZE_L_S) & AT91C_CSD_CSIZE_L_M) ) + 1 );
+					blocknr = mult * ( ( blocknr + ( (tab_response[2] >> AT91C_CSD_CSIZE_L_S) & AT91C_CSD_CSIZE_L_M) ) + 1 ); 
+																				// 2^(C_SIZE_MULT+2)*(C_SIZE+1)
 
 					pMCI_Device->pMCI_DeviceFeatures->Memory_Capacity =  pMCI_Device->pMCI_DeviceFeatures->Max_Read_DataBlock_Length * blocknr;
 			  	//// End of Compute Memory Capacity

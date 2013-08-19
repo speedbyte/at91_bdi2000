@@ -42,49 +42,45 @@ extern void AT91F_MCI_Handler(void);  // to isr.S
 extern int main(void);     // to cstartup.S
 #endif
 
-CALENDAR rtc_cal;
-TIME     rtc_time;
-int reader, writer;
 //* Global Variables
-AT91PS_USART USART_pt = AT91C_BASE_US1;
-AT91PS_MCI MCI_pt;
-AT91PS_MCI MCI_pt = AT91C_BASE_MCI;
-static int MciBeginBlock = 100;
-AT91S_MciDeviceFeatures			MCI_Device_Features;
-AT91S_MciDeviceDesc				MCI_Device_Desc;
-AT91S_MciDevice					MCI_Device;
-char							usartBuffer1[BUFFER_SIZE_MCI_DEVICE];
-char							usartBuffer2[BUFFER_SIZE_MCI_DEVICE];
-int readytowriteonSD;
-char *Bufferwechsler;
-char *printBuffer;
-int errorstatus;
-int globalj;
-int globali;
-char mciBuffer1[512];
-char mciBuffer2[512];
+CALENDAR 				rtc_cal;
+TIME     				rtc_time;
+int 					reader, writer;
+AT91PS_USART 			USART_pt = AT91C_BASE_US1;
+AT91PS_MCI 				MCI_pt = AT91C_BASE_MCI;
+static int 			MciBeginBlock = 100;
+AT91S_MciDeviceFeatures		MCI_Device_Features;
+AT91S_MciDeviceDesc			MCI_Device_Desc;
+AT91S_MciDevice				MCI_Device;
+char					usartBuffer1[BUFFER_SIZE_MCI_DEVICE];
+char					usartBuffer2[BUFFER_SIZE_MCI_DEVICE];
+int 					readytowriteonSD;
+char 					*Bufferwechsler;
+char					*printBuffer;
+int 					errorstatus;
+int 					globalj;
+int 					globali;
+char 					mciBuffer1[512];
+char 					mciBuffer2[512];
+int						RCR_recirculated; 
 // Local Functions
-
-
 void Rtc_init(void)
 {
-	
 	AT91C_BASE_RTC->RTC_CR = (AT91C_RTC_UPDTIM | AT91C_RTC_UPDCAL);         // step RTC
-	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) ); // wait for stop acknowledge
-	AT91C_BASE_RTC->RTC_MR = 0;         // 24 hour mode
-	rtc_time.time_bits.second = 0x0; 
-	rtc_time.time_bits.minute = 0x0; 
-	rtc_time.time_bits.hour =   0x6; 
-	rtc_time.time_bits.merid =  0x0;
+	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) );  // wait for stop acknowledge
+	AT91C_BASE_RTC->RTC_MR 		= 0;         		// 24 hour mode
+	rtc_time.time_bits.second 	= 0x0; 
+	rtc_time.time_bits.minute 	= 0x0; 
+	rtc_time.time_bits.hour 	= 0x3; 
+	rtc_time.time_bits.merid 	= 0x0;
 	AT91C_BASE_RTC->RTC_TIMR = (uint32)rtc_time.time_data;	
-	//while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) ); // wait for stop acknowledge
-	rtc_cal.cal_bits.century = 0x20; 
-	rtc_cal.cal_bits.year =    0x07; 
-	rtc_cal.cal_bits.month =   0x1; 
-	rtc_cal.cal_bits.day =     0x1; 
-	rtc_cal.cal_bits.date =    0x1;
+	rtc_cal.cal_bits.century 	= 0x20; 
+	rtc_cal.cal_bits.year 		= 0x07; 
+	rtc_cal.cal_bits.month 		= 0x1; 
+	rtc_cal.cal_bits.day 		= 0x2; 
+	rtc_cal.cal_bits.date 		= 0x9;
 	AT91C_BASE_RTC->RTC_CALR = (uint32)rtc_cal.cal_data;
-	AT91C_BASE_RTC->RTC_CR =    0; // start timer.		
+	AT91C_BASE_RTC->RTC_CR 		= 0; 			// start timer.		
 }
 	
 inline void __ascii1(unsigned char value)
@@ -98,6 +94,14 @@ inline void __ascii2(unsigned char value)
 	Bufferwechsler[globalj++] = ((value & 0xF0) >> 4 ) + 48 ; 
 	AT91C_BASE_PDC_MCI->PDC_RCR--;	
 	Bufferwechsler[globalj++] = (value & 0xF ) + 48 ; 
+	AT91C_BASE_PDC_MCI->PDC_RCR--;							
+}
+
+inline void __dec_to_ascii2(unsigned char value)
+{
+	Bufferwechsler[globalj++] = value + 48 ; 
+	AT91C_BASE_PDC_MCI->PDC_RCR--;	
+	Bufferwechsler[globalj++] = (value%10) + 48 ; 
 	AT91C_BASE_PDC_MCI->PDC_RCR--;							
 }
 
@@ -115,15 +119,16 @@ void PutTimeStamp()
 	__format(':');
 	__ascii2(rtc_time.time_bits.second);
 	__format( '.');
-	__ascii2(AT91F_GetTickCount() );
-	__ascii1(rtc_time.time_bits.merid);
+	//__dec_to_ascii2((char)(AT91F_GetTickCount()) );
+	Bufferwechsler[globalj++] = (char)(AT91F_GetTickCount()) + 48 ; 
+	AT91C_BASE_PDC_MCI->PDC_RCR--;	
+	Bufferwechsler[globalj++] = '-';
+	AT91C_BASE_PDC_MCI->PDC_RCR--;
 }   
 
 void PutCalStamp()
 {
 	rtc_cal.cal_data = (uint32)AT91C_BASE_RTC->RTC_CALR;
-	__ascii1( rtc_cal.cal_bits.day);
-	__format( ',');
 	__ascii2( rtc_cal.cal_bits.date);
 	__format( ',');
 	__ascii2( rtc_cal.cal_bits.month);
@@ -139,6 +144,10 @@ void PutCalTimeHeader(void)
 	for(i=0;i<10;i++) Bufferwechsler[globalj++] = '-';
 	PutTimeStamp();
 	for(i=0;i<10;i++) Bufferwechsler[globalj++] = '-';
+	Bufferwechsler[globalj++] = '\r';
+	Bufferwechsler[globalj++] = '\n';
+	Bufferwechsler[510] = '\r';
+	Bufferwechsler[511] = '\n';
 }
 //*----------------------------------------------------------------------------
 //* \fn    AT91F_DBGU_getc
@@ -175,11 +184,9 @@ int AT91F_InitDeviceStructure(void)
 	MCI_Device_Desc.SDCard_bus_width				= AT91C_MCI_SCDBUS;
 	
 	// Init AT91S_DataFlash Global Structure, by default AT45DB choosen !!!
-	MCI_Device.pMCI_DeviceDesc 		= &MCI_Device_Desc;
-	MCI_Device.pMCI_DeviceFeatures 	= &MCI_Device_Features;
+	MCI_Device.pMCI_DeviceDesc 			= &MCI_Device_Desc;
+	MCI_Device.pMCI_DeviceFeatures 		= &MCI_Device_Features;
 	x = AT91F_MCI_SDCard_Init(&MCI_Device);
-	AT91C_BASE_MCI->MCI_MR |= ((MCI_Device.pMCI_DeviceFeatures->Max_Write_DataBlock_Length << 16) | AT91C_MCI_PDCMODE);	
-	
 	return(x);
 }
 	
@@ -211,24 +218,15 @@ int main()
 	Rtc_init();
 	globalj=0;
 	if(AT91F_InitDeviceStructure() != AT91C_INIT_OK) {
-		AT91F_DBGU_Printk("\n\rSDcARD Initialisation failed\n\r");
+		AT91F_DBGU_Printk("\n\r	SDcARD Initialisation failed\n\r");
 		return FALSE;}
 
-	for (j=0;j<512;j++) usartBuffer1[j] = 'A';
-	for (j=0;j<512;j++) usartBuffer2[j] = 'B';
+	for (j=0;j<1024;j++) usartBuffer1[j] = 'A';
 	for (j=0;j<512;j++) mciBuffer1[j] = ' ';
 	for (j=0;j<512;j++) mciBuffer2[j] = ' ';
 	Max_Read_DataBlock_Length = MCI_Device.pMCI_DeviceFeatures->Max_Read_DataBlock_Length;
 	AT91F_DBGU_Printk("\n\r0) Write to SD 1 Read from SD\n\r");
 
-	//USART:
-   	AT91F_US_EnableIt(USART_pt,AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE | AT91C_US_PARE);
-	AT91F_US_EnableIt(USART_pt, AT91C_US_RXBUFF ); // interrupt only after 1024 bytes. no ENDRX
-	AT91F_US_EnableTx(USART_pt);  // We need transmitter for making the device act as a reader. 
-	AT91F_US_EnableRx(USART_pt);  // we need the receiver 
-	USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
-	USART_pt->US_PTCR = AT91C_PDC_TXTDIS;      
-	
 	// MCI
 	MCI_pt->MCI_PTCR = AT91C_PDC_RXTEN;
 	MCI_pt->MCI_PTCR = AT91C_PDC_TXTEN;	
@@ -239,52 +237,67 @@ int main()
 	resetLed(GREEN | RED | YELLOW );
 	while(1)
 	{
+		MciBeginBlock = 100;
 		character = AT91F_DBGU_getc();      //also done by PDC.. this is the place where the user will also start. like a ON button
 		switch(character)
 		{
 			case '0':
+				AT91F_US_EnableRx(USART_pt);  // we need the receiver 
+				USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
 				Bufferwechsler = mciBuffer1;
 				writer = ACTIVE; reader = NOT_ACTIVE;
-				AT91F_US_PutFrame(USART_pt,(char *)(usartBuffer1),(512),(char *)(usartBuffer2),(512)); 
 				AT91C_BASE_PDC_MCI->PDC_RCR = 512;
 				AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_TXBUFE | AT91C_MCI_ENDTX; 
 				AT91C_BASE_MCI->MCI_IER = AT91C_MCI_ENDRX; 
-				globalj = 0; globali = 0;
-				// Test Switching ON Time  .. this can be done using sprintf.
-				// aftersuccess ..*Bufferwechsler = "Test Switch ON date and time\r\n";
-				// aftersuccess ..globalj = strlen(Bufferwechsler);
+				globalj = 0; globali = 0; RCR_recirculated = 0;
 				PutCalTimeHeader();
-				AT91C_BASE_PDC_MCI->PDC_RCR = 0;   // 20 bytes		TEst switch on Time	
+				AT91F_US_PutFrame(USART_pt,(char *)(usartBuffer1),(1024),0,0); 
+				AT91F_US_EnableIt(USART_pt,AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE | AT91C_US_PARE);
+				AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX ); // interrupt only after 1024 bytes.
+				while (!AT91F_US_RxReady(USART_pt));
+				USART_pt->US_PTCR = AT91C_PDC_RXTEN;
+				PutTimeStamp();
+				Bufferwechsler[globalj++] = (char)(USART_pt->US_RHR);
+				if(character == '\n')
+				{
+					PutTimeStamp();
+				}
+				AT91C_BASE_PDC_MCI->PDC_RCR = 0;   //  Here goes the first Block.
 				do 
 				{
-					while (!AT91F_US_RxReady(USART_pt));					
-					USART_pt->US_PTCR = AT91C_PDC_RXTEN;
 					if ( readytowriteonSD == WRITE_NOW )
 					{
 						setLed(RED);
-						errorstatus = AT91F_MCI_WriteBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (uint32 *)printBuffer,Max_Read_DataBlock_Length);	
+						errorstatus = AT91F_MCI_WriteBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (uint32 *)printBuffer,Max_Read_DataBlock_Length);		
 						if (errorstatus != AT91C_WRITE_OK)	AT91F_DBGU_Printk("\n\rWrite not OK\n\r");
 						//* Wait end of Write
-						//AT91F_MCI_DeviceWaitReady(AT91C_MCI_TIMEOUT); //the interrupt will tell me when it is finished.
+						AT91F_MCI_DeviceWaitReady(AT91C_MCI_TIMEOUT); 
 						MciBeginBlock++;
 						readytowriteonSD = NOT_ACTIVE;
 					}
-					character = *((char *)((USART_pt->US_RPR)-1));
+					if( RCR_recirculated || ((USART_pt->US_RCR) < (1024-globali)) )
+					{
+					setLed(GREEN);  // shows that there are messages on USART
+					character = usartBuffer1[globali++];
 					Bufferwechsler[globalj++] = character;
-					AT91C_BASE_PDC_MCI->PDC_RCR--;		
+					AT91C_BASE_PDC_MCI->PDC_RCR--;	
+					if (globali == 1024) { globali = 0; RCR_recirculated = 0; }
 					if(character == '\n')
 					{
 						PutTimeStamp();
 					}
-					USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
+					}
+					resetLed(GREEN); // shows no messages are currently coming on USART.
 				}
 				while(1);
 				break;
 
 			case '1': //* Print in pooling
-				reader = 1;
+				AT91F_US_EnableTx(USART_pt);  // We need transmitter for making the device act as a reader. 
+				USART_pt->US_PTCR = AT91C_PDC_TXTDIS;      
+				reader = 1; writer=0;
 				AT91C_BASE_MCI->MCI_IDR = (AT91C_MCI_RXBUFF | AT91C_MCI_TXBUFE );				
-				for (MciBeginBlock=100;MciBeginBlock<103;MciBeginBlock++) {
+				for (MciBeginBlock=100;MciBeginBlock<300;MciBeginBlock++) {
 				if ((AT91F_MCI_ReadBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (unsigned int *)mciBuffer1,Max_Read_DataBlock_Length)) != AT91C_READ_OK)		
 					AT91F_DBGU_Printk("\n\rRead not OK\n\r");
 				//* Wait end of Read
