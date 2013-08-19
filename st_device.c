@@ -44,8 +44,7 @@ volatile int StStatus;
 	// Read the system timer status register 	
 	StStatus = *(AT91C_ST_SR);
 	StTick++;
-	StStatus = ((AT91C_BASE_PIOB->PIO_OSR & 7 )> 0) ? (AT91C_BASE_PIOB->PIO_ODR = AT91C_BASE_PIOB->PIO_ODR | 7) : (AT91C_BASE_PIOB->PIO_OER  = AT91C_BASE_PIOB->PIO_OER | 7);
-	
+	if (StTick > 1000 )  StTick = 0; 
 }
 
 //*----------------------------------------------------------------------------
@@ -83,7 +82,7 @@ void St_init()
 
 
 	//* System Timer initialization
-	AT91F_ST_SetPeriodIntervalTimer(AT91C_BASE_ST, 0xFFF);	// FFFF gives around 2 seconds
+	AT91F_ST_SetPeriodIntervalTimer(AT91C_BASE_ST, 32);	// FFFF gives around 2 seconds
 	AT91F_ST_EnableIt(AT91C_BASE_ST, AT91C_ST_PITS);
 }
 #endif

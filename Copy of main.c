@@ -53,7 +53,7 @@ AT91S_MciDevice					MCI_Device;
 char							Buffer[BUFFER_SIZE_MCI_DEVICE];
 char							Buffer2[BUFFER_SIZE_MCI_DEVICE];
 int readytowriteonSD = 0;
-char *Bufferwechlser;
+char *Bufferwechsler;
 
 // Local Functions
 
@@ -125,14 +125,14 @@ int main()
 	unsigned char	caractere;
 	int j;
 	uint32 Max_Read_DataBlock_Length;
-	uint32  x,y,bcd;
+	uint32  x,y,bcd_millisecond;
 	
 	Mci_init();
 	Usart_init();
 	St_init(); 
 	Led_init();
 	
-	Bufferwechlser = Buffer;
+	Bufferwechsler = Buffer;
 	if(AT91F_InitDeviceStructure() != AT91C_INIT_OK) {
 		AT91F_DBGU_Printk("\n\rSDcARD Initialisation failed\n\r");
 		return FALSE;}
@@ -152,27 +152,27 @@ int main()
 	USART_pt->US_PTCR = AT91C_PDC_TXTDIS;      
 	//MCI_pt->MCI_PTCR = AT91C_PDC_RXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard read 
 	//MCI_pt->MCI_PTCR = AT91C_PDC_TXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard write
-	USART_pt->US_PTCR = AT91C_PDC_RXTEN;  
+
 	readytowriteonSD = 2;
 	j = 0;  
 	
 	AT91C_BASE_RTC->RTC_CR = AT91C_RTC_UPDTIM;         // step RTC
 	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) ); // wait for stop acknowledge
 	AT91C_BASE_RTC->RTC_MR = 0;         // 24 hour mode
-	rtc_time.time_bits.second = 0x0; 
-	rtc_time.time_bits.minute = 0x0; 
-	rtc_time.time_bits.hour =   0x6; 
-	rtc_time.time_bits.merid =  0x0;
+	rtc_time.time_bits.second = 0; 
+	rtc_time.time_bits.minute = 0; 
+	rtc_time.time_bits.hour = 6; 
+	rtc_time.time_bits.merid = 0;
 	AT91C_BASE_RTC->RTC_TIMR = (uint32)rtc_time.time_data;
-	AT91C_BASE_RTC->RTC_CR =    0; // start timer.		
+	AT91C_BASE_RTC->RTC_CR = 0; // start timer.		
 	
 	AT91C_BASE_RTC->RTC_CR = AT91C_RTC_UPDCAL;         // step RTC
 	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) ); // wait for stop acknowledge
-	rtc_cal.cal_bits.century = 0x20; 
-	rtc_cal.cal_bits.year =    0x2007; 
-	rtc_cal.cal_bits.month =   0x1; 
-	rtc_cal.cal_bits.day =     0x1; 
-	rtc_cal.cal_bits.date =    0x1;
+	rtc_cal.cal_bits.century = 20; 
+	rtc_cal.cal_bits.year = 2007; 
+	rtc_cal.cal_bits.month = 01; 
+	rtc_cal.cal_bits.day = 1; 
+	rtc_cal.cal_bits.date = 01;
 	AT91C_BASE_RTC->RTC_CALR = (uint32)rtc_cal.cal_data;
 
 
@@ -182,39 +182,61 @@ int main()
 		switch(caractere)
 		{
 			case '0':	
-				while(1){
-				//while (!AT91F_US_RxReady(USART_pt));  // check if this line has got any effect ?
-				AT91F_US_PutFrame(USART_pt,(char *)(Bufferwechlser+8),(512-8),(char *)(Buffer2+8),(512-8)); 
-				    // start receiving the data from USART
-				resetLed(GREEN|RED|YELLOW); setLed(GREEN);// Glow Green LED ( reading from USART )
-				//while(1);
-				while(!((USART_pt->US_CSR) & AT91C_US_ENDRX));
-				x = (AT91C_BASE_RTC->RTC_TIMR) ;
-				y = AT91F_GetTickCount();				
-				Bufferwechlser[0] = (char)((x >> 16) & 0x1F );  // 16 .. 20 ( 5 bits ) 
-				Bufferwechlser[1] = ':';
-				Bufferwechlser[2] = (char)((x >> 8) & 0x7F );  // 8 .. 14 ( 7 bits ) 
-				Bufferwechlser[3] = ':';
-				Bufferwechlser[4] = (char)((x) & 0x7F);  // 0 .. 6 ( 7 bits ) 
-				Bufferwechlser[5] = '.';
-				bcd = ((y/100)<<8)+(((y/10)%10)<<4)+(y%10);
-				Bufferwechlser[6] = (char)((bcd >> 8) & 0xFF);
-				Bufferwechlser[7] = (char)((bcd) & 0xFF);
-				
-				((readytowriteonSD % 2 ) != 0) ? (Bufferwechlser = Buffer) : (Bufferwechlser = Buffer2);
-				//while(USART_pt->USART_RCR);
-				//USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
-		
-				if ((AT91F_MCI_WriteBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (uint32 *)Bufferwechlser,Max_Read_DataBlock_Length)) != AT91C_WRITE_OK)		
-					AT91F_DBGU_Printk("\n\rWrite not OK\n\r");
-				// glow yellow LED ( writing to SD card )				
-				//* Wait end of Write
-				AT91F_MCI_DeviceWaitReady(AT91C_MCI_TIMEOUT);
-				//USART_pt->US_PTCR = AT91C_PDC_RXTEN;
-				MciBeginBlock++;
+				while(1)
+				{
+					//while (!AT91F_US_RxReady(USART_pt));  // check if this line has got any effect ?
+					/* --------start receiving the data from USART  ---------*/
+					if ( USART_pt->
+					AT91F_US_PutFrame(USART_pt,(char *)(Bufferwechsler),(512),(char *)(Buffer2),(512)); 
+					USART_pt->US_PTCR = AT91C_PDC_RXTEN;  
+					do
+					{
+						if ( USART_pt->US_RHR == '\n') 
+						USART_pt->PTCR = AT91C_PDC_RXTDIS;
+						USART_pt->US_RPR = Bufferwechsler + 20; 
+						USART_pt->US_RCR = 512 - 20;
+						Puttimestamp();
+					}
+					while(!((USART_pt->US_CSR) & AT91C_US_ENDRX));
+					// Store Time info
+					rtc_time = AT91C_BASE_RTC->RTC_TIMR;
+					y = AT91F_GetTickCount();
+					bcd_millisecond = ((y/100)<<8)+(((y/10)%10)<<4)+y%10);				
+					Bufferwechsler[0] = (char)rtc_time.time_bits.merid;
+					Bufferwechsler[1] = ':';
+					Bufferwechsler[2] = (char)rtc_time.time_bits.hour;
+					Bufferwechsler[3] = ':';
+					Bufferwechsler[4] = (char)rtc_time.time_bits.minute;
+					Bufferwechsler[5] = '.';
+					Bufferwechsler[6] = (char)rtc_time.time_bits.second;
+					Bufferwechsler[7] = '.';
+					Bufferwechsler[8] = (char)((bcd_millisecond >> 8) & 0xFF);
+					Bufferwechsler[9] = (char)((bcd_millisecond) & 0xFF);
+					
+					// Store Calendar info
+					Bufferwechsler[10] = (char)rtc_cal.cal_bits.day;
+					Bufferwechsler[11] = ',';				
+					Bufferwechsler[12] = (char)rtc_cal.cal_bits.date;
+					Bufferwechsler[13] = ',';				
+					Bufferwechsler[14] = (char)rtc_cal.cal_bits.month;
+					Bufferwechsler[15] = ',';				
+					Bufferwechsler[16] = (char)rtc_cal.cal_bits.century;
+					Bufferwechsler[17] = ',';				
+					Bufferwechsler[18] = (char)rtc_cal.cal_bits.year;
+					Bufferwechsler[19] = '\n'
+	
+					((readytowriteonSD % 2 ) != 0) ? (Bufferwechsler = Buffer) : (Bufferwechsler = Buffer2);
+	
+					//while(USART_pt->USART_RCR);
+					//USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
+			
+					if ((AT91F_MCI_WriteBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (uint32 *)Bufferwechsler,Max_Read_DataBlock_Length)) != AT91C_WRITE_OK)		
+						AT91F_DBGU_Printk("\n\rWrite not OK\n\r");
+					//* Wait end of Write
+					AT91F_MCI_DeviceWaitReady(AT91C_MCI_TIMEOUT);
+					//USART_pt->US_PTCR = AT91C_PDC_RXTEN;
+					MciBeginBlock++;
 				}
-				
-//				}
 				break;
 
 			case '1': //* Print in pooling

@@ -5,6 +5,46 @@ extern void AT91F_MCI_Handler(void);  // to isr.S
 extern int main(void);     // to cstartup.S
 extern char AT91F_DBGU_getc(void);
 extern int readytowriteonSD;
+
+// REal time clock : 
+union _calendar {
+unsigned int cal_data;
+struct 
+{
+unsigned int century : 6;
+unsigned int         : 2;
+unsigned int year    : 8;
+unsigned int month   : 5;
+unsigned int day     : 3;
+unsigned int date    : 6;
+unsigned int         : 2;
+} cal_bits;
+} ;
+
+typedef union _calendar CALENDAR;
+
+union _time {
+unsigned int time_data;
+struct 
+{
+unsigned int second : 7;
+unsigned int        : 1;
+unsigned int minute : 7;
+unsigned int        : 1;
+unsigned int hour   : 5;
+unsigned int        : 1;  // this is not required but for the sake of uniformity.
+unsigned int merid  : 1;
+unsigned int        : 9;
+} time_bits;
+};
+typedef union _time TIME;
+typedef struct _led{
+char green : 1;
+char yellow: 1;
+char red   : 1;
+char pad   : 5;
+} LED;
+
 /*-----------------------------------------------*/
 /* SDCard Device Descriptor Structure Definition */
 /*-----------------------------------------------*/

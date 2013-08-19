@@ -11,22 +11,22 @@
 
 #ifndef mci_device_c
 /*Functions*/
-AT91S_MCIDeviceStatus AT91F_MCI_SendCommand (	AT91PS_MciDevice ,	unsigned int ,	unsigned int );
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_SendAppCommand (AT91PS_MciDevice ,	unsigned int ,	unsigned int );
-AT91S_MCIDeviceStatus AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address);
+uint32 AT91F_MCI_SendCommand (	AT91PS_MciDevice ,	unsigned int ,	unsigned int );
+uint32 AT91F_MCI_SDCard_SendAppCommand (AT91PS_MciDevice ,	unsigned int ,	unsigned int );
+uint32 AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address);
 extern void AT91F_MCI_Device_Handler(	AT91PS_MciDevice pMCI_Device,	unsigned int status);
-extern AT91S_MCIDeviceStatus AT91F_MCI_ReadBlock(	AT91PS_MciDevice pMCI_Device,	int src,	unsigned int *dataBuffer,	int sizeToRead );
-extern AT91S_MCIDeviceStatus AT91F_MCI_WriteBlock(	AT91PS_MciDevice pMCI_Device,	int dest,	unsigned int *dataBuffer,	int sizeToWrite );
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_SelectCard(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address);
-AT91S_MCIDeviceStatus AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address , unsigned int * response);
-AT91S_MCIDeviceStatus AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length);
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_GetAllOCR (AT91PS_MciDevice pMCI_Device);
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_GetAllCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_Init (AT91PS_MciDevice pMCI_Device);
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device);
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device);
-extern AT91S_MCIDeviceStatus AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device);
+extern uint32 AT91F_MCI_ReadBlock(	AT91PS_MciDevice pMCI_Device,	int src,	unsigned int *dataBuffer,	int sizeToRead );
+extern uint32 AT91F_MCI_WriteBlock(	AT91PS_MciDevice pMCI_Device,	int dest,	unsigned int *dataBuffer,	int sizeToWrite );
+uint32 AT91F_MCI_MMC_SelectCard(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address);
+uint32 AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address , unsigned int * response);
+uint32 AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length);
+uint32 AT91F_MCI_MMC_GetAllOCR (AT91PS_MciDevice pMCI_Device);
+uint32 AT91F_MCI_MMC_GetAllCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
+uint32 AT91F_MCI_MMC_Init (AT91PS_MciDevice pMCI_Device);
+uint32 AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device);
+uint32 AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response);
+uint32 AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device);
+extern uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device);
 extern void AT91F_MCI_DeviceWaitReady(unsigned int timeout);
 extern int Mci_init(void);
 #endif
@@ -34,7 +34,7 @@ extern int Mci_init(void);
 //* \fn    AT91F_MCI_SendCommand
 //* \brief Generic function to send a command to the MMC or SDCard
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_SendCommand (
+uint32 AT91F_MCI_SendCommand (
 	AT91PS_MciDevice pMCI_Device,
 	unsigned int Cmd,
 	unsigned int Arg)
@@ -74,7 +74,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_SendCommand (
 //* \fn    AT91F_MCI_SDCard_SendAppCommand
 //* \brief Specific function to send a specific command to the SDCard
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_SendAppCommand (
+uint32 AT91F_MCI_SDCard_SendAppCommand (
 	AT91PS_MciDevice pMCI_Device,
 	unsigned int Cmd_App,
 	unsigned int Arg	)
@@ -109,7 +109,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_SDCard_SendAppCommand (
 //* \fn    AT91F_MCI_GetStatus
 //* \brief Addressed card sends its status register
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device,unsigned int relative_card_address)
+uint32 AT91F_MCI_GetStatus(AT91PS_MciDevice pMCI_Device,unsigned int relative_card_address)
 {
 	if (AT91F_MCI_SendCommand(pMCI_Device,
 								AT91C_SEND_STATUS_CMD,
@@ -151,7 +151,7 @@ void AT91F_MCI_Device_Handler(
 //* \fn    AT91F_MCI_ReadBlock
 //* \brief Read an ENTIRE block or PARTIAL block
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_ReadBlock(
+uint32 AT91F_MCI_ReadBlock(
 	AT91PS_MciDevice pMCI_Device,
 	int src,
 	unsigned int *dataBuffer,
@@ -212,7 +212,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_ReadBlock(
 //* \fn    AT91F_MCI_WriteBlock
 //* \brief  Write an ENTIRE block but not always PARTIAL block !!!
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_WriteBlock(
+uint32 AT91F_MCI_WriteBlock(
 	AT91PS_MciDevice pMCI_Device,
 	int dest,
 	unsigned int *dataBuffer,
@@ -274,7 +274,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_WriteBlock(
 //* \fn    AT91F_MCI_GetCSD
 //* \brief Asks to the specified card to send its CSD
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address , unsigned int * response)
+uint32 AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address , unsigned int * response)
 {
  	if(AT91F_MCI_SendCommand(pMCI_Device,
 								  AT91C_SEND_CSD_CMD,
@@ -292,7 +292,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_GetCSD (AT91PS_MciDevice pMCI_Device, unsigned i
 //* \fn    AT91F_MCI_SetBlocklength
 //* \brief Select a block length for all following block commands (R/W)
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length)
+uint32 AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsigned int length)
 {
     return( AT91F_MCI_SendCommand(pMCI_Device, AT91C_SET_BLOCKLEN_CMD, length) );
 }
@@ -302,7 +302,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsi
 //* \fn    AT91F_MCI_SDCard_GetOCR
 //* \brief Asks to all cards to send their operations conditions
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device)
+uint32 AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device)
 {
 	unsigned int	response =0x0;
 
@@ -327,7 +327,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_SDCard_GetOCR (AT91PS_MciDevice pMCI_Device)
 //* \fn    AT91F_MCI_SDCard_GetCID
 //* \brief Asks to the SDCard on the chosen slot to send its CID
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response)
+uint32 AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, unsigned int *response)
 {
  	if(AT91F_MCI_SendCommand(pMCI_Device,
 							AT91C_ALL_SEND_CID_CMD,
@@ -346,7 +346,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_SDCard_GetCID (AT91PS_MciDevice pMCI_Device, uns
 //* \fn    AT91F_MCI_SDCard_SetBusWidth
 //* \brief  Set bus width for SDCard
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device)
+uint32 AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device)
 {
 	volatile int	ret_value;
 	char			bus_width;
@@ -377,7 +377,7 @@ AT91S_MCIDeviceStatus AT91F_MCI_SDCard_SetBusWidth(AT91PS_MciDevice pMCI_Device)
 //* \fn    AT91F_MCI_SDCard_Init
 //* \brief Return the SDCard initialisation status
 //*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device)
+uint32 AT91F_MCI_SDCard_Init (AT91PS_MciDevice pMCI_Device)
 {
     unsigned int	tab_response[4];
 	unsigned int	mult,blocknr;

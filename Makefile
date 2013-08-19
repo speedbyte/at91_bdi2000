@@ -34,7 +34,7 @@ FORMAT = binary
 #Target File name
 TARGET = main
 
-SRCARM = $(TARGET).c init.c mci_device.c usart_device.c st_device.c
+SRCARM = $(TARGET).c init.c mci_device.c usart_device.c st_device.c led_device.c
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM = cstartup_gnu.S isr.S
 

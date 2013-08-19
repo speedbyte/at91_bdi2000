@@ -54,6 +54,7 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 		 AT91F_US_GetChar(USART_pt);
    		//* Trace on DBGU
     		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'O');
+			AT91C_BASE_PIOB->PIO_OER  = AT91C_BASE_PIOB->PIO_OER | 7;
 	}
 
 	//* Check error
@@ -71,6 +72,7 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 		USART_pt->US_CR = AT91C_US_STTTO;
    		//* Trace on DBGU
     		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'T');
+
 	}
 
 	//* Reset the satus bit

@@ -20,11 +20,11 @@
 
 
 
-extern AT91S_MCIDeviceStatus 	AT91F_MCI_ReadBlock(AT91PS_MciDevice ,int , unsigned int * ,int );
-extern AT91S_MCIDeviceStatus 	AT91F_MCI_WriteBlock(AT91PS_MciDevice,int,unsigned int *,int);
-extern void 					AT91F_MCI_DeviceWaitReady	(unsigned int timeout);
-extern void 					AT91F_MCI_Device_Handler(AT91PS_MciDevice,unsigned int);
-extern AT91S_MCIDeviceStatus 	AT91F_MCI_SDCard_Init (AT91PS_MciDevice);
+extern uint32 	AT91F_MCI_ReadBlock(AT91PS_MciDevice ,int , uint32 * ,int );
+extern uint32 	AT91F_MCI_WriteBlock(AT91PS_MciDevice,int,uint32 *,int);
+extern void 					AT91F_MCI_DeviceWaitReady	(uint32 timeout);
+extern void 					AT91F_MCI_Device_Handler(AT91PS_MciDevice,uint32);
+extern uint32 	AT91F_MCI_SDCard_Init (AT91PS_MciDevice);
 extern void Mci_init(void);
 
 
