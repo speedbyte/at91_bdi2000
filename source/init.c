@@ -150,7 +150,7 @@ void AT91F_LowLevelInit()
 	// Enable Receiver
 	AT91F_US_EnableRx((AT91PS_USART) AT91C_BASE_DBGU);
 	
-	DBGU_Printk("\n\r\nAT91F_LowLevelInit() done\n\r");
+	DBGU_Printk("\n\r\nInitialising interrupt controller and ARM vectors done\n\r");
 	
 }
 

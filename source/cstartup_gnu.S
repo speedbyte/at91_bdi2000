@@ -7,13 +7,13 @@
 
 .data
 
-.equ ARM_MODE_USER , 0x10     
-.equ ARM_MODE_IRQ , 0x12
-.equ ARM_MODE_FIQ , 0x11
-.equ ARM_MODE_SVC , 0x13
-.equ ARM_MODE_ABORT , 0x17
-.equ ARM_MODE_UNDEF , 0x1B
-.equ ARM_MODE_SYS , 0x1F
+.equ ARM_MODE_USER  ,   0x10     
+.equ ARM_MODE_IRQ   ,   0x12
+.equ ARM_MODE_FIQ   ,   0x11
+.equ ARM_MODE_SVC   ,   0x13
+.equ ARM_MODE_ABORT ,   0x17
+.equ ARM_MODE_UNDEF ,   0x1B
+.equ ARM_MODE_SYS   ,   0x1F
 
 .equ I_BIT , 0x80
 .equ F_BIT , 0x40
@@ -26,16 +26,16 @@
 @-
 @------------------------------------------------------------------------------
 
-.equ IRQ_STACK_SIZE , 0x200
-.equ FIQ_STACK_SIZE , 0x10
-.equ ABT_STACK_SIZE , 0x10
-.equ UND_STACK_SIZE , 0x10
-.equ SVC_STACK_SIZE , 0x800
-.equ USER_STACK_SIZE , 0x200
+.equ IRQ_STACK_SIZE   , 0x200
+.equ FIQ_STACK_SIZE   , 0x10
+.equ ABT_STACK_SIZE   , 0x10
+.equ UND_STACK_SIZE   , 0x10
+.equ SVC_STACK_SIZE   , 0x800
+.equ USER_STACK_SIZE  , 0x200
 
 @- IRQ stack definition
 AT91_IRQ_Stack_End: 
-.word 0x55AA55AA                           @ 55aa55aa 	=  strpl	r5, [sl, #1450]!
+.word 0x55AA55AA
 .space (IRQ_STACK_SIZE - 4)			
 .equ AT91_IRQ_Stack_Begin , (AT91_IRQ_Stack_End + (IRQ_STACK_SIZE - 4))
 
@@ -83,21 +83,24 @@ AT91_USER_Stack_End:
 @.global AT91_USER_Stack_Begin
 
 .text
+.arm
+.global _start
 
+_start:
 
 B InitReset @ reset
 undefvec:
-B undefvec @ Undefined Instruction
+B undefvec  @ Undefined Instruction
 swivec:
-B swivec @ Software Interrupt
+B swivec    @ Software Interrupt
 pabtvec:
-B pabtvec @ Prefetch Abort
+B pabtvec   @ Prefetch Abort
 dabtvec:	
-B dabtvec @ Data Abort
+B dabtvec   @ Data Abort
 rsvdvec:
-B rsvdvec @ reserved
+B rsvdvec   @ reserved
 irqvec:
-ldr pc, [pc,#-0xF20] @ IRQ : read the AIC
+ldr pc, [pc,#-0xF20] @ IRQ : read the AIC, and it loads the interrupt vector address from there.
 fiqvec:
 B fiqvec @ FIQ
 
@@ -157,6 +160,27 @@ StackData:
 .word AT91_USER_Stack_Begin
 
 EndInitStack:
+
+
+#ifdef ROM_RUN
+// Relocate .data section (Copy from ROM to RAM)
+                LDR     R1, =_etext
+                LDR     R2, =_data
+                LDR     R3, =_edata
+LoopRel:        CMP     R2, R3
+                LDRLO   R0, [R1], #4
+                STRLO   R0, [R2], #4
+                BLO     LoopRel
+#endif
+
+// Clear .bss section (Zero init)
+                MOV     R0, #0
+                LDR     R1, =__bss_start__
+                LDR     R2, =__bss_end__
+LoopZI:         CMP     R1, R2
+                STRLO   R0, [R1], #4
+                BLO     LoopZI
+
 
 .extern AT91F_LowLevelInit
 

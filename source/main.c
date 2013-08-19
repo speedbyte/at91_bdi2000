@@ -39,8 +39,8 @@ REv 1.2 : Integrated USART function calls
 CALENDAR 				rtc_cal;
 TIME     				rtc_time;
 int 					reader, writer;
-AT91PS_USART 			USART_pt = AT91C_BASE_US1;
-AT91PS_MCI 				MCI_pt = AT91C_BASE_MCI;
+AT91PS_USART 			USART_pt;
+AT91PS_MCI 				MCI_pt;
 int			 			SDBeginBlock;
 SDCARD_INFO				mci_sdcard_info;
 SDCARD_DESC				mci_sdcard_desc;
@@ -222,6 +222,8 @@ void Interrupt_Handler_MCI_Highlevel(void)
 //*----------------------------------------------------------------------------
 int main()
 {
+	USART_pt = AT91C_BASE_US1;
+	MCI_pt = AT91C_BASE_MCI;
 	unsigned char	character;
 	int j, SDCurrentBlock,SDLastBlock, quitflag;
 	uint32 Max_Read_DataBlock_Length;
@@ -231,9 +233,9 @@ int main()
 	Led_init();
 	Rtc_init();
 	globalj=0;
-	if(Sdcard_init() != SD_INIT_NO_ERROR) {
-		DBGU_Printk( "\n\r	SDcARD Initialisation failed\n\r");
-		return FALSE;}
+	setLed(RED);
+	while(Sdcard_init() != SD_INIT_NO_ERROR);
+	resetLed(RED);
 	SDBeginBlock = 100;
 	SDLastBlock = SDBeginBlock;
 	for (j=0;j<1024;j++) usartBuffer1[j] = 'A';
@@ -291,8 +293,6 @@ int main()
 				while (!AT91F_US_RxReady(USART_pt));
 				//character = (char)USART_pt->US_RHR;
 				USART_pt->US_PTCR = AT91C_PDC_RXTEN;
-
-
 				PutTimeStamp();
 				/*Bufferwechsler[globalj++] = character;
 				AT91C_BASE_PDC_MCI->PDC_RCR--;	*/

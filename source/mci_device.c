@@ -310,10 +310,10 @@ uint32 SDcard_GetOCR_ACMD41_R3 (SDCARD_PTR ptr_sdcard)
 }
 
 //*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_SDCard_GetCID
+//* \fn    SDcard_GetCID_CMD2_R2
 //* \brief Asks to the SDCard on the chosen slot to send its CID
 //*----------------------------------------------------------------------------
-uint32 AT91F_MCI_SDCard_GetCID (SDCARD_PTR ptr_sdcard, unsigned int *response)
+uint32 SDcard_GetCID_CMD2_R2 (SDCARD_PTR ptr_sdcard, unsigned int *response)
 {
  	if(SendCommandtoSD(ptr_sdcard,
 							CMD2_ALL_SEND_CID,
@@ -377,20 +377,20 @@ uint32 SDDevice_Init_and_Cfg_Registers (SDCARD_PTR ptr_sdcard)
 {
     unsigned int	tab_response[4];
 	unsigned int	mult,blocknr;
-
+//-----------------inactive state ------------------
 	SendCommandtoSD(ptr_sdcard, CMD0_GO_IDLE_STATE, NO_ARGUMENT_REQUIRED);
-
+// ----------- idle state ------------------
     if(SDcard_GetOCR_ACMD41_R3(ptr_sdcard) == SD_INIT_FOUND_ERROR)
     	return SD_INIT_FOUND_ERROR;
 /* Register OCR , 32 bit Register, Operation Condition Register. */
-	if (AT91F_MCI_SDCard_GetCID(ptr_sdcard,tab_response) == SD_CMD_SENDNO_ERROR) 
+	if (SDcard_GetCID_CMD2_R2(ptr_sdcard,tab_response) == SD_CMD_SENDNO_ERROR) 
 /* Register CID width 128 .. Card identification number: individual card number for identification. */
-
 	{
 	    ptr_sdcard->ptr_sdcard_info->Card_Inserted = STATE_SDCARD_INSERTED;
-
+		// ----------READY state-------------.
 	    if (SendCommandtoSD(ptr_sdcard, CMD3_SET_RELATIVE_ADDR, 0) == SD_CMD_SENDNO_ERROR)
 		{
+		//------------Standby  state -----------------
 /* Register RCA width 16 .. Relative card address: local system address of a card, dynamically
 suggested by the card and approved by the host during initialization.  */
 			ptr_sdcard->ptr_sdcard_info->Relative_Card_Address = (AT91C_BASE_MCI->MCI_RSPR[0] >> 16);
