@@ -88,7 +88,7 @@ inline void __ascii1(unsigned char value)
 	AT91C_BASE_PDC_MCI->PDC_RCR--;	
 }
 
-inline void __ascii2(unsigned char value)
+inline void __ascii2(unsigned int value)
 {
 	Bufferwechsler[globalj++] = ((value & 0xF0) >> 4 ) + 48 ; 
 	AT91C_BASE_PDC_MCI->PDC_RCR--;	
@@ -96,9 +96,11 @@ inline void __ascii2(unsigned char value)
 	AT91C_BASE_PDC_MCI->PDC_RCR--;							
 }
 
-inline void __dec_to_ascii2(unsigned char value)
+inline void __dec_to_ascii2(unsigned int value)
 {
-	Bufferwechsler[globalj++] = value + 48 ; 
+	Bufferwechsler[globalj++] = (value/100) + 48 ; 
+	AT91C_BASE_PDC_MCI->PDC_RCR--;	
+	Bufferwechsler[globalj++] = ((value/10)%10) + 48 ; 
 	AT91C_BASE_PDC_MCI->PDC_RCR--;	
 	Bufferwechsler[globalj++] = (value%10) + 48 ; 
 	AT91C_BASE_PDC_MCI->PDC_RCR--;							
@@ -118,9 +120,9 @@ void PutTimeStamp()
 	__format(':');
 	__ascii2(rtc_time.time_bits.second);
 	__format( '.');
-	//__dec_to_ascii2((char)(GetTickCount_fromST()) );
-	Bufferwechsler[globalj++] = (char)(GetTickCount_fromST()) + 48 ; 
-	AT91C_BASE_PDC_MCI->PDC_RCR--;	
+	__dec_to_ascii2(GetTickCount_fromST());
+	//Bufferwechsler[globalj++] = (char)(GetTickCount_fromST()) + 48 ; 
+	//AT91C_BASE_PDC_MCI->PDC_RCR--;	
 	Bufferwechsler[globalj++] = '-';
 	AT91C_BASE_PDC_MCI->PDC_RCR--;
 }   
@@ -266,23 +268,39 @@ int main()
 				Print_LineonSD("\r\nWelcome to the RS232 to SDCard Datalogger\r\n");
 				PutCalTimeHeader();
 				AT91C_BASE_PDC_MCI->PDC_RCR = 0;   //  Here goes the first Block.	
-
+				if ( readytowriteonSD == WRITE_NOW )
+				{
+					errorstatus = SDcard_WriteBlock_CMD24_R1(&mci_sdcard,(SDCurrentBlock*Max_Read_DataBlock_Length), (uint32 *)printBuffer,Max_Read_DataBlock_Length);		
+					//* Wait end of Write
+					SDcard_Poll_AT91CMCINOTBUSY_flag(AT91C_MCI_TIMEOUT); 
+					if (errorstatus != SD_WRITE_NO_ERROR)	
+					{ 
+						DBGU_Printk( "\n\rWrite not OK\n\r");
+						if (errorstatus == (SD_WRITE_MEMFULL_ERROR | SD_WRITE_FOUND_ERROR) )
+						{
+							setLed(RED);
+							break;
+						}
+					}
+					SDCurrentBlock++;
+					readytowriteonSD = NOT_ACTIVE;
+				}
 				Configure_USART_RX_PDC(USART_pt,(char *)(usartBuffer1),(1024),0,0); 
 				AT91F_US_EnableIt(USART_pt,AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE | AT91C_US_PARE);
 				AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX ); // interrupt only after 1024 bytes.
 				while (!AT91F_US_RxReady(USART_pt));
-				character = (char)USART_pt->US_RHR;
+				//character = (char)USART_pt->US_RHR;
 				USART_pt->US_PTCR = AT91C_PDC_RXTEN;
 
 
 				PutTimeStamp();
-				Bufferwechsler[globalj++] = character;
-				AT91C_BASE_PDC_MCI->PDC_RCR--;	
+				/*Bufferwechsler[globalj++] = character;
+				AT91C_BASE_PDC_MCI->PDC_RCR--;	*/
 				/*if(character == '\n')
 				{
 					PutTimeStamp();
 				}*/
-				
+				readytowriteonSD = NOT_ACTIVE;
 				do 
 				{
 				if(AT91C_BASE_DBGU->DBGU_RHR == 'q') break;
@@ -371,12 +389,12 @@ int main()
 							quitflag = 1;
 							break;
 						default:
-							USART_Printk("\r\nBad choice, Retry please\r\n");
+							USART_Printk("\r\nBad choice, reading\r\n");
 							break;		
 					}
 				}
 			default:
-				DBGU_Printk( "\n\rBad choice, Retry please\n\r");
+				DBGU_Printk( "\n\rBad choice, writing\n\r");
 				break;		
 		}
 	}	

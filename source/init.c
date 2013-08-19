@@ -119,30 +119,7 @@ void AT91F_LowLevelInit()
 		AT91F_UndefHandler,      // AIC default handler
 		AT91F_SpuriousHandler,   // AIC spurious handler
 		0);                      // Protect mode
-/*#define AT91C_AIC_BRANCH_OPCODE ((void (*) ()) 0xE51FFF20) // ldr, pc, [pc, #-&F20]
 
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_AIC_SetExceptionVector
-//* \brief Configure vector handler
-//*----------------------------------------------------------------------------
-__inline static unsigned int  AT91F_AIC_SetExceptionVector (
-	unsigned int *pVector, // \arg pointer to the AIC registers
-	void (*Handler) () )   // \arg Interrupt Handler
-{
-	unsigned int oldVector = *pVector;
-
-	if ((unsigned int) Handler == (unsigned int) AT91C_AIC_BRANCH_OPCODE)
-		*pVector = (unsigned int) AT91C_AIC_BRANCH_OPCODE;
-	else
-		*pVector = (((((unsigned int) Handler) - ((unsigned int) pVector) - 0x8) >> 2) & 0x00FFFFFF) | 0xEA000000;
-
-	return oldVector;
-}
-	// Set the IRQ exception vector
-	AT91F_AIC_SetExceptionVector((unsigned int *) 0x18, IrqHandler);
-	// Set the Fast Interrupt exception vector
-	AT91F_AIC_SetExceptionVector((unsigned int *) 0x1C, FiqHandler);
-*/
 	// Perform 8 End Of Interrupt Command to make sýre AIC will not Lock out nIRQ 
 	AT91F_AIC_AcknowledgeIt(AT91C_BASE_AIC);
 	AT91F_AIC_AcknowledgeIt(AT91C_BASE_AIC);
