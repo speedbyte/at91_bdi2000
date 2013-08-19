@@ -19,7 +19,7 @@
 #include <string.h>
 #define debug(fmt,args...) do {} while(0)
 //#define debug(fmt,args...)	printf (fmt ,##args) 
-
+#define uart 1
 extern int fat_register_device(block_dev_desc_t *dev_desc, int part_no);
 /* Local variables */
 static block_dev_desc_t mmc_dev; 
@@ -51,6 +51,10 @@ extern AT91S_MCIDeviceStatus 	AT91F_MCI_MMC_SelectCard(AT91PS_MciDevice,unsigned
 extern AT91S_MCIDeviceStatus 	AT91F_MCI_ReadBlock(AT91PS_MciDevice,int,unsigned int *,int);
 extern AT91S_MCIDeviceStatus 	AT91F_MCI_WriteBlock(AT91PS_MciDevice,int,unsigned int *,int);
 
+#ifdef uart
+extern void Usart_init (void);
+extern void AT91F_US_Print_frame(char *buffer, unsigned short counter); // \arg pointer to a string ending by \0
+#endif
 
 /* Local Functions */
 void AT91F_MCIDeviceWaitReady	(unsigned int timeout);
@@ -81,6 +85,50 @@ void AT91F_MCIDeviceWaitReady(unsigned int timeout)
 	while( !(status & AT91C_MCI_NOTBUSY)  && (timeout>0) );	
 }
 
+
+//*----------------------------------------------------------------------------
+//* \fn    AT91F_Test
+//* \brief Test Functions
+//*----------------------------------------------------------------------------
+/*int AT91F_Test(void)
+{
+	int i;
+	unsigned int Max_Read_DataBlock_Length;
+		
+	Max_Read_DataBlock_Length = MCI_Device.pMCI_DeviceFeatures->Max_Read_DataBlock_Length;
+	
+	//* ReadBlock & WriteBlock Test -> Entire Block
+
+	//* Wait MCI Device Ready
+	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
+
+	//* Read Block 1
+	for(i=0;i<BUFFER_SIZE_MCI_DEVICE;i++) 	mmc_buf[i] = 0x00;	
+	AT91F_MCI_ReadBlock(&MCI_Device,(1*Max_Read_DataBlock_Length),(unsigned int*) mmc_buf,Max_Read_DataBlock_Length);
+	
+	//* Wait end of Read
+	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
+
+	//* Write Page 1
+    sprintf(mmc_buf,"\n\rThis sentence is written in your device... Congratulations Vikas check Lock\n\r");
+	AT91F_MCI_WriteBlock(&MCI_Device,(1*Max_Read_DataBlock_Length),(unsigned int*) mmc_buf,Max_Read_DataBlock_Length);
+
+	//* Wait end of Write
+	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
+
+	//* Read Block 1
+	for(i=0;i<BUFFER_SIZE_MCI_DEVICE;i++) 	mmc_buf[i] = 0x00;	
+	AT91F_MCI_ReadBlock(&MCI_Device,(1*Max_Read_DataBlock_Length),(unsigned int*) mmc_buf,Max_Read_DataBlock_Length);
+
+	//* Wait end of Read
+	AT91F_MCIDeviceWaitReady(AT91C_MCI_TIMEOUT);
+
+	//* End Of Test
+	AT91F_DBGU_Printk("\n\rTests Completed: !!!\n\r");
+	AT91F_DBGU_Printk(mmc_buf);
+
+	return TRUE;
+}*/
 
 
 //*----------------------------------------------------------------------------
@@ -177,7 +225,7 @@ void AT91F_MCI_Handler(void)
 	int status;
 
 	status = ( AT91C_BASE_MCI->MCI_SR & AT91C_BASE_MCI->MCI_IMR );
-	AT91F_DBGU_Printk("\rInterrupt being handled....\n\r");
+	
 
 	AT91F_MCI_Device_Handler(&MCI_Device,status);
 }
@@ -462,41 +510,14 @@ int do_mem_cp ( ulong dst, ulong src, ulong cnt)
 return 0;
 }
 
-//tutu
-void AT91F_US3_CfgPIO_useB (void)
-{
-	// Configure PIO controllers to periph mode
-	AT91F_PIO_CfgPeriph(
-		AT91C_BASE_PIOB, // PIO controller base address
-		0,
-		((unsigned int) AT91C_PIO_PB0 | (unsigned int) AT91C_PIO_PB0 | (unsigned int) AT91C_PIO_PB2)
-		); // Peripheral B
-}
-
-// tutu end
 //*----------------------------------------------------------------------------
-//* \fn    main
-//* \brief main function
+//* Function Name       : MCI_init
+//* Object              : MCI initialization 
+//* Input Parameters    : none
+//* Output Parameters   : TRUE
 //*----------------------------------------------------------------------------
-int main()
+void Mci_init(void)
 {
-	unsigned char	caractere;
-	// tutu
-	//AT91F_US_EnableRTS((AT91PS_USART)AT91C_BASE_US3);
-	AT91F_US3_CfgPIO_useB ();   	
-	pUSART_vikas = AT91C_BASE_US3; 	
-	pUSART_vikas->US_CR = AT91C_US_RTSEN; 
-	
-	AT91F_DBGU_Printk("\n\n\r======================================\n\r");
-	AT91F_DBGU_Printk("AT91RM9200 MCI Device Test\n\r");
-	AT91F_DBGU_Printk("======================================\n\r");
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//  MCI Init : common to MMC and SDCard
-///////////////////////////////////////////////////////////////////////////////////////////
-
-	AT91F_DBGU_Printk("\n\rInit MCI Interface\n\r");
-
     // Set up PIO SDC_TYPE to switch on MMC/SDCard and not DataFlash Card
 	AT91F_PIO_CfgOutput(AT91C_BASE_PIOB,AT91C_PIO_PB7);
 	AT91F_PIO_SetOutput(AT91C_BASE_PIOB,AT91C_PIO_PB7);
@@ -521,45 +542,58 @@ int main()
 
 	// Enable MCI interrupt
 	AT91F_AIC_EnableIt(AT91C_BASE_AIC,AT91C_ID_MCI);
+}
 
+//tutu
+void AT91F_US3_CfgPIO_useB (void)
+{
+	// Configure PIO controllers to periph mode
+	AT91F_PIO_CfgPeriph(
+		AT91C_BASE_PIOB, // PIO controller base address
+		0,
+		((unsigned int) AT91C_PIO_PB0)
+		); // Peripheral B
+}
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//  Enter Test Menu
-///////////////////////////////////////////////////////////////////////////////////////////
-
-	// Enable Receiver
-	AT91F_US_EnableRx((AT91PS_USART) AT91C_BASE_DBGU);
+// tutu end
+//*----------------------------------------------------------------------------
+//* \fn    main
+//* \brief main function
+//*----------------------------------------------------------------------------
+int main()
+{
+	unsigned char	caractere;
+	// tutu
+	AT91F_US3_CfgPIO_useB ();   	
+	pUSART_vikas = AT91C_BASE_US3; 	
+	pUSART_vikas->US_CR = AT91C_US_RTSEN;  // to disable RTSDIS
+	//tutu
+	
+	// Init MCi
+	Mci_init(); 
+#ifdef uart   
+	//* Init Usart
+    Usart_init();
+#endif
 
 	while(1)
 	{
 		AT91F_DBGU_Printk("\n\rTest MCI Device\n\r1:Test MMC\n\r2:Test SDCard\n\r");
-
 		// Wait for User Choice : 1 <=> Enter Test MMC , 2 <=> Enter Test SDCard
 		caractere = AT91F_DBGU_getc();
 
 		switch(caractere)
 		{
-			case '1':
-				AT91F_DBGU_Printk("\n\rEnter Test MMC\n\r");
-				
-				if(AT91F_Test_MMC() == TRUE)
-					AT91F_DBGU_Printk("\n\rTests MCI MMC Successful !!!\n\r");
-				else
-					AT91F_DBGU_Printk("\n\rTests MCI MMC Failed !!!\n\r");
-
-				break;
-			
-			case '2':	
-				AT91F_DBGU_Printk("\n\rEnter Initialiation SDCard ......\n\r");
-				pUSART_vikas->US_CR = AT91C_US_RTSDIS;
+	
+			case '1':	
 				if(AT91F_Init_SDCard() == TRUE)
 					{
 					AT91F_DBGU_Printk("Init SD card successful !!!\n\r");
 					mmc_ready = 1;
-					mmc_init(1);				// 1 = verbose
+					//mmc_init(1);				// 1 = verbose
 					//mmc_bread(0,0,1,(ulong *)mmc_buf);     //  devnr = dummy, blknr = dummy, blkcnt=1 converts to 512 later, dst 
 					AT91F_DBGU_Printk("\n\n\rWriting .................\n\r");
-					sprintf((char *)mmc_buf,"\n\r\"This sentence was written and read back\"");
+					sprintf((char *)mmc_buf,"from mci to usart with love\n\r");
 				
 					mmc_write(mmc_buf, CFG_MMC_BASE, CFG_MMC_BLOCKSIZE);
 					
@@ -569,6 +603,12 @@ int main()
 					
 					
 					mmc_read(CFG_MMC_BASE, mmc_buf, CFG_MMC_BLOCKSIZE); 					
+
+					//* PDC 1 Frame
+					//AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU,"Send Frame US1\n\r",sizeof("Send Frame US1\n\r"),0,0);
+					
+					AT91F_US_Print_frame((char *)mmc_buf,sizeof(mmc_buf));  // sizeof("Send Frame US1\n\r")
+					//end PDC frame 
 					
 					//* End Of Test
 					AT91F_DBGU_Printk((char *)mmc_buf);
