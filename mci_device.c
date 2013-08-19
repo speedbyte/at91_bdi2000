@@ -132,7 +132,7 @@ void AT91F_MCI_Device_Handler(
     {
 		AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_TXBUFE;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_TXTDIS;
-        	
+        AT91F_DBGU_Printk("\n\rTXBUFE\n\r");	
 		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
 	}	// End of if AT91C_MCI_TXBUFF		
 	
@@ -141,7 +141,7 @@ void AT91F_MCI_Device_Handler(
     {        
        	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_RXBUFF;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_RXTDIS;
-	
+		AT91F_DBGU_Printk("\n\rRXBUFE\n\r");
 		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
 	}	// End of if AT91C_MCI_RXBUFF
 
@@ -269,38 +269,6 @@ AT91S_MCIDeviceStatus AT91F_MCI_WriteBlock(
 	return AT91C_WRITE_OK;
 }
 
-//*------------------------------------------------------------------------------------------------------------
-//* \fn    AT91F_MCI_MMC_SelectCard
-//* \brief Toggles a card between the Stand_by and Transfer states or between Programming and Disconnect states
-//*------------------------------------------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_SelectCard(AT91PS_MciDevice pMCI_Device, unsigned int relative_card_address)
-{
-    int status;
-	
-	//* Check if the MMC card chosen is already the selected one
-	status = AT91F_MCI_GetStatus(pMCI_Device,relative_card_address);
-
-	if (status < 0)
-		return AT91C_CARD_SELECTED_ERROR;
-
-	if ((status & AT91C_SR_CARD_SELECTED) == AT91C_SR_CARD_SELECTED)
-		return AT91C_CARD_SELECTED_OK;
-
-	//* Search for the MMC Card to be selected, status = the Corresponding Device Number
-	status = 0;
-	while( (pMCI_Device->pMCI_DeviceFeatures[status].Relative_Card_Address != relative_card_address)
-		   && (status < AT91C_MAX_MCI_CARDS) )
-		status++;
-
-	if (status > AT91C_MAX_MCI_CARDS)
-    	return AT91C_CARD_SELECTED_ERROR;
-
-    if (AT91F_MCI_SendCommand( pMCI_Device,
-    								   AT91C_SEL_DESEL_CARD_CMD,
-    								   pMCI_Device->pMCI_DeviceFeatures[status].Relative_Card_Address << 16) == AT91C_CMD_SEND_OK)
-    	return AT91C_CARD_SELECTED_OK;
-    return AT91C_CARD_SELECTED_ERROR;
-}
 
 //*----------------------------------------------------------------------------
 //* \fn    AT91F_MCI_GetCSD
@@ -329,123 +297,6 @@ AT91S_MCIDeviceStatus AT91F_MCI_SetBlocklength(AT91PS_MciDevice pMCI_Device,unsi
     return( AT91F_MCI_SendCommand(pMCI_Device, AT91C_SET_BLOCKLEN_CMD, length) );
 }
 
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_MMC_GetAllOCR
-//* \brief Asks to all cards to send their operations conditions
-//*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_GetAllOCR (AT91PS_MciDevice pMCI_Device)
-{
-	unsigned int	response =0x0;
- 	
- 	while(1)
-    {
-    	response = AT91F_MCI_SendCommand(pMCI_Device,
-  										AT91C_MMC_SEND_OP_COND_CMD,
-  										AT91C_MMC_HOST_VOLTAGE_RANGE);
-		if (response != AT91C_CMD_SEND_OK)
-			return AT91C_INIT_ERROR;
-		
-		response = AT91C_BASE_MCI->MCI_RSPR[0];
-		
-		if ( (response & AT91C_CARD_POWER_UP_BUSY) == AT91C_CARD_POWER_UP_BUSY)
-			return(response);	
-	}
-}
-
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_MMC_GetAllCID
-//* \brief Asks to the MMC on the chosen slot to send its CID
-//*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_GetAllCID (AT91PS_MciDevice pMCI_Device, unsigned int *response)
-{
-	int Nb_Cards_Found=-1;
-  
-	while(1)
-	{
-	 	if(AT91F_MCI_SendCommand(pMCI_Device,
-								AT91C_MMC_ALL_SEND_CID_CMD,
-								AT91C_NO_ARGUMENT) != AT91C_CMD_SEND_OK)
-			return Nb_Cards_Found;
-		else
-		{		
-			Nb_Cards_Found = 0;
-			//* Assignation of the relative address to the MMC CARD
-			pMCI_Device->pMCI_DeviceFeatures[Nb_Cards_Found].Relative_Card_Address = Nb_Cards_Found + AT91C_FIRST_RCA;
-			//* Set the insert flag
-			pMCI_Device->pMCI_DeviceFeatures[Nb_Cards_Found].Card_Inserted = AT91C_MMC_CARD_INSERTED;
-	
-			if (AT91F_MCI_SendCommand(pMCI_Device,
-									 AT91C_MMC_SET_RELATIVE_ADDR_CMD,
-									 (Nb_Cards_Found + AT91C_FIRST_RCA) << 16) != AT91C_CMD_SEND_OK)
-				return AT91C_CMD_SEND_ERROR;
-				 
-			//* If no error during assignation address ==> Increment Nb_cards_Found
-			Nb_Cards_Found++ ;
-		}
-	}
-}
-
-//*----------------------------------------------------------------------------
-//* \fn    AT91F_MCI_MMC_Init
-//* \brief Return the MMC initialisation status
-//*----------------------------------------------------------------------------
-AT91S_MCIDeviceStatus AT91F_MCI_MMC_Init (AT91PS_MciDevice pMCI_Device)
-{
-    unsigned int	tab_response[4];
-	unsigned int	mult,blocknr;
-	unsigned int 	i,Nb_Cards_Found=0;
-
-	//* Resets all MMC Cards in Idle state
-	AT91F_MCI_SendCommand(pMCI_Device, AT91C_MMC_GO_IDLE_STATE_CMD, AT91C_NO_ARGUMENT);
-
-    if(AT91F_MCI_MMC_GetAllOCR(pMCI_Device) == AT91C_INIT_ERROR)
-    	return AT91C_INIT_ERROR;
-
-	Nb_Cards_Found = AT91F_MCI_MMC_GetAllCID(pMCI_Device,tab_response);
-	if (Nb_Cards_Found != AT91C_CMD_SEND_ERROR)
-	{
-	    //* Set the Mode Register
-    	AT91C_BASE_MCI->MCI_MR = AT91C_MCI_MR_PDCMODE;
-
-		for(i = 0; i < Nb_Cards_Found; i++)
-		{
-			if (AT91F_MCI_GetCSD(pMCI_Device,
-									  pMCI_Device->pMCI_DeviceFeatures[i].Relative_Card_Address,
-									  tab_response) != AT91C_CMD_SEND_OK)
-				pMCI_Device->pMCI_DeviceFeatures[i].Relative_Card_Address = 0;					  
-			else
-			{
-				pMCI_Device->pMCI_DeviceFeatures[i].Max_Read_DataBlock_Length = 1 << ((tab_response[1] >> AT91C_CSD_RD_B_LEN_S) & AT91C_CSD_RD_B_LEN_M );
-	 			pMCI_Device->pMCI_DeviceFeatures[i].Max_Write_DataBlock_Length =	1 << ((tab_response[3] >> AT91C_CSD_WBLEN_S) & AT91C_CSD_WBLEN_M );
-				pMCI_Device->pMCI_DeviceFeatures[i].Sector_Size = 1 + ((tab_response[2] >> AT91C_CSD_v22_SECT_SIZE_S) & AT91C_CSD_v22_SECT_SIZE_M );
-		  		pMCI_Device->pMCI_DeviceFeatures[i].Read_Partial = (tab_response[1] >> AT91C_CSD_RD_B_PAR_S) & AT91C_CSD_RD_B_PAR_M;
-				pMCI_Device->pMCI_DeviceFeatures[i].Write_Partial = (tab_response[3] >> AT91C_CSD_WBLOCK_P_S) & AT91C_CSD_WBLOCK_P_M;
-				
-				// None in MMC specification version 2.2
-				pMCI_Device->pMCI_DeviceFeatures[i].Erase_Block_Enable = 0;
-				
-				pMCI_Device->pMCI_DeviceFeatures[i].Read_Block_Misalignment = (tab_response[1] >> AT91C_CSD_RD_B_MIS_S) & AT91C_CSD_RD_B_MIS_M;
-				pMCI_Device->pMCI_DeviceFeatures[i].Write_Block_Misalignment = (tab_response[1] >> AT91C_CSD_WR_B_MIS_S) & AT91C_CSD_WR_B_MIS_M;
-
-				//// Compute Memory Capacity
-				// compute MULT
-				mult = 1 << ( ((tab_response[2] >> AT91C_CSD_C_SIZE_M_S) & AT91C_CSD_C_SIZE_M_M) + 2 );
-				// compute MSB of C_SIZE
-				blocknr = ((tab_response[1] >> AT91C_CSD_CSIZE_H_S) & AT91C_CSD_CSIZE_H_M) << 2;
-				// compute MULT * (LSB of C-SIZE + MSB already computed + 1) = BLOCKNR
-				blocknr = mult * ( ( blocknr + ( (tab_response[2] >> AT91C_CSD_CSIZE_L_S) & AT91C_CSD_CSIZE_L_M) ) + 1 );
-
-				pMCI_Device->pMCI_DeviceFeatures[i].Memory_Capacity =  pMCI_Device->pMCI_DeviceFeatures[i].Max_Read_DataBlock_Length * blocknr;
-		  		//// End of Compute Memory Capacity
-		  		
-			}	// end of else			  
-		}	// end of for
-		
-		return AT91C_INIT_OK;
-	}	// end of if
-
-    return AT91C_INIT_ERROR;
-}
 
 //*----------------------------------------------------------------------------
 //* \fn    AT91F_MCI_SDCard_GetOCR
@@ -603,7 +454,7 @@ void AT91F_MCI_DeviceWaitReady(unsigned int timeout)
 //* Output Parameters   : TRUE
 //*----------------------------------------------------------------------------
 
-int Mci_init(void)
+void Mci_init(void)
 {
     // Set up PIO SDC_TYPE to switch on MMC/SDCard and not DataFlash Card
 	AT91F_PIO_CfgOutput(AT91C_BASE_PIOB,AT91C_PIO_PB7);     // 	Enable PIO in output mode - Timer Counter 3 Multipurpose Timer I/O Pin B
@@ -620,17 +471,9 @@ MCCK	(AT91C_PA27_MCCK )	PIOA Periph: A Bit: 27	Multimedia Card Clock
 MCDA2	(AT91C_PB4_MCDA2 )	PIOB Periph: B Bit: 4	Multimedia Card A Data 2     */
 
 	AT91F_MCI_CfgPMC();       // Enable Peripheral Clock for MCI ( ID = 10 )
-	AT91F_PDC_Open(AT91C_BASE_PDC_MCI);  // Open PDC: disable TX and RX reset transfer descriptors, (re-enable RX and TX)
-/*
-pPDC->PDC_PTCR = AT91C_PDC_RXTEN     --> PDC Transfer Control Register
-pPDC->PDC_PTCR = AT91C_PDC_TXTEN     --> PDC Transfer Control Register
-*/
     // Disable all the interrupts
     AT91C_BASE_MCI->MCI_IDR = 0xFFFFFFFF;       // interrupt disable register; reduntant .. also done in MCI_Configure() . see below
 	
-
-
-
 	// Configure MCI interrupt 
 	AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,
 						 AT91C_ID_MCI,
@@ -679,6 +522,5 @@ __inline void AT91F_MCI_Configure (
     pMCI->MCI_SDCR = SDCR_register;
 }
 */
-	return(TRUE);
 }
 #endif

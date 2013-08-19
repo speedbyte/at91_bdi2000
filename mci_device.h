@@ -25,7 +25,7 @@ extern AT91S_MCIDeviceStatus 	AT91F_MCI_WriteBlock(AT91PS_MciDevice,int,unsigned
 extern void 					AT91F_MCI_DeviceWaitReady	(unsigned int timeout);
 extern void 					AT91F_MCI_Device_Handler(AT91PS_MciDevice,unsigned int);
 extern AT91S_MCIDeviceStatus 	AT91F_MCI_SDCard_Init (AT91PS_MciDevice);
-extern int Mci_init(void);
+extern void Mci_init(void);
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
