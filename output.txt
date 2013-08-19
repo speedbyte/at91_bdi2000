@@ -1,0 +1,74 @@
+printf is broken dont use it !!!!!!!!!!!!!!!
+======================================
+AT91RM9200 MCI Device Test
+======================================
+
+Init MCI Interface
+
+Test MCI Device
+1:Test MMC
+2: Test SDCard
+
+Enter Test SDCard
+
+SDCard Initialisation Successful: Enter Test
+
+Tests Completed: !!!
+
+This sentence is written in your device... Congratulations
+
+Tests MCI SDCard Successful !!!
+
+Test MCI Device
+1:Test MMC
+2: Test SDCard
+
+
+debug - mmc_read
+ src 0 dst 2000aa90 end 200 pstart 0 pend 0
+ astart 0 aend 200
+
+
+
+
+-----------------------------------------
+
+int
+mmc_block_read(uchar *dst, ulong src, ulong len) - pxa
+int
+mmc_block_write(ulong dst, uchar *src, int len)  - pxa
+int
+mmc_read(ulong src, uchar *dst, int size)   - (mmc_block_read((uchar *)(dst), src, mmc_block_size)
+int
+mmc_write(uchar *src, ulong dst, int size)  - mmc_block_write(dst, (uchar *)src, mmc_block_size))
+
+
+AT91S_MCIDeviceStatus AT91F_MCI_WriteBlock(
+	AT91PS_MciDevice pMCI_Device,
+	int dest,
+	unsigned int *dataBuffer,
+	int sizeToWrite )
+
+AT91F_MCI_WriteBlock(&MCI_Device,512,(unsigned int*) mmc_buf,len);
+
+
+AT91S_MCIDeviceStatus AT91F_MCI_ReadBlock(
+	AT91PS_MciDevice pMCI_Device,
+	int src,
+	unsigned int *dataBuffer,
+	int sizeToRead )
+
+AT91F_MCI_ReadBlock(&MCI_Device, 512, (unsigned int*)mmc_buf,len);
+
+
+
+mmc_read(cgf_mmc_base, mmc_buf, CFG_MMC_BLOCKSIZE);
+
+from mmc_read - src -= CFG_MMC_BASE; dst = mmc_buf,  mmc_block_size = CFG_MMC_BLOCKSIZE;
+mmc_block_read((uchar *)(dst), src, mmc_block_size))
+
+
+mmc_write(mmc_buf, cfg_mmc_base , CFG_MMC_BLOCKSIZE);
+
+from mmc_read - dst -= CFG_MMC_BASE; src = mmc_buf,  mmc_block_size = CFG_MMC_BLOCKSIZE;
+mmc_block_write((uchar *)(src), dst, mmc_block_size))
