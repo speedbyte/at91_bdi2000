@@ -4,6 +4,7 @@
 extern void AT91F_MCI_Handler(void);  // to isr.S
 extern int main(void);     // to cstartup.S
 extern char AT91F_DBGU_getc(void);
+extern int readytowriteonSD;
 /*-----------------------------------------------*/
 /* SDCard Device Descriptor Structure Definition */
 /*-----------------------------------------------*/

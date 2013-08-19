@@ -8,6 +8,7 @@
 #include "isr.h" 			// usart_asm_irq_handler()
 #include "init.h" 				// AT91F_DBGU_Printk
 #include "usart_device.h"       // selber inc
+#include "main.h"         // readytowriteonSD
 
 #ifndef usart_device_c
 extern void Usart_c_irq_handler(AT91PS_USART USART_pt);      // to isr_usart.s
@@ -33,56 +34,43 @@ void Usart_c_irq_handler(AT91PS_USART USART_pt)
 	unsigned int status;
 	//* get Usart status register
 	status = USART_pt->US_CSR;
-	if ((status & AT91C_US_RXRDY ) && ( USART_pt->US_IMR & AT91C_US_RXRDY ) ) {
-		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "RXRDY\n\r",7,0,0);
-		}
-		
+	
 	if (( status & AT91C_US_ENDRX) & (USART_pt->US_IMR & AT91C_US_ENDRX)){ //* Acknowledge Interrupt by reading the status register.
    				//* Acknowledge Interrupt
-		 AT91F_US_ReceiveFrame(USART_pt,(char *)message,10,0,0);         
-		//* Get byte and send	
-   		//* Trace on DBGU
-//* Trace on DBGU
-    		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "ENDRX\n\r",7,0,0);
+			AT91F_US_DisableIt(USART_pt, AT91C_US_ENDRX );  // Disable it for the moment to avoid nested int
+			readytowriteonSD = 1;
+    		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'R');
 	}
 	// check if interrupt is present and available 
 	if ( (status & AT91C_US_ENDTX) &  (USART_pt->US_IMR & AT91C_US_ENDTX) ){
 		 //*  Acknowledge Interrupt by mask for next send
 		 AT91F_US_DisableIt(USART_pt, AT91C_US_ENDTX );
-		 AT91F_US_PutChar(USART_pt, '\n\r');   // remember - \n\r is one character!
    		//* Trace on DBGU
-    		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "ENDTX\n\r",7,0,0);
-	}
-	// check if interrupt is present and available 
-	if ( (status & AT91C_US_TXBUFE) &  (USART_pt->US_IMR & AT91C_US_TXBUFE) ){
-		 //*  Acknowledge Interrupt by mask for next send
-		 AT91F_US_DisableIt(USART_pt, AT91C_US_TXBUFE );
-   		//* Trace on DBGU
-    		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "TXBUFE\n\r",8,0,0);
+    		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'S');
 	}
 	
 	if ( status & AT91C_US_OVRE) {
 		//* clear US_RXRDY
 		 AT91F_US_GetChar(USART_pt);
    		//* Trace on DBGU
-    		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "O",1,0,0);
+    		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'O');
 	}
 
 	//* Check error
 	if ( status & AT91C_US_PARE) {
    		//* Trace on DBGU
-    		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "P",1,0,0);
+    		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'P');
 	}
 
 	if ( status & AT91C_US_FRAME) {
    		//* Trace on DBGU
-    		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "F",1,0,0);
+    		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'F');
 	}
 
 	if ( status & AT91C_US_TIMEOUT){
 		USART_pt->US_CR = AT91C_US_STTTO;
    		//* Trace on DBGU
-    		AT91F_US_SendFrame((AT91PS_USART) AT91C_BASE_DBGU, "T",1,0,0);
+    		AT91F_US_PutChar((AT91PS_USART) AT91C_BASE_DBGU, 'T');
 	}
 
 	//* Reset the satus bit
@@ -99,8 +87,17 @@ void AT91F_US_Print_2_frame(AT91PS_USART USART_pt, char *buffer, unsigned short 
     //* Enable USART IT error and AT91C_US_ENDRX
  	AT91F_US_SendFrame(USART_pt,buffer,counter,buffer2,counter2);
  	//* enable IT
- 	AT91F_US_EnableIt(USART_pt, AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE |AT91C_US_ENDRX | AT91C_US_ENDTX | AT91C_US_ENDTX |AT91C_US_TXBUFE);
+ 	AT91F_US_EnableIt(USART_pt, AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE  | AT91C_US_ENDTX );
 }
+
+void AT91F_US_PutFrame(AT91PS_USART USART_pt, char *buffer, unsigned short counter,char *buffer2,unsigned short counter2) 
+{
+    //* Enable USART IT error and AT91C_US_ENDRX
+ 	AT91F_US_ReceiveFrame(USART_pt,buffer,counter,buffer2,counter2);
+ 	//* enable IT
+ 	AT91F_US_EnableIt(USART_pt, AT91C_US_TIMEOUT | AT91C_US_FRAME | AT91C_US_OVRE |AT91C_US_ENDRX  );
+}
+
 //*----------------------------------------------------------------------------
 //* Function Name       : Usart_init
 //* Object              : USART initialization 
@@ -152,7 +149,7 @@ void Usart_init ( void )
    // *Enable usart SSTO
 	USART_pt->US_CR = AT91C_US_STTTO;           // StartTimeOut according to Recieve TimeoutRegister. interrutpt when longer than that.
 // Currently i will only use the human switch rather than these registers. So i piut 0 in the timer counter.
-
+	AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX | AT91C_US_ENDTX  ); // All PDC related
 //* End
 }
 #endif

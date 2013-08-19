@@ -132,7 +132,7 @@ void AT91F_MCI_Device_Handler(
     {
 		AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_TXBUFE;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_TXTDIS;
-        AT91F_DBGU_Printk("\n\rTXBUFE\n\r");	
+        AT91F_DBGU_Printk("\n\rTM\n\r");	
 		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
 	}	// End of if AT91C_MCI_TXBUFF		
 	
@@ -141,7 +141,7 @@ void AT91F_MCI_Device_Handler(
     {        
        	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_RXBUFF;
  		AT91C_BASE_PDC_MCI->PDC_PTCR = AT91C_PDC_RXTDIS;
-		AT91F_DBGU_Printk("\n\rRXBUFE\n\r");
+		AT91F_DBGU_Printk("\n\rRM\n\r");
 		pMCI_Device->pMCI_DeviceDesc->state = AT91C_MCI_IDLE;
 	}	// End of if AT91C_MCI_RXBUFF
 

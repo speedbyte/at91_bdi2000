@@ -44,7 +44,6 @@ volatile int StStatus;
 	// Read the system timer status register 	
 	StStatus = *(AT91C_ST_SR);
 	StTick++;
-	//AT91C_BASE_PIOB->PIO_ODR = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;
 	StStatus = ((AT91C_BASE_PIOB->PIO_OSR & 7 )> 0) ? (AT91C_BASE_PIOB->PIO_ODR = AT91C_BASE_PIOB->PIO_ODR | 7) : (AT91C_BASE_PIOB->PIO_OER  = AT91C_BASE_PIOB->PIO_OER | 7);
 	
 }

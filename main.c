@@ -34,7 +34,7 @@ AT91S_MciDeviceFeatures			MCI_Device_Features;
 AT91S_MciDeviceDesc				MCI_Device_Desc;
 AT91S_MciDevice					MCI_Device;
 char							Buffer[BUFFER_SIZE_MCI_DEVICE];
-AT91PS_USART pUSART_vikas; 
+int readytowriteonSD = 0;
 
 // Local Functions
 void Led_glow()
@@ -51,9 +51,9 @@ void Led_glow()
 char AT91F_DBGU_getc(void)
 {
 	AT91F_DBGU_Printk("\n\rbefore while");
-	while (!AT91F_US_RxReady((AT91PS_USART)AT91C_BASE_DBGU));
+	while (!AT91F_US_RxReady((AT91PS_USART)AT91C_BASE_DBGU));  // RXRDY goes high
 	AT91F_DBGU_Printk("\n\rafter while");
-	return AT91F_US_GetChar((AT91PS_USART) AT91C_BASE_DBGU);
+	return AT91F_US_GetChar((AT91PS_USART) AT91C_BASE_DBGU);  // RXRDY goes low ( by reading the status->RHR reg )
 }
 
 
@@ -104,52 +104,49 @@ void AT91F_MCI_Handler(void)
 int main()
 {
 	unsigned char	caractere;
-	unsigned int initialtimeout = 1;
-	int i = 0,x = 33,j;
+	int j;
 	unsigned int Max_Read_DataBlock_Length;
-	
 	
 	Mci_init();
 	Usart_init();
-	St_init();	
+	St_init();
+	
 	if(AT91F_InitDeviceStructure() != AT91C_INIT_OK) {
 		AT91F_DBGU_Printk("\n\rSDcARD Initialisation failed\n\r");
 		return FALSE;}
 	Led_glow();
-	
+	for (j=0;j<512;j++) Buffer[j] = 'A';
 	Max_Read_DataBlock_Length = MCI_Device.pMCI_DeviceFeatures->Max_Read_DataBlock_Length;
 	AT91F_DBGU_Printk("\n\r0) Write to SD 1) Read from SD\n\r");
 	
 	//Interrupt Enable USART:
-	AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX | AT91C_US_ENDTX | AT91C_US_RXBUFF | AT91C_US_TXBUFE ); // All PDC related
+	AT91F_US_EnableIt(USART_pt, AT91C_US_ENDRX | AT91C_US_ENDTX ); // All PDC related
 													// Error related done in INIT
-	AT91F_US_EnableIt(USART_pt , AT91C_US_RXRDY);
+	AT91F_US_DisableIt(USART_pt , AT91C_US_RXRDY ); // TXRDY and RXRDY are automatically status are set and cleared.
 	
 	// Disable all PDC related	
 	USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
 	USART_pt->US_PTCR = AT91C_PDC_TXTDIS;      
-	MCI_pt->MCI_PTCR = AT91C_PDC_RXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard read 
-	MCI_pt->MCI_PTCR = AT91C_PDC_TXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard write
-
+	//MCI_pt->MCI_PTCR = AT91C_PDC_RXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard read 
+	//MCI_pt->MCI_PTCR = AT91C_PDC_TXTDIS;  // this is reduntant as it is disable in the beginning of the sdcard write
+	USART_pt->US_PTCR = AT91C_PDC_RXTEN;  
+j = 0;  
 	while(1)
 	{
-		USART_pt->US_PTCR = AT91C_PDC_RXTEN;
+		
 		caractere = AT91F_DBGU_getc();      // also done by PDC
 		
 		switch(caractere)
 		{
-			
 			case '0':			
-//				while(1){
-				//initialtimeout = AT91F_GetTickCount();
-				for (MciBeginBlock=0;MciBeginBlock<4;MciBeginBlock++)  
-				{
-				for (j=0;j<512;j++) {Buffer[j] = 33+x; if ( x==123 ) x=33;} x++;
-				/*AT91F_US_ReceiveFrame(USART_pt,(char *)Buffer,512,0,0);  // without meaning ..effective only on PDC enable
-				while(!((USART_pt->US_CSR) & AT91C_US_RXRDY));    // wait till the first char arrives.
-				USART_pt->US_PTCR = AT91C_PDC_RXTEN;        // start receiving the data from USART
+				while(1){
+				
+				readytowriteonSD = 0;
+				while (!AT91F_US_RxReady(USART_pt));
+				AT91F_US_PutFrame(USART_pt,(char *)Buffer,512,(char *)Buffer2,512); 
+				    // start receiving the data from USART
 				// Glow Green LED ( reading from USART )
-				while(!((USART_pt->US_CSR) & AT91C_US_ENDRX)); */
+				while(!((USART_pt->US_CSR) & AT91C_US_ENDRX));
 				USART_pt->US_PTCR = AT91C_PDC_RXTDIS;
 				
 				if ((AT91F_MCI_WriteBlock(&MCI_Device,(MciBeginBlock*Max_Read_DataBlock_Length), (unsigned int *)Buffer,Max_Read_DataBlock_Length)) != AT91C_WRITE_OK)		
@@ -157,6 +154,9 @@ int main()
 				// glow yellow LED ( writing to SD card )				
 				//* Wait end of Write
 				AT91F_MCI_DeviceWaitReady(AT91C_MCI_TIMEOUT);
+				readytowriteonSD = 0 ;
+				USART_pt->US_PTCR = AT91C_PDC_RXTEN;
+				MciBeginBlock++;
 				}
 				
 //				}
