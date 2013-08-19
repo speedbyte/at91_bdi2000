@@ -1,3 +1,5 @@
+#ifndef init_c
+#define init_c
 //*----------------------------------------------------------------------------
 //*         ATMEL Microcontroller Software Support  -  ROUSSET  -
 //*----------------------------------------------------------------------------
@@ -12,8 +14,23 @@
 //* Creation            : FB   21/11/2002
 //*
 //*----------------------------------------------------------------------------
-#include "AT91C_MCI_device.h"
+#include "mci_type.h"
+#include "main.h"
+#include "mci_device.h"
+#include "AT91RM9200.h"
+#include "lib_AT91RM9200.h"
 
+#ifndef init_c
+
+extern void AT91F_DBGU_Printk(char *buffer);
+void AT91F_SpuriousHandler() 
+void AT91F_DataAbort() 
+void AT91F_FetchAbort()
+void AT91F_Undef() 
+void AT91F_UndefHandler() 
+void AT91F_LowLevelInit()
+
+#endif
 
 #define MASTER_CLOCK	60000000
 #define BAUDRATE		115200
@@ -22,8 +39,7 @@
 //* \fn    AT91F_DBGU_Printk
 //* \brief This function is used to send a string through the DBGU channel (Very low level debugging)
 //*----------------------------------------------------------------------------
-void AT91F_DBGU_Printk(
-	char *buffer) // \arg pointer to a string ending by \0
+void AT91F_DBGU_Printk(	char *buffer) // \arg pointer to a string ending by \0
 {
 	while(*buffer != '\0') {
 		while (!AT91F_US_TxReady((AT91PS_USART)AT91C_BASE_DBGU));
@@ -125,8 +141,11 @@ void AT91F_LowLevelInit()
 
 	// Enable Transmitter
 	AT91F_US_EnableTx((AT91PS_USART) AT91C_BASE_DBGU);
-	AT91F_DBGU_Printk("\n\r\n AT91F_LowLevelInit() done\n\r");
-	AT91F_DBGU_Printk("\n\r\n HO HA HA HA HA !!!! \n\r");
+	// Enable Receiver
+	AT91F_US_EnableRx((AT91PS_USART) AT91C_BASE_DBGU);
+	
+	AT91F_DBGU_Printk("\n\r\nAT91F_LowLevelInit() done\n\r");
 	
 }
 
+#endif

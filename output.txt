@@ -72,3 +72,40 @@ mmc_write(mmc_buf, cfg_mmc_base , CFG_MMC_BLOCKSIZE);
 
 from mmc_read - dst -= CFG_MMC_BASE; src = mmc_buf,  mmc_block_size = CFG_MMC_BLOCKSIZE;
 mmc_block_write((uchar *)(src), dst, mmc_block_size))
+
+
+ 
+Write in MCI : 
+    AT91C_BASE_PDC_MCI->PDC_PTCR = (AT91C_PDC_TXTDIS | AT91C_PDC_RXTDIS);
+    AT91C_BASE_PDC_MCI->PDC_TPR = (unsigned int) dataBuffer;
+    AT91C_BASE_PDC_MCI->PDC_TCR = sizeToWrite;
+
+
+Transfers can be enabled and/or disabled
+by setting TXTEN/TXTDIS and RXTEN/RXTDIS in PDC Transfer Control Register. These
+control bits enable reading the pointer and counter registers safely without any risk of their
+changing between both reads.
+
+
+Data Transfers
+The peripheral triggers PDC transfers using transmit (TXRDY) and receive (RXRDY) signals.
+When the peripheral receives an external character, it sends a Receive Ready signal to the PDC
+which then requests access to the system bus. When access is granted, the PDC starts a read
+of the peripheral Receive Holding Register (RHR) and then triggers a write in the memory.
+After each transfer, the relevant PDC memory pointer is incremented and the number of transfers
+left is decremented. When the memory block size is reached, a signal is sent to the
+peripheral and the transfer stops.
+The same procedure is followed, in reverse, for transmit transfers.
+
+
+Next character to be transmitted after the current character if TXRDY is not set. When number of data bits is less than 8 bits, the bits are right-aligned.
+
+The peripheral end flag is automatically cleared when one of the counter-registers (Counter or
+Next Counter Register) is written. Before that it is set to 1.
+Note: When the Next Counter Register is loaded into the Counter Register, it is set to zero.
+
+
+When TXTDY signal is sent to the PDC from the peripheral, the PDC starts to reuest access of the bus, When the access is given then it it starts to transfer the data ( after reading the pointer and counter registers ) to the THR of the preipheral. It transfers till the counter is 0 and there is no nextpointer.
+
+
+AT91F_PDC_IsRxEmpty() checks for RCR ( if the counter register has ran )

@@ -21,10 +21,9 @@ FORMAT = binary
 #Target File name
 TARGET = main
 
-SRCARM = $(TARGET).c init.c mci_device.c syscalls.c
-
+SRCARM = $(TARGET).c init.c mci_device.c usart_device.c
 # List Assembler source files here which must be assembled in ARM-Mode..
-ASRCARM = Cstartup_GNU.S arm_isr.S
+ASRCARM = cstartup_gnu.S isr_mci.S isr_usart.S
 
 # Optimization level, can be [0, 1, 2, 3, s]. 
 # 0 = turn off optimization. s = optimize for size.
@@ -32,7 +31,7 @@ ASRCARM = Cstartup_GNU.S arm_isr.S
 
 
 
-OPT = 2
+OPT = 0
 
 #Debugging Information
 DEBUG = gdb3
@@ -62,12 +61,12 @@ endif
 CFLAGS = -g$(DEBUG)
 CFLAGS += $(CDEFS) $(CINCS)
 CFLAGS += -O$(OPT)
-CFLAGS += -Wall  -Wimplicit #-Wcast-align
+CFLAGS += -Wall  -Wimplicit -Wcast-align
 CFLAGS += -Wpointer-arith -Wswitch
 CFLAGS += -Wredundant-decls -Wreturn-type -Wshadow -Wunused
 CFLAGS += -Wa,-adhlns=$(subst $(suffix $<),.lst,$<) 
 CFLAGS += -finline-functions
-CFLAGS += -Wno-implicit -Werror
+CFLAGS += -Wno-implicit
 #AT91-lib warnings with:
 ##CFLAGS += -Wcast-qual
 # flags only for C
@@ -270,7 +269,7 @@ clean_list :
 	$(REMOVE) *.lssall
 	$(REMOVE) *.sym
 	$(REMOVE) *.symall
-	$(REMOVE) $(SRC:.c=.s)
+	#$(REMOVE) $(SRC:.c=.s)
 	$(REMOVE) -rf .dep
 
 
