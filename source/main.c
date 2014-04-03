@@ -253,6 +253,25 @@ int main()
 	resetLed(GREEN | RED | YELLOW );
 	while(1)
 	{
+	// Hack
+	AT91C_BASE_PIOB->PIO_CODR = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;
+	//AT91C_BASE_PIOB->PIO_SODR |= 0x02; //Disable YELLOW LED by outpt high
+	//AT91C_BASE_PIOB->PIO_PPUER |=0x07; //Dosable Pullups
+	
+	while(1)
+	{
+		setLed(GREEN);
+		resetLed(RED);
+		for(unsigned int i=0;i<200000;i++)
+		i=i;
+		
+		setLed(RED);
+		resetLed(GREEN);
+		for(unsigned int i=0;i<200000;i++)
+		i=i;		
+		
+	}
+	//*************
 	character = DBGU_GetChar();      //also done by PDC.. this is the place where the user will also start. like a ON button
 	AT91F_US_PutChar((AT91PS_USART)AT91C_BASE_DBGU, character);
 		switch(character)
