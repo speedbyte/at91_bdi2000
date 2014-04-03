@@ -1,6 +1,6 @@
 # Define programs and commands.
 
-TOOLCHAIN = linux
+TOOLCHAIN = elf
 # Define programs and commands.
 SHELL 	= sh
 CC 		= arm-$(TOOLCHAIN)-gcc

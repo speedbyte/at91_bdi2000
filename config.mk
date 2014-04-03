@@ -1,7 +1,7 @@
 ## Create ROM-Image (final)  
-RUN_MODE=ROM_RUN
+#RUN_MODE=ROM_RUN
 ## Create RAM-Image (debugging)  
-#RUN_MODE=RAM_RUN
+RUN_MODE=RAM_RUN
 
 
 #VECTOR_LOCATION=VECTORS_IN_ROM ## - Exception vectors in ROM:
@@ -11,7 +11,7 @@ VECTOR_LOCATION=VECTORS_IN_RAM  ## - Exception vectors in RAM:
 FORMAT = binary
 
 # target file name
-TARGET = project
+TARGET = project_win
 
 
 MCU      = arm920t
