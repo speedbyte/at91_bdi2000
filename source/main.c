@@ -62,6 +62,12 @@ void Print_LineonSD(char *buffer)
 		Bufferwechsler[globalj++] = *buffer++;
 }
 
+void WaitTicks(int ticks)
+{
+		for(unsigned int i=0;i<ticks;i++)
+		i=i; //asm("nop");
+}
+
 void Rtc_init(void)
 {
 	AT91C_BASE_RTC->RTC_CR = (AT91C_RTC_UPDTIM | AT91C_RTC_UPDCAL);         // step RTC
@@ -222,7 +228,7 @@ void Interrupt_Handler_MCI_Highlevel(void)
 //*----------------------------------------------------------------------------
 int main()
 {
-	USART_pt = AT91C_BASE_US1;
+	/*USART_pt = AT91C_BASE_US1;
 	MCI_pt = AT91C_BASE_MCI;
 	unsigned char	character;
 	int j, SDCurrentBlock,SDLastBlock, quitflag;
@@ -249,30 +255,50 @@ int main()
 	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_RXBUFF;  // We need interrupts every 512 bytes not 1024 bytes.
 	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_TXBUFE; 
 	readytowriteonSD = NOT_ACTIVE;
-	reader = NOT_ACTIVE; writer = NOT_ACTIVE;
+	reader = NOT_ACTIVE; writer = NOT_ACTIVE;*/
+	Led_init();
 	resetLed(GREEN | RED | YELLOW );
 	while(1)
 	{
 	// Hack
-	AT91C_BASE_PIOB->PIO_CODR = AT91C_PIO_PB0|AT91C_PIO_PB1|AT91C_PIO_PB2;
+	//WaitTicks(200000);
+	//setLed(YELLOW);
 	//AT91C_BASE_PIOB->PIO_SODR |= 0x02; //Disable YELLOW LED by outpt high
-	//AT91C_BASE_PIOB->PIO_PPUER |=0x07; //Dosable Pullups
+	//while(1)
+	//{
+	
+	//AT91C_BASE_PIOB->PIO_CODR =0x02;
+	//}
 	
 	while(1)
-	{
-		setLed(GREEN);
-		resetLed(RED);
-		for(unsigned int i=0;i<200000;i++)
-		i=i;
-		
+	{	//Traffig light test:
+	
+		//RED
 		setLed(RED);
 		resetLed(GREEN);
-		for(unsigned int i=0;i<200000;i++)
-		i=i;		
+		resetLed(YELLOW);
+		WaitTicks(1000000);
 		
+		//RED YELLOW
+		setLed(YELLOW);
+		WaitTicks(200000);
+		
+		//GREEN
+		setLed(GREEN);
+		resetLed(RED);
+		resetLed(YELLOW);
+		WaitTicks(1000000);
+		
+		//YELLOW
+		setLed(YELLOW);
+		resetLed(RED);
+		resetLed(GREEN);
+		WaitTicks(400000);	
+	
+	
 	}
 	//*************
-	character = DBGU_GetChar();      //also done by PDC.. this is the place where the user will also start. like a ON button
+	/*character = DBGU_GetChar();      //also done by PDC.. this is the place where the user will also start. like a ON button
 	AT91F_US_PutChar((AT91PS_USART)AT91C_BASE_DBGU, character);
 		switch(character)
 		{
@@ -313,12 +339,12 @@ int main()
 				//character = (char)USART_pt->US_RHR;
 				USART_pt->US_PTCR = AT91C_PDC_RXTEN;
 				PutTimeStamp();
-				/*Bufferwechsler[globalj++] = character;
-				AT91C_BASE_PDC_MCI->PDC_RCR--;	*/
-				/*if(character == '\n')
-				{
-					PutTimeStamp();
-				}*/
+				//Bufferwechsler[globalj++] = character;
+				//AT91C_BASE_PDC_MCI->PDC_RCR--;	
+				//if(character == '\n')
+				//{
+				//	PutTimeStamp();
+				//}
 				readytowriteonSD = NOT_ACTIVE;
 				do 
 				{
@@ -326,7 +352,7 @@ int main()
 					if ( readytowriteonSD == WRITE_NOW )
 					{
 						errorstatus = SDcard_WriteBlock_CMD24_R1(&mci_sdcard,(SDCurrentBlock*Max_Read_DataBlock_Length), (uint32 *)printBuffer,Max_Read_DataBlock_Length);		
-						//* Wait end of Write
+						// Wait end of Write
 						SDcard_Poll_AT91CMCINOTBUSY_flag(AT91C_MCI_TIMEOUT); 
 						if (errorstatus != SD_WRITE_NO_ERROR)	
 						{ 
@@ -415,7 +441,7 @@ int main()
 			default:
 				DBGU_Printk( "\n\rBad choice, writing\n\r");
 				break;		
-		}
+		}*/
 	}	
 return 0;
 }

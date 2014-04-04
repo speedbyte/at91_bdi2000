@@ -11,12 +11,14 @@ extern void Led_init(void);
 
 static inline void setLed(unsigned char flag)
 {
-       AT91C_BASE_PIOB->PIO_OER |= flag;
+       //AT91C_BASE_PIOB->PIO_OER = flag;
+	   AT91C_BASE_PIOB->PIO_CODR =flag;
 }
     
 static inline void resetLed(unsigned char flag)
 {
-       AT91C_BASE_PIOB->PIO_ODR |= flag;
+      // AT91C_BASE_PIOB->PIO_ODR = flag;
+	   AT91C_BASE_PIOB->PIO_SODR =flag;
 }
     
 static inline unsigned char getLed(unsigned char flag) 
