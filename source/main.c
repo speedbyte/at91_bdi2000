@@ -266,7 +266,7 @@ int main()
 	
 	char myBuffer[]="Hi this is AT91RM9200-EK booting up! ;) Int";
 	
-	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,sizeof(myBuffer),0,0);
+	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
 	/*va_list ap;
 	va_start(ap,fmt);
 	vsnprintf(&myBuffer, sizeof(myBuffer),0,0);*/
