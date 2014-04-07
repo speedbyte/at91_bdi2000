@@ -259,7 +259,7 @@ int main()
 	USART_pt = AT91C_BASE_US1;
 	Led_init();
 	Usart_init();
-	
+	unsigned char myUsartRxChar='F';
 	
 	//USART_Printk( "\n\n--- Hi this is AT91RM9200-EK booting up! ;) ---\n\n ");
 	//int vsnprintf(char *buffer, size_t bufsize, const  char *format, va_list ap);
@@ -271,13 +271,38 @@ int main()
 	va_start(ap,fmt);
 	vsnprintf(&myBuffer, sizeof(myBuffer),0,0);*/
 	
-	resetLed(GREEN | RED | YELLOW );
+	//resetLed(GREEN | RED | YELLOW );
 	while(1)
 	{
+	while(1) //USART Polling RX Test!
+	{
+	myUsartRxChar=AT91F_US_GetChar((AT91PS_USART)AT91C_BASE_US1);
+		switch(myUsartRxChar)
+		{
+		case 'R':	
+					setLed(RED);
+					break;
+					
+		case 'Y':	
+					setLed(YELLOW);
+					break;
+					
+		case 'G':	
+					setLed(GREEN);
+					break;
+					
+					
+		case 'C':	
+					resetLed(GREEN | RED | YELLOW );
+					break;
+		
+		default: break;
+		}
+	}
 
 	
-	while(1)
-	{	//Traffic light test:
+	/*while(1)	//Traffic light test:
+	{
 	
 		//RED
 		setLed(RED);
@@ -302,7 +327,14 @@ int main()
 		WaitTicks(400000);	
 	
 	
-	}
+	}*/
+	
+	
+	
+	
+	
+	
+	
 	//*************
 	/*character = DBGU_GetChar();      //also done by PDC.. this is the place where the user will also start. like a ON button
 	AT91F_US_PutChar((AT91PS_USART)AT91C_BASE_DBGU, character);
