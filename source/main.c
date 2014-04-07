@@ -256,22 +256,28 @@ int main()
 	AT91C_BASE_MCI->MCI_IDR = AT91C_MCI_TXBUFE; 
 	readytowriteonSD = NOT_ACTIVE;
 	reader = NOT_ACTIVE; writer = NOT_ACTIVE;*/
+	USART_pt = AT91C_BASE_US1;
 	Led_init();
+	Usart_init();
+	
+	
+	//USART_Printk( "\n\n--- Hi this is AT91RM9200-EK booting up! ;) ---\n\n ");
+	//int vsnprintf(char *buffer, size_t bufsize, const  char *format, va_list ap);
+	
+	char myBuffer[]="Hi this is AT91RM9200-EK booting up! ;) Int";
+	
+	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,sizeof(myBuffer),0,0);
+	/*va_list ap;
+	va_start(ap,fmt);
+	vsnprintf(&myBuffer, sizeof(myBuffer),0,0);*/
+	
 	resetLed(GREEN | RED | YELLOW );
 	while(1)
 	{
-	// Hack
-	//WaitTicks(200000);
-	//setLed(YELLOW);
-	//AT91C_BASE_PIOB->PIO_SODR |= 0x02; //Disable YELLOW LED by outpt high
-	//while(1)
-	//{
-	
-	//AT91C_BASE_PIOB->PIO_CODR =0x02;
-	//}
+
 	
 	while(1)
-	{	//Traffig light test:
+	{	//Traffic light test:
 	
 		//RED
 		setLed(RED);
