@@ -33,6 +33,7 @@ REv 1.2 : Integrated USART function calls
 #include "st_device.h"
 #include "led_device.h"
 #include "errm.h"
+#include "Timer.h"
 
 
 //* Global Variables
@@ -259,14 +260,18 @@ int main()
 	USART_pt = AT91C_BASE_US1;
 	Led_init();
 	Usart_init();
+	init_I_O();
+	
+	
 	unsigned char myUsartRxChar='F';
 	
 	//USART_Printk( "\n\n--- Hi this is AT91RM9200-EK booting up! ;) ---\n\n ");
 	//int vsnprintf(char *buffer, size_t bufsize, const  char *format, va_list ap);
 	
-	char myBuffer[]="Hi this is AT91RM9200-EK booting up! ;) Int";
+	char myBuffer[]="Hi this is AT91RM9200-EK booting up! ;) Int\n";
+	unsigned int myIOtest;
 	
-	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
+	//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
 	/*va_list ap;
 	va_start(ap,fmt);
 	vsnprintf(&myBuffer, sizeof(myBuffer),0,0);*/
@@ -274,7 +279,34 @@ int main()
 	//resetLed(GREEN | RED | YELLOW );
 	while(1)
 	{
-	while(1) //USART Polling RX Test!
+	resetLed(GREEN | RED | YELLOW );
+	while(1)
+	{
+		if(getDigInputState(AT91C_BASE_PIOB, AT91C_PIO_PB15))
+		{
+		setLed(RED);
+		}
+		else
+		{
+		resetLed(RED);
+		}
+		
+
+		/*myIOtest=(AT91C_BASE_PIOB->PIO_PDSR);
+		AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myIOtest,4,0,0);
+		AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, "\n",1,0,0);
+		WaitTicks(500000);
+		
+		setLed(GREEN | RED | YELLOW );
+		myIOtest=(AT91C_BASE_PIOB->PIO_PDSR);
+		AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myIOtest,4,0,0);
+		AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, "\n",1,0,0);
+		WaitTicks(500000);
+		resetLed(GREEN | RED | YELLOW );*/
+		
+	
+	}
+	/*while(1) //USART Polling RX Test!
 	{
 	myUsartRxChar=AT91F_US_GetChar((AT91PS_USART)AT91C_BASE_US1);
 		switch(myUsartRxChar)
@@ -298,7 +330,7 @@ int main()
 		
 		default: break;
 		}
-	}
+	}*/
 
 	
 	/*while(1)	//Traffic light test:
