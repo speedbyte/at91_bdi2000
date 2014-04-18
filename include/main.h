@@ -101,4 +101,8 @@ typedef struct _SDCARD
 #define 	AT91DKC_SDRAM_BASE_ADDRESS	(( char *)(0x20100000))
 #define 	BLOCK_SIZE	(1024 * 10)
 
+
+
+#define MY_INT_PIN AT91C_PIO_PB15
+
 #endif

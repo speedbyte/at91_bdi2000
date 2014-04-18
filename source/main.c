@@ -34,6 +34,9 @@ REv 1.2 : Integrated USART function calls
 #include "led_device.h"
 #include "errm.h"
 #include "Timer.h"
+#include "isr.h"
+
+
 
 
 //* Global Variables
@@ -223,6 +226,33 @@ void Interrupt_Handler_MCI_Highlevel(void)
 }
 
 
+void  Interrupt_Handler_PIO_Highlevel (void)
+{
+		{volatile dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
+		/*dummy=AT91C_BASE_AIC -> AIC_ISR;
+		dummy=AT91C_BASE_AIC -> AIC_IVR;
+		//AT91C_BASE_AIC->AIC_IVR = 0 ; 
+		}*/
+		
+		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN)
+		{
+		// ... 1 level
+		setLed(GREEN);
+		USART_Printk( "Entering the MY_INT_PIN Interrupt\n ");
+		while(AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN); // Wait if high!
+		USART_Printk( "Leaving the MY_INT_PIN Interrupt\n ");
+		resetLed(GREEN);
+		}
+		else
+		{
+		//USART_Printk( "Im in Low Level Interrupt ;)\n ");
+		//setLed(YELLOW);
+		// ... 0 level
+		}
+		//AT91C_BASE_AIC -> AIC_EOICR = 0xFF;	
+		//asm ("msr         CPSR_c, #0x10");
+}
+
 //*----------------------------------------------------------------------------
 //* \fn    main
 //* \brief main function
@@ -260,7 +290,7 @@ int main()
 	USART_pt = AT91C_BASE_US1;
 	Led_init();
 	Usart_init();
-	init_I_O();
+	//init_I_O();
 	
 	
 	unsigned char myUsartRxChar='F';
@@ -271,25 +301,40 @@ int main()
 	char myBuffer[]="Hi this is AT91RM9200-EK booting up! ;) Int\n";
 	unsigned int myIOtest;
 	
-	//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
+	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
 	/*va_list ap;
 	va_start(ap,fmt);
 	vsnprintf(&myBuffer, sizeof(myBuffer),0,0);*/
 	
 	//resetLed(GREEN | RED | YELLOW );
+	
 	while(1)
 	{
 	resetLed(GREEN | RED | YELLOW );
-	while(1)
-	{
-		if(getDigInputState(AT91C_BASE_PIOB, AT91C_PIO_PB15))
+				
+			AT91F_PMC_EnablePeriphClock (AT91C_BASE_PMC, ((unsigned int) 1 << AT91C_ID_PIOB)); // first controller clock can PIOB
+			AT91F_PIO_CfgInput (AT91C_BASE_PIOB, MY_INT_PIN); // PB0 input configured as input
+			AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,AT91C_ID_PIOB,AT91C_AIC_PRIOR_HIGHEST,AT91C_AIC_SRCTYPE_EXT_POSITIVE_EDGE,Interrupt_Handler_PIO_Lowlevel);
+			// AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED. 
+			// AT91C_AIC_SRCTYPE_EXT_HIGH_LEVEL
+			// AT91C_AIC_SRCTYPE_INT_LEVEL_SENSITIVE
+			//{volatile dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
+			AT91F_PIO_InterruptEnable (AT91C_BASE_PIOB, MY_INT_PIN); // enable change interrupt
+			{volatile dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
+			AT91F_AIC_EnableIt (AT91C_BASE_AIC, AT91C_ID_PIOB); // Enable PIOB controller interrupt
+			
+
+
+	while(1);
+	{   
+		/*if(getDigInputState(AT91C_BASE_PIOB, AT91C_PIO_PB15))
 		{
 		setLed(RED);
 		}
 		else
 		{
 		resetLed(RED);
-		}
+		}*/
 		
 
 		/*myIOtest=(AT91C_BASE_PIOB->PIO_PDSR);
