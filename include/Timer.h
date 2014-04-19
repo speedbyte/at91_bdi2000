@@ -2,9 +2,8 @@
 #define Timer_H
 
 void initTimer(void);
-void startTimerOnetime(int duration_us);
-void startTimerPermanent(int duration_us);
-void stopTimerActions(void);
+unsigned int getTimerValue(void);
+void resetTimerValue(void);
 
 
 extern void init_I_O(void);

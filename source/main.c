@@ -59,6 +59,7 @@ int 					globali;
 char 					SDBuffer1[512];
 char 					SDBuffer2[512];
 int						RCR_recirculated; 
+unsigned int			InterruptTimeUsed;
 // Local Functions
 void Print_LineonSD(char *buffer)
 {
@@ -234,21 +235,27 @@ void  Interrupt_Handler_PIO_Highlevel (void)
 		//AT91C_BASE_AIC->AIC_IVR = 0 ; 
 		}*/
 		
-		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN)
+		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN) //Highlevel rising edge
 		{
-		// ... 1 level
-		setLed(GREEN);
-		USART_Printk( "Entering the MY_INT_PIN Interrupt\n ");
-		while(AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN); // Wait if high!
-		USART_Printk( "Leaving the MY_INT_PIN Interrupt\n ");
-		resetLed(GREEN);
+			
+			resetTimerValue();
+
+			setLed(GREEN);
+			//USART_Printk( "EntInt\n");
+			//	while(AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN); // Wait if high!
+			//USART_Printk( "ExiInt\n");
+			WaitTicks(0xFF);
+			resetLed(GREEN);
+			InterruptTimeUsed=getTimerValue();
+			AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &InterruptTimeUsed,2,0,0);
+			AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, "\n",1,0,0);
 		}
-		else
-		{
+		//else
+		//{
 		//USART_Printk( "Im in Low Level Interrupt ;)\n ");
 		//setLed(YELLOW);
 		// ... 0 level
-		}
+		//}
 		//AT91C_BASE_AIC -> AIC_EOICR = 0xFF;	
 		//asm ("msr         CPSR_c, #0x10");
 }
@@ -290,6 +297,7 @@ int main()
 	USART_pt = AT91C_BASE_US1;
 	Led_init();
 	Usart_init();
+	initTimer();
 	//init_I_O();
 	
 	
