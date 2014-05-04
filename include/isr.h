@@ -5,5 +5,5 @@ extern void 					Interrupt_Handler_USART_Lowlevel(void);
 extern void 					Interrupt_Handler_MCI_Lowlevel(void);
 extern void					Interrupt_Handler_SysTimer_Lowlevel(void);
 extern void					Interrupt_Handler_PIO_Lowlevel(void);
-
+extern void					Interrupt_Handler_TC0_Lowlevel(void);
 #endif

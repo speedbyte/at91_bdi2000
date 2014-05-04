@@ -227,6 +227,30 @@ Interrupt_Handler_PIO_Lowlevel:
 
 @------------------------------------------------------------
 
+@------------------------------------------------------------------------------
+@ Interrupt_Handler_TC0_Lowlevel
+@ ---------------------
+@       Handler called by the AIC
+@       
+@	Save context
+@       Call C handler
+@ 	Restore context
+@------------------------------------------------------------------------------
+	.global Interrupt_Handler_TC0_Lowlevel
+	.extern Interrupt_Handler_TC0_Highlevel
+
+Interrupt_Handler_TC0_Lowlevel:
+	IRQ_ENTRY
+
+	ldr     r1, =Interrupt_Handler_TC0_Highlevel
+	mov     r14, pc
+	bx      r1
+
+	IRQ_EXIT
+
+
+@------------------------------------------------------------
+
     .end
 
 

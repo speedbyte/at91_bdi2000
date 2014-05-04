@@ -22,7 +22,7 @@ void initTimer(void)
 #define TIMER_CLOCK2 		0x01		//MCK/8
 #define TIMER_CLOCK3 		0x02		//MCK/32
 #define TIMER_CLOCK4 		0x03		//MCK/129
-#define TIMER_CLOCK5 		0x04		//SLCK
+#define TIMER_CLOCK5 		0x04		//SLCK (32768HZ)
 #define CPCTRG				(1<<14)		//RC Compare Trigger Enable
 #define TIMER_START_VAL		0x0000		//RC Compare Trigger Enable
 
@@ -35,11 +35,13 @@ AT91C_BASE_TCB0->TCB_BMR = AT91C_TCB_TC0XC0S_NONE | AT91C_TCB_TC1XC1S_NONE | AT9
 
 AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
 
-AT91C_BASE_TC0->TC_CMR = TIMER_CLOCK4 | CPCTRG;  //Set Timer To MCK/128 And ENABLE CPCTRG
+AT91C_BASE_TC0->TC_CMR = TIMER_CLOCK5 | CPCTRG;  //Set Timer To SLCK And ENABLE CPCTRG
 
 AT91C_BASE_TC0->TC_IDR = ~0ul;  //Disable all Timer Interrupts
 
-AT91C_BASE_TC0->TC_RC = TIMER_START_VAL;
+AT91C_BASE_TC0->TC_IER = AT91C_TC_COVFS;  //Enable TC0 Counter Overflow
+
+//AT91C_BASE_TC0->TC_RC = TIMER_START_VAL;
 
 AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG | AT91C_TC_CLKEN; // Timer Clock enable and start the Timer
 
@@ -54,7 +56,7 @@ return (AT91C_BASE_TC0->TC_CV&0x0000FFFF);
 void resetTimerValue(void)
 {
 //AT91C_BASE_TC0->TC_RC=val;
-AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG | AT91C_TC_CLKEN; // Timer Clock enable and start the Timer
+AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG | AT91C_TC_CLKEN; // Timer Clock enable,reset and (re)start the Timer
 }
 
 

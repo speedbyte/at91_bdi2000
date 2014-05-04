@@ -104,5 +104,7 @@ typedef struct _SDCARD
 
 
 #define MY_INT_PIN AT91C_PIO_PB15
+#define TIMER0_INTERRUPT_LEVEL		7
+#define 	AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE    ((unsigned int) 0x1 <<  5) // (AIC) Internal Sources Code Label Positive Edge triggered
 
 #endif
