@@ -260,7 +260,14 @@ void  Interrupt_Handler_TC0_Highlevel (void)
     //* Suppress warning variable "dummy" was set but never used
     dummy = dummy;
 	resetLed(RED);
-setLed(YELLOW);
+	
+	if(getLed(YELLOW))
+	{resetLed(YELLOW);}
+	else
+	{setLed(YELLOW);} 
+	
+
+
 char myBuffer[]="TC0 Timeroverflow\n";
 AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0);
 }
@@ -275,8 +282,8 @@ void  Interrupt_Handler_PIO_Highlevel (void)
 		
 		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN) //Highlevel rising edge
 		{
-			
-			resetTimerValue();
+			initTimer();
+			//resetTimerValue();
 
 			setLed(GREEN);
 			//USART_Printk( "EntInt\n");
@@ -338,7 +345,7 @@ int main()
 	USART_pt = AT91C_BASE_US1;
 	Led_init();
 	Usart_init();
-	initTimer();
+	//initTimer();
 	//init_I_O();
 	
 	
@@ -373,10 +380,17 @@ int main()
 			AT91F_AIC_EnableIt (AT91C_BASE_AIC, AT91C_ID_PIOB); // Enable PIOB controller interrupt
 			//Timer Oveflow Test
 			//AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,AT91C_ID_TC0,AT91C_AIC_PRIOR_HIGHEST,AT91C_AIC_SRCTYPE_EXT_POSITIVE_EDGE,Interrupt_Handler_TC0_Lowlevel);
+			
+			//short disable timer (later init)
+			AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
+			AT91C_BASE_TC0->TC_IDR = 0xFFFFFFFF;  //Disable all Timer Interrupts
+			
+			
 			AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, TIMER0_INTERRUPT_LEVEL,AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE, Interrupt_Handler_TC0_Lowlevel );
-			AT91C_BASE_TC0->TC_IER = AT91C_TC_COVFS;
+			//AT91C_BASE_TC0->TC_IER = AT91C_TC_COVFS;
 			AT91F_AIC_EnableIt (AT91C_BASE_AIC, AT91C_ID_TC0);
-			 AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG ;
+			// AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG ;
+			
 			setLed(RED);
 			//Test
 			//initTimer();

@@ -23,7 +23,7 @@ static inline void resetLed(unsigned char flag)
     
 static inline unsigned char getLed(unsigned char flag) 
 {
-       return ((AT91C_BASE_PIOB->PIO_OSR) & flag);
+       return (unsigned char)((~(AT91C_BASE_PIOB->PIO_ODSR)) & flag);
 }
 
 #endif
