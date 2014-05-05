@@ -60,7 +60,8 @@ char 					SDBuffer1[512];
 char 					SDBuffer2[512];
 int						RCR_recirculated; 
 unsigned int			InterruptTimeUsed;
-unsigned char			ASCII_Tick_Buffer[]="65000 Ticks\n";
+unsigned char			ASCII_Tick_Buffer[]="4294967296 Ticks\n";
+unsigned int			TimerOverflowCnt;
 
 // Local Functions
 void Print_LineonSD(char *buffer)
@@ -233,11 +234,11 @@ void Dec2ASCII_Ticks(unsigned int value,unsigned char blanksym)
 	unsigned int num;
 	unsigned int ValToWork=value;
 	unsigned int i;
-	unsigned int Devider[5]={10000,1000,100,10,1};
+	unsigned int Devider=1000000000;
 	
-	for(i=0;i<5;i++)
+	for(i=0;i<10;i++)
 	{	
-		num=ValToWork/Devider[i];
+		num=ValToWork/Devider;
 		if(num|numberoccoured)
 		{
 		ASCII_Tick_Buffer[i]=(unsigned char)num+48;
@@ -247,7 +248,8 @@ void Dec2ASCII_Ticks(unsigned int value,unsigned char blanksym)
 		{
 		ASCII_Tick_Buffer[i]=blanksym;
 		}
-		ValToWork%=Devider[i];
+		ValToWork%=Devider;
+		Devider/=10;
 	}
 }
 
@@ -261,15 +263,16 @@ void  Interrupt_Handler_TC0_Highlevel (void)
     dummy = dummy;
 	resetLed(RED);
 	
-	if(getLed(YELLOW))
+	/*if(getLed(YELLOW))
 	{resetLed(YELLOW);}
 	else
-	{setLed(YELLOW);} 
-	
+	{setLed(YELLOW);} */
+	toggleLed(YELLOW );
+	TimerOverflowCnt++;
 
 
-char myBuffer[]="TC0 Timeroverflow\n";
-AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0);
+//char myBuffer[]="TC0 Timeroverflow\n";
+//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0);
 }
 
 void  Interrupt_Handler_PIO_Highlevel (void)
@@ -281,8 +284,9 @@ void  Interrupt_Handler_PIO_Highlevel (void)
 		}*/
 		
 		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN) //Highlevel rising edge
-		{
-			initTimer();
+		{	
+			TimerOverflowCnt=0;
+			StartTimer();
 			//resetTimerValue();
 
 			setLed(GREEN);
@@ -291,7 +295,9 @@ void  Interrupt_Handler_PIO_Highlevel (void)
 			//USART_Printk( "ExiInt\n");
 			WaitTicks(0x1FF);
 			resetLed(GREEN);
-			InterruptTimeUsed=getTimerValue();
+			InterruptTimeUsed=(TimerOverflowCnt<<16)+getTimerValue();
+			StopTimer();
+			
 			Dec2ASCII_Ticks(InterruptTimeUsed,'_');
 			AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
 	
@@ -345,7 +351,7 @@ int main()
 	USART_pt = AT91C_BASE_US1;
 	Led_init();
 	Usart_init();
-	//initTimer();
+	initTimer();
 	//init_I_O();
 	
 	

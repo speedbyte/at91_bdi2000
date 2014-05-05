@@ -17,5 +17,15 @@ void Led_init()
 }
 
 
+void  toggleLed(unsigned char flag) 
+{		
+ unsigned char LedState=getLed(GREEN | RED | YELLOW);
+ 
+		LedState^=flag;
+		
+	   AT91C_BASE_PIOB->PIO_CODR =(LedState)&0x07;
+	   AT91C_BASE_PIOB->PIO_SODR =(~LedState)&0x07;
+}
+
 
 #endif
