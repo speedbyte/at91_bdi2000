@@ -204,7 +204,7 @@ Interrupt_Handler_SysTimer_Lowlevel:
 @------------------------------------------------------------
 
 @------------------------------------------------------------------------------
-@ Interrupt_Handler_PIO_Lowlevel
+@ Measured_Interrupt_Lowlevel
 @ ---------------------
 @       Handler called by the AIC
 @       
@@ -212,13 +212,17 @@ Interrupt_Handler_SysTimer_Lowlevel:
 @       Call C handler
 @ 	Restore context
 @------------------------------------------------------------------------------
-	.global Interrupt_Handler_PIO_Lowlevel
-	.extern Interrupt_Handler_PIO_Highlevel
-
-Interrupt_Handler_PIO_Lowlevel:
+	.global Measured_Interrupt_Lowlevel
+	.extern Measured_Interrupt_Highlevel
+    .extern StartTimer
+	
+Measured_Interrupt_Lowlevel:
 	IRQ_ENTRY
 
-	ldr     r1, =Interrupt_Handler_PIO_Highlevel
+	@Branch with Link to start the Timer
+	BL StartTimer  
+
+	ldr     r1, =Measured_Interrupt_Highlevel
 	mov     r14, pc
 	bx      r1
 
@@ -239,9 +243,10 @@ Interrupt_Handler_PIO_Lowlevel:
 	.global Interrupt_Handler_TC0_Lowlevel
 	.extern Interrupt_Handler_TC0_Highlevel
 
+
 Interrupt_Handler_TC0_Lowlevel:
 	IRQ_ENTRY
-
+	
 	ldr     r1, =Interrupt_Handler_TC0_Highlevel
 	mov     r14, pc
 	bx      r1

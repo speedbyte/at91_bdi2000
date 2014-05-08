@@ -9,6 +9,7 @@
 #include "lib_AT91RM9200.h"
 #include "Timer.h"
 
+extern unsigned int TimerOverflowCnt;
 /*
 
 unsigned int getTimerValue(void);
@@ -35,7 +36,7 @@ AT91C_BASE_TCB0->TCB_BMR = AT91C_TCB_TC0XC0S_NONE | AT91C_TCB_TC1XC1S_NONE | AT9
 
 AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
 
-AT91C_BASE_TC0->TC_CMR = TIMER_CLOCK4 | CPCTRG;  //Set Timer To SLCK And ENABLE CPCTRG
+AT91C_BASE_TC0->TC_CMR = TIMER_CLOCK1 | CPCTRG;  //Set Timer To SLCK And ENABLE CPCTRG
 
 AT91C_BASE_TC0->TC_IDR = 0xFFFFFFFF;  //Disable all Timer Interrupts
 
@@ -57,14 +58,17 @@ return (AT91C_BASE_TC0->TC_CV&0x0000FFFF);
 
 void StartTimer(void)
 {
+TimerOverflowCnt=0;
 AT91C_BASE_TC0->TC_IER = AT91C_TC_COVFS;  //Enable TC0 Counter Overflow
 AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG | AT91C_TC_CLKEN; // Timer Clock enable,reset and (re)start the Timer
+return;
 }
 
 void StopTimer(void)
 {
-AT91C_BASE_TC0->TC_IER = AT91C_TC_COVFS;  //Enable TC0 Counter Overflow
+AT91C_BASE_TC0->TC_IDR = AT91C_TC_COVFS;  //Disable TC0 Counter Overflow
 AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
+return;
 }
 
 

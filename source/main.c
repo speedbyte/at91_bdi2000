@@ -60,7 +60,7 @@ char 					SDBuffer1[512];
 char 					SDBuffer2[512];
 int						RCR_recirculated; 
 unsigned int			InterruptTimeUsed;
-unsigned char			ASCII_Tick_Buffer[]="4294967296 Ticks\n";
+unsigned char			ASCII_Tick_Buffer[]="4294967296 us\n";
 unsigned int			TimerOverflowCnt;
 
 // Local Functions
@@ -275,7 +275,7 @@ void  Interrupt_Handler_TC0_Highlevel (void)
 //AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0);
 }
 
-void  Interrupt_Handler_PIO_Highlevel (void)
+void  Measured_Interrupt_Highlevel (void)
 {
 		{volatile dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
 		/*dummy=AT91C_BASE_AIC -> AIC_ISR;
@@ -285,17 +285,17 @@ void  Interrupt_Handler_PIO_Highlevel (void)
 		
 		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN) //Highlevel rising edge
 		{	
-			TimerOverflowCnt=0;
-			StartTimer();
+			
+			//StartTimer();  //Tryout in isr.s
 			//resetTimerValue();
 
 			setLed(GREEN);
 			//USART_Printk( "EntInt\n");
-				while(AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN); // Wait if high!
+			while(AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN); // Wait if high!
 			//USART_Printk( "ExiInt\n");
-			WaitTicks(0x1FF);
+			//WaitTicks(0x1FF);
 			resetLed(GREEN);
-			InterruptTimeUsed=(TimerOverflowCnt<<16)+getTimerValue();
+			InterruptTimeUsed=((TimerOverflowCnt<<16)+getTimerValue())/30;
 			StopTimer();
 			
 			Dec2ASCII_Ticks(InterruptTimeUsed,'_');
@@ -376,7 +376,7 @@ int main()
 				
 			AT91F_PMC_EnablePeriphClock (AT91C_BASE_PMC, ((unsigned int) 1 << AT91C_ID_PIOB)); // first controller clock can PIOB
 			AT91F_PIO_CfgInput (AT91C_BASE_PIOB, MY_INT_PIN); // PB0 input configured as input
-			AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,AT91C_ID_PIOB,AT91C_AIC_PRIOR_LOWEST,AT91C_AIC_SRCTYPE_EXT_POSITIVE_EDGE,Interrupt_Handler_PIO_Lowlevel);
+			AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,AT91C_ID_PIOB,AT91C_AIC_PRIOR_LOWEST,AT91C_AIC_SRCTYPE_EXT_POSITIVE_EDGE,Measured_Interrupt_Lowlevel);
 			// AT91C_AIC_SRCTYPE_INT_EDGE_TRIGGERED. 
 			// AT91C_AIC_SRCTYPE_EXT_HIGH_LEVEL
 			// AT91C_AIC_SRCTYPE_INT_LEVEL_SENSITIVE
