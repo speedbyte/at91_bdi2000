@@ -3,15 +3,12 @@
 
 void initTimer(void);
 unsigned int getTimerValue(void);
-void resetTimerValue(void);
+void StartTimer(void);
+void StopTimer(void);
+void Interrupt_Handler_TC0_Highlevel (void);
 
-
-extern void init_I_O(void);
-char getDigInputState(AT91PS_PIO Port_pt, unsigned int Pin);
-
-
-
-
+void Start_Latency_Measurement(void);
+void Stop_Latency_Mesurement(void);
 
 
 

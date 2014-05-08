@@ -61,7 +61,7 @@ char 					SDBuffer2[512];
 int						RCR_recirculated; 
 unsigned int			InterruptTimeUsed;
 unsigned char			ASCII_Tick_Buffer[]="4294967296 us\n";
-unsigned int			TimerOverflowCnt;
+
 
 // Local Functions
 void Print_LineonSD(char *buffer)
@@ -253,66 +253,41 @@ void Dec2ASCII_Ticks(unsigned int value,unsigned char blanksym)
 	}
 }
 
-void  Interrupt_Handler_TC0_Highlevel (void)
-{
-	AT91PS_TC TC_pt = AT91C_BASE_TC0;
-    unsigned int dummy;
-    //* Acknowledge interrupt status
-    dummy = TC_pt->TC_SR;
-    //* Suppress warning variable "dummy" was set but never used
-    dummy = dummy;
-	resetLed(RED);
-	
-	/*if(getLed(YELLOW))
-	{resetLed(YELLOW);}
-	else
-	{setLed(YELLOW);} */
-	toggleLed(YELLOW );
-	TimerOverflowCnt++;
 
 
-//char myBuffer[]="TC0 Timeroverflow\n";
-//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &myBuffer,(sizeof(myBuffer)-1),0,0);
-}
 
+
+
+/* Measured Interrupt Service Routine
+/ Interrupt duration is measured automatically and transmitted via UART
+/ Parameters: None
+/ Returnvalue: None 			*/
 void  Measured_Interrupt_Highlevel (void)
-{
-		{volatile dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
-		/*dummy=AT91C_BASE_AIC -> AIC_ISR;
-		dummy=AT91C_BASE_AIC -> AIC_IVR;
-		//AT91C_BASE_AIC->AIC_IVR = 0 ; 
-		}*/
+{		
+		// Read the PIO Interrupt Status Register to clear pending Interrupt (reenable rising edge triggering))
+		{volatile unsigned int dummy = AT91C_BASE_PIOB -> PIO_ISR; dummy=dummy;}
 		
+		
+		// Highlevel (rising edge) for PIO
 		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN) //Highlevel rising edge
 		{	
 			
-			//StartTimer();  //Tryout in isr.s
-			//resetTimerValue();
-
+			// Demo interrupt latency
 			setLed(GREEN);
-			//USART_Printk( "EntInt\n");
 			while(AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN); // Wait if high!
-			//USART_Printk( "ExiInt\n");
-			//WaitTicks(0x1FF);
 			resetLed(GREEN);
-			InterruptTimeUsed=((TimerOverflowCnt<<16)+getTimerValue())/30;
-			StopTimer();
 			
+			
+			InterruptTimeUsed=getTimerValue()/30;
+			StopTimer();
+			toggleLed(YELLOW);
 			Dec2ASCII_Ticks(InterruptTimeUsed,'_');
 			AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
-	
-			//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &InterruptTimeUsed,2,0,0);
-			//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, "\n",1,0,0);
+
 		}
-		//else
-		//{
-		//USART_Printk( "Im in Low Level Interrupt ;)\n ");
-		//setLed(YELLOW);
-		// ... 0 level
-		//}
-		//AT91C_BASE_AIC -> AIC_EOICR = 0xFF;	
-		//asm ("msr         CPSR_c, #0x10");
 }
+
+
 
 //*----------------------------------------------------------------------------
 //* \fn    main
@@ -382,14 +357,13 @@ int main()
 			// AT91C_AIC_SRCTYPE_INT_LEVEL_SENSITIVE
 			//{volatile dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
 			AT91F_PIO_InterruptEnable (AT91C_BASE_PIOB, MY_INT_PIN); // enable change interrupt
-			{volatile dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
+			{volatile unsigned int dummy; dummy = AT91C_BASE_PIOB -> PIO_ISR;}
 			AT91F_AIC_EnableIt (AT91C_BASE_AIC, AT91C_ID_PIOB); // Enable PIOB controller interrupt
 			//Timer Oveflow Test
 			//AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,AT91C_ID_TC0,AT91C_AIC_PRIOR_HIGHEST,AT91C_AIC_SRCTYPE_EXT_POSITIVE_EDGE,Interrupt_Handler_TC0_Lowlevel);
 			
 			//short disable timer (later init)
-			AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
-			AT91C_BASE_TC0->TC_IDR = 0xFFFFFFFF;  //Disable all Timer Interrupts
+			StopTimer();
 			
 			
 			AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, TIMER0_INTERRUPT_LEVEL,AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE, Interrupt_Handler_TC0_Lowlevel );

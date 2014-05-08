@@ -214,17 +214,21 @@ Interrupt_Handler_SysTimer_Lowlevel:
 @------------------------------------------------------------------------------
 	.global Measured_Interrupt_Lowlevel
 	.extern Measured_Interrupt_Highlevel
-    .extern StartTimer
+    .extern Start_Latency_Measurement
+	.extern Stop_Latency_Measurement
 	
 Measured_Interrupt_Lowlevel:
 	IRQ_ENTRY
 
-	@Branch with Link to start the Timer
-	BL StartTimer  
+	@Branch with Link to start the the interrupt latency measuremnt
+	BL Start_Latency_Measurement  
 
 	ldr     r1, =Measured_Interrupt_Highlevel
 	mov     r14, pc
 	bx      r1
+	
+	@Branch with Link to Stop the interrupt latency measurment
+	BL Stop_Latency_Measurement
 
 	IRQ_EXIT
 

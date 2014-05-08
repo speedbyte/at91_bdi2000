@@ -8,16 +8,9 @@
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
 #include "Timer.h"
+#include "led_device.h"
 
-extern unsigned int TimerOverflowCnt;
-/*
 
-unsigned int getTimerValue(void);
-void resetTimerValue(void);
-*/
-
-void initTimer(void)
-{
 // Used Timer: "AT91C_BASE_TC0"
 #define TIMER_CLOCK1 		0x00     	//MCK/2
 #define TIMER_CLOCK2 		0x01		//MCK/8
@@ -25,9 +18,13 @@ void initTimer(void)
 #define TIMER_CLOCK4 		0x03		//MCK/128
 #define TIMER_CLOCK5 		0x04		//SLCK (32768HZ)
 #define CPCTRG				(1<<14)		//RC Compare Trigger Enable
-#define TIMER_START_VAL		0x0000		//RC Compare Trigger Enable
 
+unsigned int 		TimerOverflowCnt=0;
+unsigned int 		InterruptTimeUsed=0;
+unsigned char		ASCII_Tick_Buffer[]="4294967296 us\n";
 
+void initTimer(void)
+{
 AT91C_BASE_PMC->PMC_PCER=1 << AT91C_ID_TC0;  /* enable clock */
 
 AT91C_BASE_TCB0->TCB_BCR = 0;	// TC Block Control Register, No SYNC Mode
@@ -40,12 +37,6 @@ AT91C_BASE_TC0->TC_CMR = TIMER_CLOCK1 | CPCTRG;  //Set Timer To SLCK And ENABLE 
 
 AT91C_BASE_TC0->TC_IDR = 0xFFFFFFFF;  //Disable all Timer Interrupts
 
-
-
-//AT91C_BASE_TC0->TC_RC = TIMER_START_VAL;
-
-//AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG | AT91C_TC_CLKEN; // Timer Clock enable and start the Timer
-
 }
 
 
@@ -53,12 +44,12 @@ AT91C_BASE_TC0->TC_IDR = 0xFFFFFFFF;  //Disable all Timer Interrupts
 
 unsigned int getTimerValue(void)
 {
-return (AT91C_BASE_TC0->TC_CV&0x0000FFFF); 
+//((TimerOverflowCnt<<16)+getTimerValue())
+return ((TimerOverflowCnt<<16)+(AT91C_BASE_TC0->TC_CV&0x0000FFFF)); 
 }
 
 void StartTimer(void)
 {
-TimerOverflowCnt=0;
 AT91C_BASE_TC0->TC_IER = AT91C_TC_COVFS;  //Enable TC0 Counter Overflow
 AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG | AT91C_TC_CLKEN; // Timer Clock enable,reset and (re)start the Timer
 return;
@@ -71,53 +62,36 @@ AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
 return;
 }
 
-
-
-
-
-
-/*
-void init_I_O(void)
+void  Interrupt_Handler_TC0_Highlevel (void)
 {
-	//AT91C_BASE_PIOB->PIO_PER = AT91C_PIO_PB15; //Enable Register! 
-	
-	//AT91C_BASE_PIOB->PIO_ODR = AT91C_PIO_PB15; //Disable output! 
-	//AT91C_BASE_PIOB->PIO_IDR = AT91C_PIO_PB15; //Interrupt disabled!
-	AT91C_BASE_PMC->PMC_PCER=0xFFFFFFFF; // Enable peripheral clock, otherwise input is "frozen"
+	AT91PS_TC TC_pt = AT91C_BASE_TC0;
+    unsigned int dummy;
+    //* Acknowledge interrupt status
+    dummy = TC_pt->TC_SR;
+    //* Suppress warning variable "dummy" was set but never used
+    dummy = dummy;
+	resetLed(RED);
 
-AT91C_BASE_PIOB->PIO_PER= AT91C_PIO_PB15;
+	TimerOverflowCnt++;
+}
 
-AT91C_BASE_PIOB->PIO_ODR= AT91C_PIO_PB15;
+void Start_Latency_Measurement(void)
+{
+TimerOverflowCnt=0;
+StartTimer();
+}
 
-AT91C_BASE_PIOB->PIO_IFDR= AT91C_PIO_PB15;
-
-AT91C_BASE_PIOB->PIO_CODR= AT91C_PIO_PB15;
-
-AT91C_BASE_PIOB->PIO_IDR= AT91C_PIO_PB15;
-
-AT91C_BASE_PIOB->PIO_MDDR= AT91C_PIO_PB15;
-
-AT91C_BASE_PIOB->PIO_PPUDR= AT91C_PIO_PB15;
-
-AT91C_BASE_PIOB->PIO_OWDR= AT91C_PIO_PB15;
-
-
-
-
+void Stop_Latency_Mesurement(void)
+{
+	InterruptTimeUsed=getTimerValue()/30;
+	StopTimer();
+	toggleLed(YELLOW);
+	Dec2ASCII_Ticks(InterruptTimeUsed,'_');
+	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
 
 }
 
-char getDigInputState(AT91PS_PIO Port_pt, unsigned int Pin)
-{
-	if(Port_pt->PIO_PDSR&(Pin))
-	{
-	return 1;
-	}
-	else
-	{
-	return 0;
-	}
-}
-*/
+
+
 
 #endif
