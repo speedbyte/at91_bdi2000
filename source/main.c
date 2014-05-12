@@ -59,8 +59,7 @@ int 					globali;
 char 					SDBuffer1[512];
 char 					SDBuffer2[512];
 int						RCR_recirculated; 
-unsigned int			InterruptTimeUsed;
-unsigned char			ASCII_Tick_Buffer[]="4294967296 us\n";
+
 
 
 // Local Functions
@@ -70,11 +69,6 @@ void Print_LineonSD(char *buffer)
 		Bufferwechsler[globalj++] = *buffer++;
 }
 
-void WaitTicks(int ticks)
-{
-		for(unsigned int i=0;i<ticks;i++)
-		i=i; //asm("nop");
-}
 
 void Rtc_init(void)
 {
@@ -229,33 +223,6 @@ void Interrupt_Handler_MCI_Highlevel(void)
 	Interrupt_Handler_SDcard_Highlevel(&mci_sdcard,status);
 }
 
-void Dec2ASCII_Ticks(unsigned int value,unsigned char blanksym)
-{	unsigned char numberoccoured=0;
-	unsigned int num;
-	unsigned int ValToWork=value;
-	unsigned int i;
-	unsigned int Devider=1000000000;
-	
-	for(i=0;i<10;i++)
-	{	
-		num=ValToWork/Devider;
-		if(num|numberoccoured)
-		{
-		ASCII_Tick_Buffer[i]=(unsigned char)num+48;
-		numberoccoured=1;
-		}
-		else
-		{
-		ASCII_Tick_Buffer[i]=blanksym;
-		}
-		ValToWork%=Devider;
-		Devider/=10;
-	}
-}
-
-
-
-
 
 
 /* Measured Interrupt Service Routine
@@ -264,27 +231,25 @@ void Dec2ASCII_Ticks(unsigned int value,unsigned char blanksym)
 / Returnvalue: None 			*/
 void  Measured_Interrupt_Highlevel (void)
 {		
-		// Read the PIO Interrupt Status Register to clear pending Interrupt (reenable rising edge triggering))
-		{volatile unsigned int dummy = AT91C_BASE_PIOB -> PIO_ISR; dummy=dummy;}
-		
-		
+
+	// ########################## DEMO ISR CONTENT ########################## 
+	
 		// Highlevel (rising edge) for PIO
 		if (AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN) //Highlevel rising edge
 		{	
-			
 			// Demo interrupt latency
 			setLed(GREEN);
 			while(AT91F_PIO_GetInput (AT91C_BASE_PIOB) & MY_INT_PIN); // Wait if high!
 			resetLed(GREEN);
-			
-			
-			InterruptTimeUsed=getTimerValue()/30;
-			StopTimer();
-			toggleLed(YELLOW);
-			Dec2ASCII_Ticks(InterruptTimeUsed,'_');
-			AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
-
 		}
+		else
+		{/*AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, "Int_L\n",6,0,0);*/ }
+		
+		// Read the PIO Interrupt Status Register to clear pending Interrupt (reenable rising edge triggering))
+		{volatile unsigned int dummy = AT91C_BASE_PIOB -> PIO_ISR; dummy=dummy;}
+		
+	// ###################################################################### 
+	
 }
 
 
@@ -327,7 +292,7 @@ int main()
 	Led_init();
 	Usart_init();
 	initTimer();
-	//init_I_O();
+
 	
 	
 	unsigned char myUsartRxChar='F';

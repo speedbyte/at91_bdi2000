@@ -229,6 +229,7 @@ Measured_Interrupt_Lowlevel:
 	
 	@Branch with Link to Stop the interrupt latency measurment
 	BL Stop_Latency_Measurement
+	   	
 
 	IRQ_EXIT
 

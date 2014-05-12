@@ -9,6 +9,8 @@
 #include "lib_AT91RM9200.h"
 #include "Timer.h"
 #include "led_device.h"
+#include "conversion.h"
+
 
 
 // Used Timer: "AT91C_BASE_TC0"
@@ -17,7 +19,10 @@
 #define TIMER_CLOCK3 		0x02		//MCK/32
 #define TIMER_CLOCK4 		0x03		//MCK/128
 #define TIMER_CLOCK5 		0x04		//SLCK (32768HZ)
+
 #define CPCTRG				(1<<14)		//RC Compare Trigger Enable
+
+#define TIMER_CLK_USED TIMER_CLOCK4
 
 unsigned int 		TimerOverflowCnt=0;
 unsigned int 		InterruptTimeUsed=0;
@@ -33,7 +38,7 @@ AT91C_BASE_TCB0->TCB_BMR = AT91C_TCB_TC0XC0S_NONE | AT91C_TCB_TC1XC1S_NONE | AT9
 
 AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
 
-AT91C_BASE_TC0->TC_CMR = TIMER_CLOCK1 | CPCTRG;  //Set Timer To SLCK And ENABLE CPCTRG
+AT91C_BASE_TC0->TC_CMR = TIMER_CLK_USED | CPCTRG;  //Set Timer To SLCK And ENABLE CPCTRG
 
 AT91C_BASE_TC0->TC_IDR = 0xFFFFFFFF;  //Disable all Timer Interrupts
 
@@ -81,13 +86,38 @@ TimerOverflowCnt=0;
 StartTimer();
 }
 
-void Stop_Latency_Mesurement(void)
+void Stop_Latency_Measurement(void)
 {
-	InterruptTimeUsed=getTimerValue()/30;
+	InterruptTimeUsed=Convert_Ticks_To_us(getTimerValue());
 	StopTimer();
 	toggleLed(YELLOW);
-	Dec2ASCII_Ticks(InterruptTimeUsed,'_');
+	Dec2ASCII_Ticks(InterruptTimeUsed,'0');
+	
 	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
+}
+
+static inline unsigned int Convert_Ticks_To_us (unsigned int Ticks)
+{ 
+ switch (TIMER_CLK_USED)
+ {
+ case TIMER_CLOCK1:
+		return Ticks/30; 		//Tested [v]
+	
+ case TIMER_CLOCK2:
+		return (Ticks<<1)/15; 	//Tested [v]
+ 
+ case TIMER_CLOCK3:
+		return (Ticks<<3)/15;	//Tested [v]	
+ 
+ case TIMER_CLOCK4:
+		return (Ticks<<5)/15;	//Tested [v]
+		
+ case TIMER_CLOCK5:
+		return (unsigned int)(((unsigned long long)(Ticks*15625))>>9);  //SLCK (32768HZ)
+
+ default:
+		return Ticks;
+ }
 
 }
 
