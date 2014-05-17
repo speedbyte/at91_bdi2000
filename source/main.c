@@ -71,22 +71,27 @@ void Print_LineonSD(char *buffer)
 
 
 void Rtc_init(void)
-{
+{	
+	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_SECEV) );  // wait for SEC-Flag to allow change in 
 	AT91C_BASE_RTC->RTC_CR = (AT91C_RTC_UPDTIM | AT91C_RTC_UPDCAL);         // step RTC
 	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) );  // wait for stop acknowledge
 	AT91C_BASE_RTC->RTC_MR 		= 0;         		// 24 hour mode
-	rtc_time.time_bits.second 	= 0x0; 
-	rtc_time.time_bits.minute 	= 0x0; 
-	rtc_time.time_bits.hour 	= 0x3; 
-	rtc_time.time_bits.merid 	= 0x0;
-	AT91C_BASE_RTC->RTC_TIMR = (uint32)rtc_time.time_data;	
+	rtc_time.time_bits.second 	= 0x00; 
+	rtc_time.time_bits.minute 	= 0x03; 
+	rtc_time.time_bits.hour 	= 0x20; 
+	rtc_time.time_bits.merid 	= 0x00;
+	
 	rtc_cal.cal_bits.century 	= 0x20; 
-	rtc_cal.cal_bits.year 		= 0x07; 
-	rtc_cal.cal_bits.month 		= 0x1; 
-	rtc_cal.cal_bits.day 		= 0x2; 
-	rtc_cal.cal_bits.date 		= 0x9;
+	rtc_cal.cal_bits.year 		= 0x14; 
+	rtc_cal.cal_bits.month 		= 0x05; 
+	rtc_cal.cal_bits.day 		= 0x06; 
+	rtc_cal.cal_bits.date 		= 0x17;
+	
+	AT91C_BASE_RTC->RTC_TIMR = (uint32)rtc_time.time_data;	
 	AT91C_BASE_RTC->RTC_CALR = (uint32)rtc_cal.cal_data;
+	
 	AT91C_BASE_RTC->RTC_CR 		= 0; 			// start timer.		
+	AT91C_BASE_RTC->RTC_SR=0; //Clear SEC-Flag
 }
 
 
@@ -292,6 +297,7 @@ int main()
 	Led_init();
 	Usart_init();
 	initTimer();
+	Rtc_init();
 
 	
 	
@@ -328,7 +334,7 @@ int main()
 			//AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,AT91C_ID_TC0,AT91C_AIC_PRIOR_HIGHEST,AT91C_AIC_SRCTYPE_EXT_POSITIVE_EDGE,Interrupt_Handler_TC0_Lowlevel);
 			
 			//short disable timer (later init)
-			StopTimer();
+			//StopTimer();
 			
 			
 			AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, TIMER0_INTERRUPT_LEVEL,AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE, Interrupt_Handler_TC0_Lowlevel );
@@ -340,8 +346,12 @@ int main()
 			//Test
 			//initTimer();
 
-	while(1);
+	while(1)
 	{   
+	
+	if(AT91F_US_GetChar((AT91PS_USART)AT91C_BASE_US1)=='R')
+	setLed(RED);
+	
 		/*if(getDigInputState(AT91C_BASE_PIOB, AT91C_PIO_PB15))
 		{
 		setLed(RED);

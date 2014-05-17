@@ -27,6 +27,7 @@
 unsigned int 		TimerOverflowCnt=0;
 unsigned int 		InterruptTimeUsed=0;
 unsigned char		ASCII_Tick_Buffer[]="4294967296 us\n";
+unsigned char		ASCII_UART_Buffer[]="DD/MM/YYYY HH:MM:SS 4294967296 us\n";
 
 void initTimer(void)
 {
@@ -91,9 +92,12 @@ void Stop_Latency_Measurement(void)
 	InterruptTimeUsed=Convert_Ticks_To_us(getTimerValue());
 	StopTimer();
 	toggleLed(YELLOW);
+	PutDateAndTimeStamp('/',':');
 	Dec2ASCII_Ticks(InterruptTimeUsed,'0');
 	
-	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
+	//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
+	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_UART_Buffer,(sizeof(ASCII_UART_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
+
 }
 
 static inline unsigned int Convert_Ticks_To_us (unsigned int Ticks)
