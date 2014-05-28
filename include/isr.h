@@ -6,6 +6,5 @@ extern void 					Interrupt_Handler_MCI_Lowlevel(void);
 extern void					Interrupt_Handler_SysTimer_Lowlevel(void);
 extern void					Measured_Interrupt_Lowlevel(void);
 extern void					Interrupt_Handler_TC0_Lowlevel(void);
-//extern void					Start_Latency_Measurement(void);
-//extern void					Stop_Latency_Measurement(void);
+
 #endif

@@ -1,7 +1,7 @@
 #ifndef main_h
 #define main_h
 
-extern void 	Interrupt_Handler_MCI_Highlevel(void) ; // to isr.S
+//extern void 	Interrupt_Handler_MCI_Highlevel(void) ; // to isr.S
 extern int 	main(void);     // to cstartup.S
 extern int 	readytowriteonSD;
 extern char 	usartBuffer1[1024];
@@ -103,9 +103,9 @@ typedef struct _SDCARD
 
 
 
-#define MY_INT_PIN AT91C_PIO_PB15
-#define TIMER0_INTERRUPT_LEVEL		7
-#define 	AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE    ((unsigned int) 0x1 <<  5) // (AIC) Internal Sources Code Label Positive Edge triggered
+	#define MY_INT_PIN AT91C_PIO_PB15
+	#define TIMER0_INTERRUPT_LEVEL		7
+	#define 	AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE    ((unsigned int) 0x1 <<  5) // (AIC) Internal Sources Code Label Positive Edge triggered
 
 	#define TIMER_CLOCK1 		0x00     	//MCK/2
 	#define TIMER_CLOCK2 		0x01		//MCK/8
@@ -113,5 +113,6 @@ typedef struct _SDCARD
 	#define TIMER_CLOCK4 		0x03		//MCK/128
 	#define TIMER_CLOCK5 		0x04		//SLCK (32768HZ)
 	#define INT_COMP_OFF 		0x00		
-	#define INT_COMP_ON 		0x01		
+	#define INT_COMP_ON 		0x01	
+	
 #endif

@@ -50,7 +50,7 @@ void Dec2ASCII_Ticks(unsigned int value,unsigned char blanksym)
 
 void PutDateAndTimeStamp(unsigned char datedivider,unsigned char timedivider)
 {
-char idx=0;
+unsigned char idx=0;
 const unsigned char Dec2ASCII[]="0123456789";
 
 
@@ -120,8 +120,8 @@ unsigned int Convert_Ticks_To_us (unsigned int Ticks,unsigned char TimerClockBas
 			return (Ticks<<5)/15;	//Tested [v]
 			
 	 case TIMER_CLOCK5:
-			return (unsigned int)(((unsigned long long)(Ticks*15625))>>9);  //SLCK (32768HZ)
-	
+			return (unsigned int)(((unsigned long long)(Ticks*15625))>>9);  //Tested [v] //SLCK (32768HZ)
+			// Value is not valid for times >= approx 5s
 	 default:
 			return Ticks;
 	 }
