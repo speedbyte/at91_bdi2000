@@ -77,21 +77,21 @@ void Rtc_init(void)
 	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) );  // wait for stop acknowledge
 	AT91C_BASE_RTC->RTC_MR 		= 0;         		// 24 hour mode
 	rtc_time.time_bits.second 	= 0x00; 
-	rtc_time.time_bits.minute 	= 0x03; 
-	rtc_time.time_bits.hour 	= 0x20; 
+	rtc_time.time_bits.minute 	= 0x36; 
+	rtc_time.time_bits.hour 	= 0x09; 
 	rtc_time.time_bits.merid 	= 0x00;
 	
 	rtc_cal.cal_bits.century 	= 0x20; 
 	rtc_cal.cal_bits.year 		= 0x14; 
 	rtc_cal.cal_bits.month 		= 0x05; 
 	rtc_cal.cal_bits.day 		= 0x06; 
-	rtc_cal.cal_bits.date 		= 0x17;
+	rtc_cal.cal_bits.date 		= 0x23;
 	
 	AT91C_BASE_RTC->RTC_TIMR = (uint32)rtc_time.time_data;	
 	AT91C_BASE_RTC->RTC_CALR = (uint32)rtc_cal.cal_data;
 	
 	AT91C_BASE_RTC->RTC_CR 		= 0; 			// start timer.		
-	AT91C_BASE_RTC->RTC_SR=0; //Clear SEC-Flag
+	AT91C_BASE_RTC->RTC_SCCR 	=AT91C_RTC_SECEV; //Clear SEC-Flag
 }
 
 

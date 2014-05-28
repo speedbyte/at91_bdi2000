@@ -11,7 +11,8 @@
 
 extern unsigned char		ASCII_Tick_Buffer[];
 extern unsigned char	    ASCII_UART_Buffer[];
-
+extern CALENDAR 				Rtc_Date_Start;
+extern TIME     				Rtc_Time_Start;
 
 
 
@@ -52,54 +53,51 @@ void PutDateAndTimeStamp(unsigned char datedivider,unsigned char timedivider)
 char idx=0;
 const unsigned char Dec2ASCII[]="0123456789";
 
-CALENDAR 				Rtc_Date;
-TIME     				Rtc_Time;
-Rtc_Time.time_data = (uint32)AT91C_BASE_RTC->RTC_TIMR;
-Rtc_Date.cal_data = (uint32)AT91C_BASE_RTC->RTC_CALR;
+
 
 //Day
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.date& 0xF0)>>4)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.date& 0xF0)>>4)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.date& 0x0F)>>0)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.date& 0x0F)>>0)];
 idx++;
 ASCII_UART_Buffer[idx]=datedivider;
 idx++;
 //Month
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.month& 0xF0)>>4)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.month& 0xF0)>>4)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.month& 0x0F)>>0)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.month& 0x0F)>>0)];
 idx++;
 ASCII_UART_Buffer[idx]=datedivider;
 idx++;
 //Year
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.century& 0xF0)>>4)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.century& 0xF0)>>4)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.century& 0x0F)>>0)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.century& 0x0F)>>0)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.year& 0xF0)>>4)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.year& 0xF0)>>4)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date.cal_bits.year& 0x0F)>>0)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Date_Start.cal_bits.year& 0x0F)>>0)];
 idx++;
 ASCII_UART_Buffer[idx]=' ';
 idx++;
 //Hour
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time.time_bits.hour& 0xF0)>>4)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time_Start.time_bits.hour& 0xF0)>>4)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time.time_bits.hour& 0x0F)>>0)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time_Start.time_bits.hour& 0x0F)>>0)];
 idx++;
 ASCII_UART_Buffer[idx]=timedivider;
 idx++;
 //Minute
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time.time_bits.minute& 0xF0)>>4)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time_Start.time_bits.minute& 0xF0)>>4)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time.time_bits.minute& 0x0F)>>0)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time_Start.time_bits.minute& 0x0F)>>0)];
 idx++;
 ASCII_UART_Buffer[idx]=timedivider;
 idx++;
 //Second
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time.time_bits.second& 0xF0)>>4)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time_Start.time_bits.second& 0xF0)>>4)];
 idx++;
-ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time.time_bits.second& 0x0F)>>0)];
+ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time_Start.time_bits.second& 0x0F)>>0)];
 
 }
 

@@ -10,6 +10,9 @@
 #include "Timer.h"
 #include "led_device.h"
 #include "conversion.h"
+#include "mci_type.h"
+#include "main.h"
+
 
 
 
@@ -28,6 +31,9 @@ unsigned int 		TimerOverflowCnt=0;
 unsigned int 		InterruptTimeUsed=0;
 unsigned char		ASCII_Tick_Buffer[]="4294967296 us\n";
 unsigned char		ASCII_UART_Buffer[]="DD/MM/YYYY HH:MM:SS 4294967296 us\n";
+CALENDAR 				Rtc_Date_Start;
+TIME     				Rtc_Time_Start;
+
 
 void initTimer(void)
 {
@@ -85,6 +91,8 @@ void Start_Latency_Measurement(void)
 {
 TimerOverflowCnt=0;
 StartTimer();
+Rtc_Time_Start.time_data = (uint32)AT91C_BASE_RTC->RTC_TIMR;
+Rtc_Date_Start.cal_data = (uint32)AT91C_BASE_RTC->RTC_CALR;
 }
 
 void Stop_Latency_Measurement(void)
