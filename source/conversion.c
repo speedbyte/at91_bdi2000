@@ -7,7 +7,7 @@
 #include "AT91RM9200.h"
 #include "lib_AT91RM9200.h"
 
-#define MEASVALOFF	20
+#define MEASVALOFF	20 // Measurement value offset in in string
 
 extern unsigned char		ASCII_Tick_Buffer[];
 extern unsigned char	    ASCII_UART_Buffer[];
@@ -101,4 +101,30 @@ ASCII_UART_Buffer[idx]=Dec2ASCII[((Rtc_Time_Start.time_bits.second& 0x0F)>>0)];
 
 }
 
+
+
+unsigned int Convert_Ticks_To_us (unsigned int Ticks,unsigned char TimerClockBase)
+{ 
+	 switch (TimerClockBase)
+	 {
+	 case TIMER_CLOCK1:
+			return Ticks/30; 		//Tested [v]
+		
+	 case TIMER_CLOCK2:
+			return (Ticks<<1)/15; 	//Tested [v]
+	 
+	 case TIMER_CLOCK3:
+			return (Ticks<<3)/15;	//Tested [v]	
+	 
+	 case TIMER_CLOCK4:
+			return (Ticks<<5)/15;	//Tested [v]
+			
+	 case TIMER_CLOCK5:
+			return (unsigned int)(((unsigned long long)(Ticks*15625))>>9);  //SLCK (32768HZ)
+	
+	 default:
+			return Ticks;
+	 }
+
+}
 #endif

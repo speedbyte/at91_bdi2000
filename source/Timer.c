@@ -16,27 +16,24 @@
 
 
 
-// Used Timer: "AT91C_BASE_TC0"
-#define TIMER_CLOCK1 		0x00     	//MCK/2
-#define TIMER_CLOCK2 		0x01		//MCK/8
-#define TIMER_CLOCK3 		0x02		//MCK/32
-#define TIMER_CLOCK4 		0x03		//MCK/128
-#define TIMER_CLOCK5 		0x04		//SLCK (32768HZ)
+
 
 #define CPCTRG				(1<<14)		//RC Compare Trigger Enable
 
-#define TIMER_CLK_USED TIMER_CLOCK4
+//#define TIMER_CLK_USED TIMER_CLOCK4
 
 unsigned int 		TimerOverflowCnt=0;
-unsigned int 		InterruptTimeUsed=0;
-unsigned char		ASCII_Tick_Buffer[]="4294967296 us\n";
-unsigned char		ASCII_UART_Buffer[]="DD/MM/YYYY HH:MM:SS 4294967296 us\n";
-CALENDAR 				Rtc_Date_Start;
-TIME     				Rtc_Time_Start;
 
 
-void initTimer(void)
+
+//extern CALENDAR 	Rtc_Date_Start;
+//extern TIME     	Rtc_Time_Start;
+
+
+void initTimer(unsigned char TimerClockBase)
 {
+//TIMER_CLK_USED=TimerClockBase;
+
 AT91C_BASE_PMC->PMC_PCER=1 << AT91C_ID_TC0;  /* enable clock */
 
 AT91C_BASE_TCB0->TCB_BCR = 0;	// TC Block Control Register, No SYNC Mode
@@ -45,7 +42,7 @@ AT91C_BASE_TCB0->TCB_BMR = AT91C_TCB_TC0XC0S_NONE | AT91C_TCB_TC1XC1S_NONE | AT9
 
 AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
 
-AT91C_BASE_TC0->TC_CMR = TIMER_CLK_USED | CPCTRG;  //Set Timer To SLCK And ENABLE CPCTRG
+AT91C_BASE_TC0->TC_CMR = TimerClockBase | CPCTRG;  //Set Timer To SLCK And ENABLE CPCTRG
 
 AT91C_BASE_TC0->TC_IDR = 0xFFFFFFFF;  //Disable all Timer Interrupts
 
@@ -74,6 +71,14 @@ AT91C_BASE_TC0->TC_CCR=AT91C_TC_CLKDIS; //Disable Timer Clock
 return;
 }
 
+unsigned int Time_Used_In_Timer_Int(void)
+{
+return (unsigned int) TimerOverflowCnt>>1; // MCK= 60MHz ,Approx 30 Clockcycles per Timer overflow =1us per switch
+}
+
+
+
+
 void  Interrupt_Handler_TC0_Highlevel (void)
 {
 	AT91PS_TC TC_pt = AT91C_BASE_TC0;
@@ -87,51 +92,7 @@ void  Interrupt_Handler_TC0_Highlevel (void)
 	TimerOverflowCnt++;
 }
 
-void Start_Latency_Measurement(void)
-{
-TimerOverflowCnt=0;
-StartTimer();
-Rtc_Time_Start.time_data = (uint32)AT91C_BASE_RTC->RTC_TIMR;
-Rtc_Date_Start.cal_data = (uint32)AT91C_BASE_RTC->RTC_CALR;
-}
 
-void Stop_Latency_Measurement(void)
-{
-	InterruptTimeUsed=Convert_Ticks_To_us(getTimerValue());
-	StopTimer();
-	toggleLed(YELLOW);
-	PutDateAndTimeStamp('/',':');
-	Dec2ASCII_Ticks(InterruptTimeUsed,'0');
-	
-	//AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_Tick_Buffer,(sizeof(ASCII_Tick_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
-	AT91F_US_SendFrame((AT91PS_USART)AT91C_BASE_US1, &ASCII_UART_Buffer,(sizeof(ASCII_UART_Buffer)-1),0,0); //Including \0 at the end (sizeof(Buffer)-1) will not send the string delimiter
-
-}
-
-static inline unsigned int Convert_Ticks_To_us (unsigned int Ticks)
-{ 
- switch (TIMER_CLK_USED)
- {
- case TIMER_CLOCK1:
-		return Ticks/30; 		//Tested [v]
-	
- case TIMER_CLOCK2:
-		return (Ticks<<1)/15; 	//Tested [v]
- 
- case TIMER_CLOCK3:
-		return (Ticks<<3)/15;	//Tested [v]	
- 
- case TIMER_CLOCK4:
-		return (Ticks<<5)/15;	//Tested [v]
-		
- case TIMER_CLOCK5:
-		return (unsigned int)(((unsigned long long)(Ticks*15625))>>9);  //SLCK (32768HZ)
-
- default:
-		return Ticks;
- }
-
-}
 
 
 

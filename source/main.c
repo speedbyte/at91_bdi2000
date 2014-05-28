@@ -33,8 +33,9 @@ REv 1.2 : Integrated USART function calls
 #include "st_device.h"
 #include "led_device.h"
 #include "errm.h"
-#include "Timer.h"
+//#include "Timer.h"
 #include "isr.h"
+#include "InterruptMeasurmentService.h"
 
 
 
@@ -296,8 +297,16 @@ int main()
 	USART_pt = AT91C_BASE_US1;
 	Led_init();
 	Usart_init();
-	initTimer();
 	Rtc_init();
+	/*#define TIMER_CLOCK1 		0x00     	//MCK/2
+	#define TIMER_CLOCK2 		0x01		//MCK/8
+	#define TIMER_CLOCK3 		0x02		//MCK/32
+	#define TIMER_CLOCK4 		0x03		//MCK/128
+	#define TIMER_CLOCK5 		0x04		//SLCK (32768HZ)
+	#define INT_COMP_OFF 		0x00		
+	#define INT_COMP_ON 		0x01*/		
+	
+	
 
 	
 	
@@ -337,9 +346,7 @@ int main()
 			//StopTimer();
 			
 			
-			AT91F_AIC_ConfigureIt ( AT91C_BASE_AIC, AT91C_ID_TC0, TIMER0_INTERRUPT_LEVEL,AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE, Interrupt_Handler_TC0_Lowlevel );
-			//AT91C_BASE_TC0->TC_IER = AT91C_TC_COVFS;
-			AT91F_AIC_EnableIt (AT91C_BASE_AIC, AT91C_ID_TC0);
+			Init_Latency_Measurement(TIMER_CLOCK1,INT_COMP_ON);
 			// AT91C_BASE_TC0->TC_CCR = AT91C_TC_SWTRG ;
 			
 			setLed(RED);

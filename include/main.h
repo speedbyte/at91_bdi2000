@@ -107,4 +107,11 @@ typedef struct _SDCARD
 #define TIMER0_INTERRUPT_LEVEL		7
 #define 	AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE    ((unsigned int) 0x1 <<  5) // (AIC) Internal Sources Code Label Positive Edge triggered
 
+	#define TIMER_CLOCK1 		0x00     	//MCK/2
+	#define TIMER_CLOCK2 		0x01		//MCK/8
+	#define TIMER_CLOCK3 		0x02		//MCK/32
+	#define TIMER_CLOCK4 		0x03		//MCK/128
+	#define TIMER_CLOCK5 		0x04		//SLCK (32768HZ)
+	#define INT_COMP_OFF 		0x00		
+	#define INT_COMP_ON 		0x01		
 #endif

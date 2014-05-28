@@ -14,7 +14,7 @@ $(shell [ -d ${OBJECT_DIR} ] || mkdir -p ${OBJECT_DIR})
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM 	= cstartup_gnu.S isr.S
-SRCARM 		= main.c init.c mci_device.c usart_device.c st_device.c led_device.c Timer.c conversion.c
+SRCARM 		= main.c init.c mci_device.c usart_device.c st_device.c led_device.c Timer.c conversion.c InterruptMeasurmentService.c
 
 # Define all object files.
 
