@@ -25,26 +25,26 @@ void WaitTicks(unsigned int ticks)
 
 
 void Dec2ASCII_Ticks(unsigned int value,unsigned char blanksym)
-{	unsigned char numberoccoured=0;
+{	unsigned char numberoccurred=0;
 	unsigned int num;
 	unsigned int ValToWork=value;
 	unsigned int i;
-	unsigned int Devider=1000000000;
+	unsigned int Divider=1000000000;
 	
 	for(i=0;i<10;i++)
 	{	
-		num=ValToWork/Devider;
-		if(num|numberoccoured)
+		num=ValToWork/Divider;
+		if(num|numberoccurred)
 		{
 		ASCII_UART_Buffer[i+MEASVALOFF]=(unsigned char)num+48;
-		numberoccoured=1;
+		numberoccurred=1;
 		}
 		else
 		{
 		ASCII_UART_Buffer[i+MEASVALOFF]=blanksym;
 		}
-		ValToWork%=Devider;
-		Devider/=10;
+		ValToWork%=Divider;
+		Divider/=10;
 	}
 }
 

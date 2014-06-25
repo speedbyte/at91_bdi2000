@@ -33,15 +33,15 @@ void Rtc_init(void)
 	while (!(AT91C_BASE_RTC->RTC_SR & AT91C_RTC_ACKUPD) );  // wait for stop acknowledge
 	AT91C_BASE_RTC->RTC_MR 		= 0;         		// 24 hour mode
 	rtc_time.time_bits.second 	= 0x00; 
-	rtc_time.time_bits.minute 	= 0x34; 
-	rtc_time.time_bits.hour 	= 0x16; 
+	rtc_time.time_bits.minute 	= 0x35; 
+	rtc_time.time_bits.hour 	= 0x11; 
 	rtc_time.time_bits.merid 	= 0x00;
 	
 	rtc_cal.cal_bits.century 	= 0x20; 
 	rtc_cal.cal_bits.year 		= 0x14; 
-	rtc_cal.cal_bits.month 		= 0x05; 
-	rtc_cal.cal_bits.day 		= 0x06; 
-	rtc_cal.cal_bits.date 		= 0x28;
+	rtc_cal.cal_bits.month 		= 0x06; 
+	rtc_cal.cal_bits.day 		= 0x05; 
+	rtc_cal.cal_bits.date 		= 0x27;
 	
 	AT91C_BASE_RTC->RTC_TIMR = (uint32)rtc_time.time_data;	
 	AT91C_BASE_RTC->RTC_CALR = (uint32)rtc_cal.cal_data;
@@ -61,7 +61,7 @@ void InitHardware(void)
 void InitDemoInterrupt(AT91PS_PIO PIOptr, unsigned int ParallelID, unsigned int MyIOpin, unsigned int priority, unsigned int intType)
 {
 			AT91F_PMC_EnablePeriphClock (AT91C_BASE_PMC, ((unsigned int) 1 << ParallelID)); // first controller clock can PIOB
-			AT91F_PIO_CfgInput (PIOptr, MyIOpin); // PB0 input configured as input
+			AT91F_PIO_CfgInput (PIOptr, MyIOpin); // PB15 input configured as input
 			AT91F_AIC_ConfigureIt(AT91C_BASE_AIC,ParallelID,priority,intType,Measured_Interrupt_Lowlevel);
 
 			AT91F_PIO_InterruptEnable (PIOptr, MyIOpin); // enable change interrupt
