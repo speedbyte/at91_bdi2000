@@ -1,0 +1,33 @@
+\contentsline {section}{List of Abbreviations}{III}{chapter*.4}
+\contentsline {chapter}{\numberline {1}Task description}{1}{chapter.1}
+\contentsline {chapter}{\numberline {2}Environment}{2}{chapter.2}
+\contentsline {section}{\numberline {2.1}The chip ATMEL AT91RM9200}{2}{section.2.1}
+\contentsline {section}{\numberline {2.2}WinARM}{3}{section.2.2}
+\contentsline {section}{\numberline {2.3}Programmers Notepad 2}{4}{section.2.3}
+\contentsline {section}{\numberline {2.4}TFTP-Server}{4}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}BDI-Configuration-File}{4}{subsection.2.4.1}
+\contentsline {section}{\numberline {2.5}Telnet}{5}{section.2.5}
+\contentsline {subsection}{\numberline {2.5.1}BDI2000 Telnet command's}{5}{subsection.2.5.1}
+\contentsline {section}{\numberline {2.6}System overview}{7}{section.2.6}
+\contentsline {chapter}{\numberline {3}Hardware abstraction}{8}{chapter.3}
+\contentsline {section}{\numberline {3.1}LED}{9}{section.3.1}
+\contentsline {section}{\numberline {3.2}\acs {UART}}{11}{section.3.2}
+\contentsline {section}{\numberline {3.3}Digital Input}{13}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Sharp sensor}{14}{subsection.3.3.1}
+\contentsline {section}{\numberline {3.4}\acs {RTC}}{15}{section.3.4}
+\contentsline {chapter}{\numberline {4}Interrupt Latency Measurement Service}{17}{chapter.4}
+\contentsline {section}{\numberline {4.1}\ac {AIC}}{18}{section.4.1}
+\contentsline {section}{\numberline {4.2}\acs {ILMS} initialization}{18}{section.4.2}
+\contentsline {section}{\numberline {4.3}Interrupt concept}{20}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Time correction}{21}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Timestamp and result conversion}{22}{subsection.4.3.2}
+\contentsline {subsection}{\numberline {4.3.3}Measurement transmission}{24}{subsection.4.3.3}
+\contentsline {subsubsection}{\numberline {4.3.3.1}RS232 frame format}{24}{subsubsection.4.3.3.1}
+\contentsline {subsection}{\numberline {4.3.4}Measurement scenarios}{25}{subsection.4.3.4}
+\contentsline {subsection}{\numberline {4.3.5}Demo interrupt function}{28}{subsection.4.3.5}
+\contentsline {chapter}{\numberline {5}Conclusion}{29}{chapter.5}
+\contentsline {section}{\numberline {5.1}Further improvements}{29}{section.5.1}
+\contentsline {chapter}{List of Figures}{31}{section*.29}
+\contentsline {chapter}{List of Tables}{32}{section*.31}
+\contentsline {chapter}{List of Listings}{33}{section*.33}
+\contentsline {chapter}{Bibliography}{34}{section*.35}

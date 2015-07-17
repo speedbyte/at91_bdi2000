@@ -1,0 +1,550 @@
+\chapter{Einfluss von Druckänderungen}
+Druckänderungen beziehen sich im Kupplungshydrauliksystem auf den Gegendruck der Kupplungstellerfeder. Diese Änderung des Gegendrucks bewirkt ohne Kompensation eine Verschiebung der Kupplungskennlinie und damit eine Änderung des Übertragenenmoment der Kupplung.\\
+Diese Druckänderungen treten auch bei Serienfahrzeugen mit manueller Kupplungsbetätigung auf, haben aber dort, aufgrund der kürzeren Öffnungsdauer\footnote{Voraussetzung Kupplung wird nur bei Anfahr- oder Schaltvorgängen betätigt}, nahezu keinen Einfluss. Hinzu kommt, dass der Fahrer als diese Ungenauigkeit im System mit dem Pedal als Regler korrigiert.\\
+Im Gegensatz dazu wird bei \ac{SSC}-Fahrzeugen mit manueller Schaltung die Kupplung während der Segelphasen oder beim \ac{SiG} offen gehalten. Dabei ist das Hydraulikmedium bei geöffneter Kupplung zwischen Geber- und Nehmerzylinder eingesperrt. Es besteht keine Verbindung zum Ausgleichsbehälter. Die dabei über die Zeit stattfindenden Druckänderungen beinflussen die Momentengenauigkeit beim Anreißen des \ac{VM} durch die Kupplung. Die Druckänderungen wirken sich somit über das Kupplungsmoment auf die Startzeit des \ac{VM} sowie auf den Komfort des Motorstarts aus.\\
+
+\newpage
+\section{Einflussgrößen der Druckänderungen}
+Die Einflussgrößen der Druckänderungen beruhen auf Temperatureinflüssen im Hydrauliksystem und der Leckage\footnote{Hydrauliksystem wird als leckagefrei betrachtet. Selbstsperrendes ABS-Rückfluss Ventil ohne Leckage}.\\ 
+In Abbildung \ref{fig:eflDruck} sind die wichtigsten Größen aufgeführt. Die Absoluthydrauliktemperatur ist in Verbindung mit der Umgebungstemperatur für die Abkühlung der Strecke zu erfassen. Dabei kann die Hydraulikflüssigkeit nicht kälter als die Umgebungstemperatur werden. Zur Erwärmung der Strecke stellt die Motorabwärme einen signifikanten Einfluss. Diese ist zusammen mit der Einbaulage im Motorraum für steigende Temperaturen des Hydraulikmediums verantwortlich. Dabei spielt der Aufbau des Kupplungssystems eine entscheidende Rolle. Bei Systemen mit außenliegenden Nehmerzylindern\footnote{Serien außenliegender Kupplungsnehmerzylinder aus Kunststoff im Audi A3} hat die Temperatur der Kupplung im Gegesatz zu Zentralausrücker-Systemen einen geringen Einfluss. Das Volumen hat gekoppelt mit der Querschnittsfläche bei temeratur- oder leckagebedingter Volumenänderung direkten Einfluss auf den Anpressdruck der Kupplungsscheiben. Die Eigenschaft der Leitung\footnote{Stahlleitung im Versuchsträger} zwischen Geber- und Nehmerzylinder bezüglich ihrer Eigenschaft als Wärmebrücke sowie Ausdehnung bei Druck und Temperatur ist ebenfalls zu beachten.\\
+%###############################################
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture}[every node/.style={concept, circular drop shadow}]
+  \path[small mindmap,concept color=green!90,text=black]
+  
+    node[concept,  line width=1ex,text=black, minimum size=2cm] {Druck\-änderungen}
+    [clockwise from=90] % Nötig damit verbindungslinien gezogen werden
+    
+    child[concept color=lightblue ,grow=90,  minimum size=2cm ] { node[concept] {Absolut\-hydraulik\-temperatur}}  
+    child[concept color=lightblue,grow=135,  level distance=113, minimum size=2cm] { node[concept] {Umgebungs\-temperatur}}
+    child[concept color=lightblue,grow=180,  minimum size=2cm ] { node[concept] {Aufbau des Kupplungs\-systems} }
+    child[concept color=lightblue,grow=225, level distance=113, minimum size=2cm ] { node[concept] {Volumen in der Hydraulikstrecke} }
+    child[concept color=lightblue,grow=270 ,  minimum size=2cm ] { node[concept] {Einbaulage des Systems} }
+    child[concept color=lightblue,grow=315,  level distance=113, minimum size=2cm ] { node[concept] {Fahrzeug\-geschwindig\-keit} }
+    child[concept color=lightblue,grow=0,  minimum size=2cm ] { node[concept] {Motor\-abwärme} }
+    child[concept color=lightblue,grow=45,  level distance=113, minimum size=2cm ] { node[concept] {Querschnitt des Nehmer\-zylinders} }
+    ;
+  
+\end{tikzpicture}
+
+\end{center}
+\caption{Einflussgrößen der Druckänderungen}
+		\label{fig:eflDruck}
+\end{figure}
+
+\section{Beschreibung des Versuchsablauf}
+\label{Tempversuch}
+Zur Identifikation der Druckänderungen im Versuchsträger wurde dieser im Stuttgart-Rundkurs (Kapitel: \ref{SRKdesc} Seite: \pageref{SRKdesc}) untersucht. Die Versuchsfahrt wurde mit zusätzlichen Sensoren (Abschnitt \ref{Messystem}) und dem ETAS-Messsystem aufgezeichnet. Ziel dabei ist es, den Druckverlauf über eine möglichst lange Segelphase aufzuzeichen und die dabei auftretenden Schwankungen den Einflussfaktoren zuzuordnen.\\
+Dieser Versuch wurde ebenso mit einem VW Touareg Hybrid zum Vergleich durchgeführt. Der Touareg Hybrid ist mit einem V6 TSI mit 245 kW und einem über eine Trennkupplung getrennten E-Maschine mit 34 kW ausgerüstet. Die Trennkupplung mit integriertem Torsionsdämpfer und Zentralausrücker wird über einen Kupplungsaktuator gesteuert. Diese Kupplung erlaubt dem P2-Hybrid eine rein elektrische Fahrweise und Rekuperation ohne mitlaufenden \ac{VM}. Der Motorstart des \ac{VM} wird über einen Momentenvorhalt der E-Maschine realisiert. \cite{Hybridfahrzeuge}\cite{boschESC3}\\
+Der Touareg besitzt in Serie einen Drucksensor im Kupplungshydrauliksystem mit dem er durch den Aktor Druckänderungen ausgleicht. Das Fahrzeug wurde ohne VW-Strategie mit einer reinen Start/Stopp-Segel-Strategie betrieben. Die E-Maschine wurde dabei nur für den Motorstart und für die Kompensation ihrer eigenen Verluste angesteuert. Die Druckkompensation wurde ebenso per Bypass ausgeschaltet wobei die Messdaten der Kompensation mit aufgezeichnet wurden.\cite{boschESC3}\\
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/PA3uTouareg2.pdf}
+		\caption {Messfahrt Druckänderungen A3 und Touareg}
+	\label{fig:A3uTouaregPtoggle}
+\end{center}
+\end{figure}
+
+Abbildung \ref{fig:A3uTouaregPtoggle} zeigt die aufgezeichneten Drucksignale einer circa 100 Sekunden dauernden Start/Stopp-Segelphase. Beim Touareg (\textbf{\textcolor{blue}{\noindent\rule{0.5cm}{2pt}}} Messwerte) ist ab Beginn der Segelphase ein Druckanstieg zu erkennen. Dieser fällt nach 20 Sekunden wieder ab.  Die Drucksprünge (Bereich 45 - 48 und 93 - 97 Sekunden)  werden durch eine nicht ausgeschaltete Leckageprüfung verursacht. Während dieser Zeit verfährt der Kupplungsaktuator (\textbf{\textcolor{green}{\noindent\rule{0.5cm}{2pt}}} Aktorposition). Das Drucksignal des Touareg kann dabei nicht aufkumuliert werden, da nach der Leckageprüfung der Aktor entsprechend des Startdruck positioniert wird. Die Druckänderungen sind während dieser Segelphase ohne Leckageprüfung deutlich größer als 3 Bar. Der anfängliche Anstieg des Drucks ist damit erklärbar, dass das Hydraulikmedium zum Öffnen der Kupplung in den heißen Zentralaußrücker\footnote{Zentralausrücker aus Metall} verschoben wird. Nach dem Ausgleichsvorgang der Temperaturen des Zentralausrückers und der Hydraulikflüssigkeit kühlt das Medium durch Luftströmung, bedingt durch die Fahrzeuggeschwindigkeit, wieder ab.\\
+Im A3 bleibt die Position des Aktors (nicht eingezeichnet) während der gesamten Segelphase konstant. Die Druckänderungen (\textbf{\textcolor{red}{\noindent\rule{0.5cm}{2pt}}} Messwerte) während der Segelphase liegen dabei im Bereich von 0,5-0,8 Bar\footnote{Vergleichbares Kupplungssystem ($Citro\ddot{e}n\; C4$ 1,6l R4 außenliegender Nehmerzylinder FTE-Kupplungssteller) zeigte ebenso lineare Druckabnahme (1 Bar)}. Eine ständige Druck-Positionsregelung durch den Aktor wie im Touareg (Serienkonzept) wird durch diesen kleinen Hubbereich des Drucks erschwert\footnote{Drucksensorauflösung im Touareg 0,2 Bar. Druckregelung regelt ab einer Abweichung von 0,3 Bar}. Diese würde bei einer dieser 100 Sekunden Segelphase bei einem linearen Druckabfall um 0,5 Bar erst nach circa 60 Sekunden aktiv. Davor wäre keine Druckregelung und somit Kompensation, auf Grund von Toggeln des Drucksignals, möglich.\\
+Für die folgenden Untersuchungen und Auswertungen wurden verschiedene Szenarien und Bedingungen aufgestellt:
+\begin{itemize}
+	\item Untersuchungen im Normalbetrieb des Fahrzeugs bei \ac{SSC}-Fahrten. Fahrten mit möglichst langen Segelphasen\footnote{Streckenabschnitt im Stuttgart-Rundkurs erlaubt Segelphasen $\geq$ 100 Sekunden bei 2,5 km Fahrstrecke} bis circa 100 Sekunden zur Überprüfung der Momentengenauigkeit beim Wiederstart des \ac{VM}.\\
+	\item Offenhalten der Kupplung im Stand bei \ac{SiG} oder Fahrer betätigt das Kupplungspedal. Dabei läuft der \ac{VM} oder befindet sich im Start/Stopp. Die maximal Stoppdauer wurde auf 300 Sekunden festgelegt und entspricht damit einem Stopp am Bahnübergang oder einer langen Ampelphase.\\
+\end{itemize}
+%
+%
+%
+%
+\section{Temperaturauswertung des Hydraulikmediums}
+Aufgrund der geringen Druckänderungen wurde die Temperatur des Hydraulikmediums während verschiedener Segelphasen ausgewertet. Die Temperaturen wurden direkt im Hydraulikmedium zwischen Aktor und Nehmerzylinder (Temperatursensor 1 (k) Abschnitt: \ref{Messystem} Abbildung: \ref{fig:uberHyd}) aufgezeichnet\footnote{Der zweite Temperatursensor (l) zwischen Aktor und Drucksensor wurde zur Plausibilisierung der Temperaturwerte verwendet. Die Temperaturschwankungen lagen dabei im gleichen Wertebereich des Sensors zwischen Aktor und Nehmerzylinder}. Die \ac{MTD} hat über die Temperatureigenschaften des Hydraulikmediums (Seite \pageref{HydMed}) direkten Einfluss auf das Volumen, das sich in der Strecke befindet.\\
+Zur Auswertung der \ac{MTD} wurde der Absolutwert der Hydrauliktemperatur zu Beginn einer Segelphase als Ausgangspunkt verwendet. Bis zu dem Start der Segelphase ist der Antriebsstrang und damit die Kupplung geschlossen und der Aktor öffnet die Schnüffelbohrung. Die Temperaturänderung wird dabei über die gesamte Segeldauer aufgezeichenet. \\
+Abbildung \ref{fig:temprela} zeigt die \ac{MTD}. Diese ist über die Segelphase bei der dabei gemessene Fahrzeuggeschwindigkeit (vfzg\_w), eingefärbt. Die Colorbar (\ref{fig:temprela} rechts) gibt dabei den Bezug zur Fahrzeuggeschwindigkeit an. Wärmere Farben stehen für hohe und kühlere Farben für eine geringe Geschwindigkeit. Dabei zeigt sich, dass vor allem bei Segelphasen die kleiner als 20 Sekunden sind die \ac{MTD} im Bereich von $\pm 2$ °C ändert. Erst längere Segelphasen haben einen größeren Temperatureinfluss. Die Abkühlung des Hydraulikmediums korreliert dabei mit der Fahrzeuggeschwindigkeit. Bei hohen Geschwindigkeiten kühlt das Medium schneller ab, als wenn das Fahrzeug während der Segelphase langsamer gefahren wurde.\\
+Zusätzlich ist in Abbildung \ref{fig:tempabs} die absolut gemessene Hydrauliktemperatur dargestellt. Diese gefilterten\footnote{Filterung in MATLAB über gleitenden Mittelwert zur Reduzierung von Messrauschen} Messwerte können so im Bezug zur Umgebungstemperatur\footnote{Umgebungstemperatur (tumg) während der Messfahrt im Bereich 15 $\pm 2$ °C} verglichen werden. Dabei zeigt sich, dass zum Beispiel die Temperaturaufzeichnung (Starttemperatur: 26 °C Segeldauer: 93 Sekunden) im Vergleich zu einer längeren Segelphase mit höherer Starttemperatur, diese sich bis zum Ende der Phase geringer abkühlt als eine wärmere Hydraulikstrecke bei gleicher Fahrzeuggeschwindigkeit.\\
+Die im Gesamten während der Start/Stopp-Segelphase stattfindende Abkühlung des Hydraulikmediums lässt sich über den gestoppten Motor und der kühlenden Luft durch die Fahrzeuggeschwindigkeit erklären. Dabei ist bis circa 20 Sekunden Segeldauer noch ein "`Nachheizen"' des \ac{VM} aktiv.
+
+
+\begin{figure}[H]
+\begin{center}
+    \subfigure[Relative Temperaturänderungen des Hydraulikmediums in Start/Stopp-Segelphasem]{
+   \includegraphics[width=\textwidth]{images/TempRel2.pdf}
+		\label{fig:temprela}}
+		%\vspace{1.0 cm}
+    \subfigure[Absolute Temperaturänderungen des Hydraulikmediums in Start/Stopp-Segelphasem]{
+    \includegraphics[width=\textwidth]{images/TempAbs2.pdf}
+		\label{fig:tempabs}}	
+		\caption{Temperaturänderungen in Start/Stopp-Segelphasen bezüglich der Fahrzeuggeschwindigkeit}
+		\label{fig:TempSpeed}
+		\end{center}
+\end{figure}
+
+%\subsection{Druckänderung bei laufendem Motor}
+
+\subsection{Berechnung des Hydraulikvolumens}
+\label{calcHydVol}
+Das Hydraulikvolumen zwischen Geberzylinder (SmartAktuator) und Seriennehmerzylinder wird mit Hilfe des Linearpotentiometers im Kupplungssystem erfasst. Der Einfluss von Temperaturschwankungen im Medium wird über das Grundvolumen ($V_{0}$) der Strecke verstärkt.\\
+
+\subsubsection{Abgegrenztes Hydraulikvolumen}
+Das Hydraulikvolumen ist bei geschlossener Kupplung direkt mit dem Ausgleichsbehälter verbunden. %Dieser dient als Vorratsbehälter für das Kupplungs- und Bremssystem. Aus Sicherheitsgründen ist dabei die Versorgungsleitung für das Bremssystem unten am Vorratsbehälter angebracht, um bei einem defekten Kupplungssystem ein verzögern des Fahrzeuges sicherzustellen.
+Abbildung \ref{fig:sniffopn} zeigt den Kupplungsnehmerzylinder bei einer geschlossenen Kupplung. Der Kolben des Aktor oder Geberzylinders (Abbildung Aktor mit mechanischer Schnüffelbohrung) gibt dabei die Schnüffelbohrung frei. Dabei ist das Volumen im Aktor maximal.
+Bei geöffneter Kupplung (Abbildung \ref{fig:sniffcld}) ist die Schnüffelbohrung durch den Kolben verdeckt. Das Volumen im Aktor selbst ist dabei nahezu Null. Das verschobene Hydraulikvolumen ist nun vom Ausgleichsbehälter abgegrenzt und betätigt damit den Kupplungsnehmerzylinder.\\
+Dies Funktionalität der mechanischen Ausgleichsöffnung wird vom Kupplungssystem über die steuerbare Schnüffelbohrung (Selbstsperrendes ABS-Ventil) nachgeahmt. Ab einer applizierten Position\footnote{Applikationswert der Öffnung des Ventils:  10,2 mm bezogen auf die Aktorposition} des Aktuators öffnet das Ventil. Die expandierte oder kontrahierte Hydraulikflüssigkeit kann dabei über die Schnüffelbohrung ihr ursprüngliches Volumen wieder annehmen. Dazu strömt bei expandierte Medium Hydrauliflüssigkeit hin zum Ausgleichsbehälter oder kontrahiertes Medium zurück in das Kupplungssystem.\\
+\begin{figure}[H]
+\begin{center}
+    \subfigure[Schnüffelbohrung geöffnet, Kupplung geschlossen]{
+   \includegraphics[width=0.42\textwidth]{images/Schnueffelopen.pdf}
+		\label{fig:sniffopn}}
+		\hspace{0.8 cm}
+    \subfigure[Schnüffelbohrung geschlossen, Kupplung geöffnet]{
+    \includegraphics[width=0.42\textwidth]{images/Schnueffelcld.pdf}
+		\label{fig:sniffcld}}	
+		\caption{Verhalten der gesteuerten Schnüffelbohrung}
+		\label{fig:sniff}
+		\end{center}
+\end{figure}
+
+
+\subsubsection{Übersetzung Messsystem am Kupplungsnehmerzylinder}
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/LinSensKpplOV2.pdf}
+		\caption [Übersicht Einbaulage Kupplungspositionssensor]{Übersicht Einbaulage Kupplungspositionssensor (nicht maßstäblich)}
+	\label{fig:linpotinsys}
+\end{center}
+\end{figure}
+Der Linearpotentiometer ist durch eine Verlängerung an der Ausrückschwinge des Kupplungssystems befestigt (Abbildung \ref{fig:linpotinsys}). Der Sensor wird dabei direkt vom der \ac{ECU} mit 5 V versorgt\footnote{Versorgungsspannung stabil bei 5,00 V $\pm$ 1 $\permil$ gemessen}. Über den Messbereich des Sensors (50 mm) ergibt sich daraus eine Messauflösung ($Upot2PotPos$) von 10 $\frac{mm}{V}$. Damit lässt sich durch die mechanische Verbindung die Position der Ausrückschwinge und damit auch des Nehmerzylinders ermitteln.\\
+Für die Berechnung des Übersetzungsverhältnisses der Potentiometer- bezüglich des Nehmerzylinderweges ($n_{Upot2Nz}$) wurden folgende Messwerte ab dem Mittelpunkt der Halterung der Ausrückschwinge (5) ermittelt:
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{p{0.2\linewidth} p{0.5\linewidth} p{0.2\linewidth}} %\hline
+\textbf{Länge}	  &\textbf{Endpunkt} 		&\textbf{Messwert [mm]} \\
+\hline
+\hline
+$Pos_{NZ}$			&    Lager-Nehmerzylinder (2) & 180\\
+$Pos_{Clth}$		&   Kupplungs Ausrücklager (3) & 80\\
+$Pos_{Upot}$		&  Aufnahme Linearpotentiometer (11) & 215\\
+\end{tabular}
+\caption{Abmessungen Messystem an der Ausrückschwinge}
+\label{tab:ausrscwing}
+\end{center}
+\end{table} 
+
+Damit berechnet sich das Übersetzungsverhältnis\footnote{Ohne Berücksichtigung des Auslenkungswinkels ($\alpha$) der Ausrückschwinge, da für kleine Auslenkungswinkel $sin(\alpha) \approx \alpha$  (Maximale Auslenkung $\leq\;6$°)} zu:
+\begin{equation}
+	n_{Upot2Nz}=\frac{Pos_{Upot}}{Pos_{NZ}}=\frac{215\;mm}{180\;mm}=1,194:1
+	\label{eq:Upot2Nz}
+\end{equation}
+
+Ebenso lässt sich so die Position der Kupplung\footnote{Ohne Berücksichtigung des Spiels des Ausrücklagers} über das Verhältnis $n_{Upot2Clth}$ bezüglich des Potentiometers bestimmen:
+\begin{equation}
+	n_{Upot2Clth}=\frac{Pos_{Upot}}{Pos_{Upot}}=\frac{215\;mm}{80\;mm}=2,6875:1
+	\label{eq:Upot2Clth}
+\end{equation}
+
+\subsubsection{Messung der Temperaturausdehnung}
+Zur Berechnung des Hydraulikvolumens wurde der Versuchsträger im Stand aufgeheizt. Die Erwärmung der Motor- und Hydrauliktemperatur wurde gemessen. Die Steuerung des Aktors erfolgte über die manuelle Positionsvorgabe. Die Kupplung wurde dabei während des gesamten Versuchs über die Aktorposition 0 mm offengehalten. In unregelmäßigen Abständen wurde die Kupplung auf Aktorsollposition 5 mm geschlossen. Dabei befand sich der Schalthebel im Neutralgang und der \ac{VM} im Leerlaufdrehzahlbereich. Die Position der Ausrückschwinge wurde über die Potentiometerspannung mit erfasst.\\
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/HydVolTmp.pdf}
+		\caption {Expansion des Hydraulikvolumens}
+	\label{fig:HydTmpVol}
+\end{center}
+\end{figure}
+\newpage
+Aus der Messung (Abbildung: \ref{fig:HydTmpVol}) wurden zwei Messpunkte ausgewählt. Das Messverfahren durch die Aktoransteuerung vom geöffenten zum leicht geschlossenen Zustand wurde gewählt um Ungenauigkeiten\footnote{"`Spiel"' an der Halterung des Potentiometer, durch die Ansteuerung zu Null angenommen} im Messystem konstant zu halten.\\
+Für die Identifikation des Hydraulikvolumens wurde die Ist-Aktorposition des ersten Messpunktes als Referenz ($Pos_{Act-Ref}$) definiert. Die Positionskorrektur der Potentiometerstrecke des zweiten Messpunktes erfolgt über die Gleichungen \ref{eq:Upot2Nz} und \ref{eq:Gz2Nz}:
+
+
+\begin{flalign}
+Pot_{PosCor}&=\Delta_{Pos}*n_{Gz2Nz}*n_{Upot2Clth}\nonumber\\
+            &=(5,154;mm-5,073\;mm)*1,298*1,194=0,1255\;mm&&
+            \label{eq:PosKorrAct}
+\end{flalign}
+
+
+
+Damit ergibt sich für dem Messpunkt 2 eine neue Potentiometerposition von:
+\begin{flalign}
+	Pot_{PosMess2}&=(U_{PotMess2}*Upot2PotPos)-Pot_{PosCor}\nonumber\\
+	              &= (2,987 V*10 \frac{mm}{V})-0,1255\;mm=29,74\;mm&&
+	\label{eq:Potpos2}
+\end{flalign}
+Damit sind alle Positionen korrigiert und umgerechnet:
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{l||ll} %\hline
+	                      &\textbf{Potentiometerposition [mm]} 		&\textbf{Hydrauliktemperatur [°C]} \\
+\hline
+\hline
+\textbf{Messpunkt 1}    &31,21 ($Pot_{PosMess1}$) &18,3 ($T_{HydrMess1}$)\\
+\textbf{Messpunkt 2}    &29,74 ($Pot_{PosMess2}$) &50,0 ($T_{HydrMess2}$)\\
+\end{tabular}
+\caption{Ausgangsgrößen für die Volumenberechnung}
+\label{tab:HydVolMesswerte}
+\end{center}
+\end{table} 
+Über den Volumen Ausdehnungskoeffizient ($\gamma_{Hydraulan 404}$ Gleichung: \ref{eq:facthyd}) lässt sich  mit den Werten\footnote{K= $T$[°C]*$\frac{K}{\text{°C}}$ +273,15 K} aus Tabelle \ref{tab:HydVolMesswerte} das Volumen in der Hydraulikstrecke berechnen:
+\begin{flalign}
+	\Delta V_{Hydr}&=\Delta Nz_{Pos}*A_{Nz}\nonumber\\
+	\Delta T_{Hydr}*\gamma_{Hydraulan 404}&=\delta Pot_{Pos}/n_{Upot2Clth}*A_{Nz}\nonumber\\
+	(T_{HydrMess2}-T_{HydrMess1})*\gamma_{Hydraulan 404}&=(Pot_{PosMess1}-Pot_{PosMess2})/n_{Upot2Clth}*A_{Nz}\nonumber\\
+	(323,15 - 291,45 K)*0,894\; \frac{\permil}{\text{K}}&=(31,21-29,74\;mm)/1,194* 298,64\;mm^2\nonumber\\
+	0,02833\;V_{Hydr}&= 367,67\;mm^3\nonumber\\
+	\Rightarrow\;\;V_{Hydr}&= \frac{367,67\;mm^3}{0,02833}=12978\;mm^3
+	\label{eq:VolHydraulik}
+\end{flalign} 
+Der in Gleichung \ref{eq:VolHydraulik} berechnete Wert des Hydraulikvolumens, beruht auf der Annahme, dass die Hydrauliktemperatur in der gesamten Strecke\footnote{Zweiter Temperatursensor zeigte Temperaturen im gleichen Bereich an} homogen war und der Ausdehnungskoeffizient der der Hydraulikflüsssigkeit entspricht. Da für folgenden Algorithmen nur eine Volumenänderung benötigt wird, kann die Ungenauigkeit des Temperaturausdehnungskoeffizienten herausgerechent werden. Dabei gibt das Deltavolumen ($Vol_{Hyd1K}$) das Volumen an, das bei einer Änderung um ein Kelvin entsteht:
+\begin{flalign}
+	Vol_{Hyd1K}&=V_{Hydr}*1\;K*\gamma_{Hydraulan 404}\nonumber\\
+	Vol_{Hyd1K}&=12978\;mm^3*1\;K*0,894\; \frac{\permil}{\text{K}}=11,60\;mm^3
+	\label{eq:Hyd1K}
+\end{flalign} 
+Damit kann über die Aktorgrundfläche eine Positionskorrektur der Aktorsollvorgabe errechnet werden.\\
+%
+\subsection{Temperaturkoeffizienten der Hydraulikstrecke}
+\label{tkoeff}
+%-------------------------------------------------------------
+
+Die Temperaturausdehnungskoeffizienten für das Hydraulikmedium wurden aus Messfahrten (Abbildung \ref{fig:temprela}) ausgewählt. Dabei wird das durchschnittliche Temperaturverhalten des Hydraulikmediums als Kennline abgespeichert. Zwischen den Geschwindigkeits- und Drehzahlstützstellen (\textbf{\textcolor{red}{+}}-Interpolationspunkte) wird linear interpoliert.\\
+Die Koeffizienten wurden dabei in abkühlende (geschwindigkeitsabhänig) und erwärmende (motordrehzahlabhänig) Faktoren unterteilt.
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/TmpKoeffa.pdf}
+		\caption {Geschwindigkeitsabhänige Temperaturkoeffizienten}
+	\label{fig:tempKennlinea}
+\end{center}
+\end{figure}
+
+Die Abbildung \ref{fig:tempKennlinea} zeigt die Messwerte der Hydrauliktemperatur pro Sekunde der abkühlenden Faktoren.
+Dabei ist ersichtlich, dass sich das Hydraulikmedium bei höheren Geschwindigkeiten stärker abkühlt als bei langsamerer Fahrt.
+Die Temperaturabkühlung wurde auf die Differenz der absoluten Hydraulik zur Umgebungstemperatur\footnote{Umgebungstemperatur (tumg) bei 15 °C} normiert, um so schwankende Umgebungstemperaturen mit zu berücksichtigen.\\
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/TmpKoeffe.pdf}
+		\caption {Motordrehzahl Temperaturkoeffizienten}
+	\label{fig:tempKennlinee}
+\end{center}
+\end{figure}
+Die Koffizienten für die Erwärmung wurden bei Fahrzeugstillstand\footnote{300 Sekunden Fahrzeugstopp, Start/Stopp linear $\Delta T$ = 3 K, Leerlauf $\Delta T$ = 6 K} ermittelt (Abbildung \ref{fig:tempKennlinee}). Dabei erwärmte sich die Strecke linear. Aufgrund der geringen Erwärmung sind diese Faktoren bei segelnder Fahrweise vernachlässigbar.\\
+
+
+
+%--------------------------------------------------------------
+\subsection{Berechnung der vergangenen Motorlast}
+\label{lab:plast}
+Ein weiterer Punkt in Abbildung \ref{fig:temprela} ist das Temperaturverhalten in den ersten 20 Sekunden einer Segelphase.
+Die dort stattfindenden Temperatureinflüsse sind größtenteils von der zuvor abgegebenen Motorleistung abhängig.
+Diese verursacht ein "`nachheizen"' des  \ac{VM} und hat somit über eine Totzeit einen Wärmeeintrag auf die Hydraulikstrecke. Zur Auswertung der vergangenen Motorleistung ($P_{AvgL20s}$) wurde diese aus dem Inneren-Motormoment($ActMod_{trqInr}$) und der Motordrehzahl ($nmot$) berechnet:\\
+\begin{flalign}
+	P_{AvgL20s}&= \frac{1}{t_2-t_1}*\int_{t_1}^{t_2}2*\pi*M*n\;\textbf{d\textit{t}}\nonumber\\
+						&= \frac{1}{t_2-t_1}*\int_{t_1}^{t_2}2*\pi*ActMod_{trqInr}*\frac{nmot}{60}\;\textbf{d\textit{t}}
+	\label{eq:calcPavr}
+\end{flalign} 
+Die Zeitpunkte $t_1$ und $t_2$ wurden auf eine feste Zeitdifferenz\label{Im Steuergerät 20 Sekunden Durchschnittsfilter der Motorleistung} vor Segelbeginn festgelegt. 
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/TempRelPWR.pdf}
+		\caption {Durchschnittliche Motorleistungen vor Segelbeginn}
+	\label{fig:engPwrLast}
+\end{center}
+\end{figure}
+
+Abbildung \ref{fig:engPwrLast} zeigt beispielhaft verschiedene Motordurchschnittsleistungen vor Segelbeginn.
+Dabei ist zu erkennen, dass sich die Temperatur je nach Fahrzeuggeschwindigkeit (vfzg) und der vergangenen Motorleistung in den ersten Sekunden entwickelt. Vor den Segelphasen in denen das Fahrzeug eine höhere Motorleistung im Vergleich zu der für die Geschwindigkeit benötigten Leistung hatte, erwärmte sich die Hydraulikflüssigkeit. Bei geringerer Leistung kühlte sich das Hydraulikmedium tendenziell ab. Dabei überlagern sich mehrere Effekte. Zum Einen beschleunigt das Fahrzeug wenn die Motorleistung größer als die benötigte Leistung ist. Durch die erhöhte Leistung gibt der \ac{VM} einen größeren Wärmeeintrag auf die Hydraulikstrecke ab. Je nach Umgebungstemperatur und Fahrzeuggeschwindigkeit kühlt dabei diese Strecke ab. Bei einer langsamen Fahrzeuggeschwindigkeit erwärmt sich die Strecke durch die mangelnde Luftzirkulation im Motorraum. Bei höheren Geschwindigkeiten hat das "`Nachheizen"' des \ac{VM} durch umströmende Luft fast keinen Einfluss auf das Hydraulikmedium, dieses kühlt sich dabei weiter ab.\\
+
+
+\subsubsection{Auswirkung der Motorlast auf die Initialtemperaturänderung}
+Die Effkte aus Abschnitt \ref{lab:plast} wurden dazu genutzt, um nach 20 Sekunden mit geöffneter Kupplung einen Temperaturwert für die Hydrauliktemperatur zu ermitteln.
+
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/Tempini20S3G.pdf}
+		\caption {Bedatetes Kennfeld der Hydraulik Initialisierungstemperatur}
+	\label{fig:20stmp}
+\end{center}
+\end{figure}
+
+In Abbildung \ref{fig:20stmp} ist das Kennfeld\footnote{Kennfeld mit vier Stützstellen extrapoliert auf den gesamten Kennfeldbereich} des Initialtemperaturwertes der Hydraulikstrecke aufgezeigt. Dieses stellt mit wärmeren Farben eine Erwärmung der Strecke und im Gegenzug eine Abkühlung (kühlere Farben) des Hydraulikmediums dar. Der darin gespeicherte Temperatur-Initialisierungswert stützt das Temperaturmodell der Hydraulikstrecke (Abschnitt: \ref{tempModa3}).
+
+
+\subsection{Ermittlung der absoluten Hydrauliktemperatur}
+\label{absHydtemp}
+Die Ermittlung der absoluten Hydrauliktemperatur im Kupplungssystem ist insbesondere für die Systeminitalisierung als auch für den dynamischen Bereich bei der Erwärmung der Flüssigkeit notwendig. Beispielsweise kann sich die Hydrauliktemperatur, wenn sie der Umgebungstemperatur entspricht, nicht mehr abkühlen. Ebenso wird sich die Strecke, die sich zum Beispiel durch Stadtverkehr stark erwärmt hat, in einer anschließender Segelphase stärker abkühlen. Um diesen Effekt mit zu berücksichtigen, ist die absolute Hydrauliktemperatur notwendig, um daraus die $\Delta Temp$ als Abstand der Hydrauliktemperatur zur abkühlenden Umgebungstemperatur zu bilden. Die Hydrauliktemperatur bewegt sich dabei im Bereich der minimalen\footnote{Minimaletemperatur angenommen als Umgebungstemperatur (Tumg)} und maximalen\footnote{Maximaletemperatur angenommen als Motortemperatur (tmot)} Temperatur im Motorraum.\\
+Zur Schätzung der absoluten Hydrauliktemperatur wurde die Temperaturabhängigkeit der Aktorleistung\footnote{Temperatursensor im Aktor gibt die Platinenetemperatur im Aktor an} (Abschnitt: \ref{ActEngTmpCorell}) für ein Temperaturmodell genutzt. Dabei bedeutet eine niedrigere Energie über den besseren Wirkungsgrad des Aktors eine wärmere Hydraulikstrecke. Um wie bei der Erststartfreigabe eine Leistungsintegration ohne dynamische Anteile zu ermöglichen wurde dabei das Kupplungsöffnen bei einer Segelphase benutzt. Dieses gibt immer eine feste Öffnungsgeschwindigkeit vor, mit dem die Kupplung über den Aktor gleichmäßig geöffnet wird.\\
+Abbildung \ref{fig:ActEngPwrOpen} zeigt die dabei aufgenommenen Aktorenergien bezüglich der dabei gemessenen Hydrauliktemperatur (\textbf{\textcolor{blue}{$\bullet$}}-Messpunkte). Dabei ist deutlich zu erkennen, dass die Energie bei wärmerer Hydrauliktemperatur abnimmt. Die Ausgleichsgerade\footnote{Beispielhaft lineare Ausgleichsgerade (Aktorenergie kann dabei nicht geringer als der beste Aktorwirkungsgrad werden). Realerverlauf (Exponentialfunktion) ist im Steuergerät per Kennlinie hinterlegt} (\textbf{\textcolor{red}{--}} Gerade) weist dabei einen Korrelationskoeffizienten nahe Eins auf. Diese gute Korrelation lässt sich durch das geringe Hydraulikvolumen und den Aufbau der Strecke erklären. Der aus Metall bestehende Aktor besitzt bei geschlossener Kupplung fast die Hälfte des gesamten Hydraulik\-mediums. Durch die gute Wärmeleitfähigkeit des Metalls und der Stahl-Hydraulikleitung überträgt sich fast ausschließlich die Aktortemperatur auf das Hydraulikmedium.
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=0.9\textwidth]{images/ActEngPwrOpening.pdf}
+		\caption {Gemessene Aktorleistungen bei Start/Stopp-Segelbeginn}
+	\label{fig:ActEngPwrOpen}
+\end{center}
+\end{figure}
+Die aus der Messung ermittelte Umrechnungskurve, aus Aktorenergie($Act_{Pwr}$) beim Kupplungsöffnen zur geschätzten Hydrauliktemperatur, wurde genutzt um die aktuelle absolute Hydrauliktemperatur ({$T_{abs-Hyd}$}) zu errechnen. Ebenso lässt sich durch Einbeziehung der Umgebungstemperatur (Tumg) ein Gewichtungsfaktor\footnote{Normierung erfolgt dabei auf eine Temperaturdifferenz von 20 K} ($Load_{Fact}$) bestimmen.\\
+
+% Input Tempalgo und in savebox speichern
+\newsavebox\myTempalg 
+\newsavebox\myHydalg
+\input{parts/TempAlgo}
+\input{parts/AbsHydAlgo}
+%---------------------------------
+\begin{figure}[H]
+		\begin{center}
+     \usebox\myHydalg
+		\end{center}
+		\caption{Ablauf Algorithmus zur Bestimmung der absoluten Hydrauliktemperatur und Gewichtung}
+		\label{fig:absHydtempalg}
+\end{figure}
+Durch die Mittelung der berechneten Hydrauliktemperatur ($Hyd_{RAW}$) mit der letzten geschätzten Temperatur ({$T_{abs-Hyd}$}) verringert dabei das Messrauschen, schränkt aber damit die Dynamik\footnote{Keine Anforderung an hohe Dynamik, da die Hydrauliktemperatur hohe Zeitkonstanten aufweist} des Schätzers ein.\\
+In Abbildung \ref{fig:vglhydtemp} wurde die aufgezeichnete Messkurve mit den berechneten Signalen verglichen.
+Dabei kann der Algorithmus als Startbedingung über die Umgebungstemperatur initialisiert (\textbf{\textcolor{blue}{$--$}} Temperatur mit Initialisierung) werden. Dies ist der Fall wenn bei Motor- und Umgebungstemperatur ähnliche Werte\footnote{Applizierter Wert $|tmot-tumg|\leq 10\;K$} gemessen werden. Dann wird die Hydrauliktemperatur durch Umgebungstemperatur initialisiert. Bei jeder Segelphase wird zu Beginn ein neuer Temperaturwert errechnet und mit dem alten Wert gemittelt.\\
+Wird das Fahrzeug zum Beispiel im warmen Zustand abgestellt und der \ac{VM} hat sich noch nicht auf die Umgebungstemperatur abgekühlt, kann die Hydrauliktemperatur nicht initalisiert werden (\textbf{\textcolor{green}{$-$}} Temperatur ohne Initialisierung).
+Die geschätzte Temperatur wird dabei dann beim Ersten mal ohne Mittelwertbildung gesetzt. Ab dieser nachträglichen Initialisierung arbeitet der Algorithmus immer mit der Mittelwertfilterung.\\% über die mit der letzten geschätzten Temperatur.\\
+Dabei zeigt Abbildung \ref{fig:vglhydtemp}, dass sich beide Verfahren sehr schnell auf den gleichen Wert einschwingen. Insbesondere die Aufwärmphase bis etwa 2500 Sekunden stimmt mit der gemessenen Hydrauliktemperatur überein. Die Toleranzen der Temperaturschätzung liegen dabei bei circa $\pm 5$ °C bezüglich Absoluttemperatur während der gesamten Messfahrt.
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/ErgAbsHydTmp.pdf}
+		\caption {Vergleich gemessener und simulierter Hydrauliktemperatur}
+	\label{fig:vglhydtemp}
+\end{center}
+\end{figure}
+
+
+\subsection{Ablauf des Delta-Temperaturalgorithmus}
+Die Bestimmung der Temperaturänderung während der Segelphasen erfolgt über ein Temperaturmodell das die \ac{MTD}, zwischen Segelbeginn und Kupplungsschließen, im Hydrauliksystem errechnet. Der Algorithmus kann dabei ab einer applizierbaren Zeit\footnote{Temperaturmodell im Versuchsträger ab 20 Sekunden geöffneter Kupplung aktiv} während einer geöffneten Kupplung eingeschaltet werden. Während dieser Zeit sind die Temperaturänderungen so gering, dass diese in der Genauigkeit des Algorithmus untergehen.\\
+In Abbildung \ref{fig:Tempabl} ist der schematische Ablauf dargestellt. Dieser beginnt nach seiner Aktivierung mit der Auswahl der Initialtemperatur. Die Temperatur wird dabei aus der Fahrzeuggeschwindigkeit (Vfzg) und der durchschnittlichen Motorleistung vor Segelbeginn ($P_{Eng\_Last}$) ausgewählt (Abbildung \ref{fig:20stmp}).\\
+Ab diesem Punkt wird die Temperatur über die Temperaturkoeffizienten berechnet.
+Diese Koeffizienten teilen sich dabei in zwei Anteile:
+\begin{itemize}
+	\item \textbf{Abkühlenden Koeffizienten:}\\ 
+	Diese Abkühlung der Strecke stützt sich hauptsächlich auf die umströmende Luft im Motorraum, die im Modell aus der      Fahrzeuggeschwindigkeit bestimmt wird (Abbildung \ref{fig:tempKennlinea})
+	
+\item \textbf{Erwärmende Koeffizienten:}\\ 
+	Die Erwärmung der Strecke wird vor allem, bei Fahrzeugstillstand aufgrund der fehlenden Luftzirkulation, von der Abwärme des \ac{VM} geprägt. Diese wurde über die Motordrehzahl ($nmot$) ermittelt um so auch Fahrzeugstopps\footnote{Erwärmung der Hydraulikstrecke ist viel geringer als die Abkühlung während einer Segelphase.} mit mitlaufendem \ac{VM} zu berücksichtigen (Abbildung \ref{fig:tempKennlinee}).
+
+\end{itemize}
+Der Algorithmus stellt dabei ständig einen $\Delta$-Temperaturwert ($\Delta T_{Hydr}$) der \ac{MTD} zur Verfügung. Dieser wird aufgrund der langsamen Zeitkonstanten der Hydraulikstrecke im 1 Sekunden-Raster aktualisiert.\\
+
+\begin{figure}[H]
+		\begin{center}
+     \usebox\myTempalg
+		\end{center}
+		\caption{Ablauf $\Delta$-Temperaturalgorithmus}
+		\label{fig:Tempabl}
+\end{figure}
+%-----------------------
+In Abbildung \ref{fig:Simerg} ist das Ergebnis der Temperaturberechnung im Vergleich zum gemessenen Wert dargestellt.
+Während der ersten 20 Sekunden ist dabei der Temperaturalgorithmus deaktiviert und zeigt den Wert 0 °C an. Die Fahrzeuggeschwindigkeit während der Segelphase ist über den Farbverlauf des Messwertes codiert.\\
+Abbildung \ref{fig:sim1} zeigt eine circa 120 Sekunden lange Segelphase. Der Algorithmus wählt nach seiner Aktivierung die Initial-$\Delta T_{Hydr}$ aus. Diese liegt aufgrund der Fahrzeuggeschwindigkeit und vergangenen Motorlast nahe 0 °C. Anschließend wird der Temperatuverlauf über die Temperaturkoeffizienten errechenet. Dabei zeigen Simulation und gemessener Wert den gleichen Kurfenverlauf.\\
+In Abbildung \ref{fig:sim2} ist die Auswahl eines abgekühlten und in \ref{fig:sim3} eines erhöhten Initial-$\Delta T_{Hydr}$ bei unterschiedlicher Fahrzeuggeschwindigkeit zu sehen.
+
+
+%-----------------------
+\begin{figure}[H]
+\begin{center}
+    \subfigure[Ergebnis mit neutraler Motorlast Initialisierung]{
+   \includegraphics[width=\textwidth]{images/Tempsim1.pdf}
+		\label{fig:sim1}}
+		%\hspace{0.2 cm}
+    \subfigure[Ergebnis mit abgekühlter Initialisierung]{
+    \includegraphics[width=\textwidth]{images/Tempsim2.pdf}
+		\label{fig:sim2}}	
+		%\hspace{0.2 cm}
+		\subfigure[Ergebnis mit erwärmter Initialisierung]{
+    \includegraphics[width=\textwidth]{images/Tempsim3.pdf}
+		\label{fig:sim3}}	
+		\caption{Beispiel Berechnungsergebnisse des $\Delta$-Temperaturalgorithmus}
+		\label{fig:Simerg}
+		\end{center}
+\end{figure}
+%--------------------------
+
+
+
+\subsection{Segel und Start/Stopp-Phasen}
+\label{SSCverteil}
+Zum Abschätzen der durchschnittlichen Segel und Start/Stopp-Phasen wurde der Versuchsträger im Stuttgart-Rundkurs (Abschnitt: \ref{SRKdesc}) mit \ac{SiG} und \ac{SSC} gefahren. Die Fahrten wurden von unterschiedlichen Probanden mit verschiedenensten Aufgabengebieten durchgeführt. Bei 13 Messfahrten\footnote{Fahrer bei ihrer ersten Fahrt nicht ins System und Segeln eingewiesen. Bei zweiter möglicher Fahrt erfolgte eine Einweisung} ergaben sich rund 1900 Segel- und 330 Start/Stopp-Phasen.\\
+Abbildung \ref{fig:sglverteil} zeigt die Verteilung der Messkampange in 10-Sekunden-Klassen.
+Dabei sind über 90 \% aller Segelphasen\footnote{Segeln hier Start/Stopp- und Leerlaufsegeln} kürzer als 20 Sekunden.
+Größere Temperaturschwankungen fallen dabei nur in circa 8 \% der Fälle an. Die Höhe der Temperaturänderung ist dabei von der Segeldauer abhängig, deren Häufigkeit über die Segelzeit stetig abnimmt.\\
+Ein ähnliches Ergebnis zeigt sich dabei auch für die Start/Stopp-Zeiten im Rundkurs. Die Durchschnittszeiten liegen bei circa 15 Sekunden. Aufgrund des geringen Temperaturanstiegs in Start/Stopp-Phasen liegen hier fast 98 \% aller Stopps\footnote{Stopps bis circa 60 Sekunden} bei Temperaturerwärmungen die kleiner als 2 K sind.\\
+Die längste Stoppphase lag dabei bei circa 260 Sekunden und wird damit noch von der Anforderung an den Temperaturalgoritmus (Abschnitt: \ref{Tempversuch}) mit abgedeckt.
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/StstUSeglVert.pdf}
+		\caption [Verteilung Start/Stopp- und Segelzeiten im Stuttgart-Rundkurs]{Verteilung Start/Stopp- und Segelzeiten im Stuttgart-Rundkurs \cite{boschESC3}}
+	\label{fig:sglverteil}
+\end{center}
+\end{figure}
+
+\subsection{Vergleich Algorithmus zur Realität}
+\definecolor{Kumerg}{rgb}{1 0.800000011920929 0}      % hellgruener Rahmen
+
+Nach dem durch die Segelverteilung (Abschnitt \ref{SSCverteil}) der Temperaturalgorithmus statistisch nur jedes zehnte mal aktiv wird, sind in Abbildung \ref{fig:tempkorrigiert} Temperaturschwankungen von Segelphasen die länger als 20 Sekunden dauerten aufgetragen.
+Die dabei aufretenden Tempeaturschwankungen (\textbf{\textcolor{blue}{\noindent\rule{0.3cm}{8pt}}}-Bargraph $\Delta$ Temperaturberechnung inaktiv) zeigen die betragsmäßige maximale Temperaturabweichung im Bezug zur Temperatur bei Segelbeginn. Dabei zeigt sich, dass von diesen längeren Segelphasen 75 \% der Phasen Temperaturschwankungen kleiner 2 K aufweisen. Erst bei sehr langen Segelphasen streut die \ac{MTD} stärker.\\
+Die aktivierte $\Delta$-Temperaturberechnung (\textbf{\textcolor{green}{\noindent\rule{0.3cm}{8pt}}}-Bargraph $\Delta$ Temperaturberechnung aktiv) zeigt dabei die maximale Abweichung des gemessenen zum berechneten Temperaturverlaufs (Beispiel siehe Abbildung \ref{fig:Simerg}). Die Berechnung der \ac{MTD} erfolgt dabei über die Temperaturkoeffizienten\footnote{Temperaturkoeffizieten bereits über das Verhältniss Umgebungs- zu Hydrauliktemperatur gewichtet}. Für kleine Temperaturschwankungen zeigt der Algorithmus ein ähnliches Verhalten wie mit ausgeschalteter Berechnung. Erst bei längeren Segelphasen mit größeren Temperaturdiferenzen wirkt sich die Berechnung aus. Die kumulativ aufgetragene Abweichung (\textbf{\textcolor{Kumerg}{\noindent\rule{0.5cm}{2pt}}} Kumulativ $\Delta$ Temperaturberechnung aktiv) zeigt, dass die Berechnung der \ac{MTD} mit einer Genauigkeit von $\pm2\;K$ geschätzt wird. Bei langen Segelphasen verbessert sich dabei die Temperaturabweichung,  um fast\footnote{Annahme maximale unkorrigierte Abweichung $\pm10\;K$} 80 \%. %für spätere Berechnungen,
+%--------------------------------------
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/Tempstreung.pdf}
+		\caption {Relative und berechnete Temperaturänderungen im Hydrauliksystem}
+	\label{fig:tempkorrigiert}
+\end{center}
+\end{figure}
+%--------------------------------------
+
+
+
+
+
+\section{Ablauf Temperaturmodell im Audi A3}
+\label{tempModa3} %\footnote{Gesteuerte Schnüffelborhrung bei 10.1875 mm bezüglich Aktorpositon}
+Die Berechnung der \ac{MTD} wird nach 20 Sekunden nach Öffnen der Kupplung aktiviert. Dabei kann sich das Fahrzeug sowohl im Segeln oder im Start/Stopp, mit und ohne getretenem Kupplungspedal, befinden. Die Detektion des Kupplungszustandes richtet sich dabei nach der Postion der Schnüffelbohrung, wird diese vom Kolben des Aktors verdeckt, ist das Hydraulikmedium im System eingeschlossen. Durch die Verzögerung der Aktivierung, wird beispielsweise bei kurzen Segelphasen oder Schaltvorgängen keine Korrektur ausgelöst. Dabei zeigt die $\Delta$-Temperatur den Wert Null an.\\
+Wird der Temperaturalgorithmus aktviert, beginnt dieser mit der Auswahl seiner Initial-$\Delta$-Temperatur. Diese berechnet sich über ein Kennfeld (Abbildung \ref{fig:20stmp}) aus der Fahrzeuggeschwindigkeit (vfzg) und der vor Beginn der Kupplungsöffnung gemittelten\footnote{Durchschnittliche Motorleistung 20 Sekunden vor Öffnen der Kupplung} vergangenen Motorleistung ($P_{Eng\_Last}$). Die Initial-$\Delta$-Temperatur bildet den Startwert für die weiteren Temperaturberechnungen. Über die Geschwindigkeits- und Motordrehzahl- ($nmot$) abhängigen Temperaturkoeffizienten wird jede Sekunde ein neuer $\Delta$-Temperaturwert ($\Delta T_{Hydr}$) der Hydraulikflüssigkeit im Kupplungssystem berechnet. Als Basis dafür dient der zuletzt errechnete Wert.\\
+Parallel dazu wird die Berechnung der Absolutenhydrauliktemperatur durchgeführt. Über die Temperaturabhängigkeit der Aktorleistung wird dabei über ein Kennfeld auf die Hydrauliktemperatur im System geschlossen. Durch den Normierungsfaktor ($Load_{Fact}$) wird die Temperaturdifferenz zwischen Hydraulik und Umgebungstemperatur ($Tumg$) normiert. Somit kann, insbesondere bei sich einschwingender oder geringer Temperaturdifferenz, ein passender Verstärkungsfaktor für die berechnete $\Delta$-Temperatur bestimmt werden. Die Schätzung der Absoluthydrauliktemperatur erfolgt dabei immer zu Beginn einer Segelphase. Der neue geschätzte Temperaturwert wird gefiltert und steht bis zu einer neuen Segelphase als konstanter Wert bereit. Die Leistungsintegration des Aktors erfolgt beim Öffnen der Kupplung im gewählten Bereich mit konstanter Geschwindigkeit (Abschnitt \ref{BfillActEng} auf Seite \pageref{fig:actpwrNint}).\\
+Die so berechnete gewichtete \ac{MTD} ({Gew. $\Delta T_{Hydr}$}) entspricht dem berechneten Ergebnis der tatsächlichen Temperaturschwankungen. Aus dieser Temperaturdifferenz wird über den  Hydraulikvolumenfaktor ({$Vol_{Hyd1K}$}) ein Delta-Volumen ($\Delta Vol_{Hydr}$) in der Hydraulikstrecke berechnet. Der Hydraulikvolumenfaktor gibt dabei die Volumenänderung pro Kelvin an. Dieser bestimmt sich aus dem Gesamtvolumen im Hydrauliksystem und dem Temperaturkoeffizienten der Bremsflüssigkeit. Eine falsche Annahme des Temperaturkoeffizienten wird über die Berechnung des Gesamtvolumen (Abschnitt: \ref{calcHydVol}, Gleichung:\ref{eq:Hyd1K}) kompensiert.\\
+Das $\Delta Vol_{Hydr}$ kann nun über die Aktorgundfläche ($Aktor_{Area}$) in eine Positionskorrektur ($Act_{Poscor}$) umgerechnet werden. Dabei wird keine ständige Positionskorrektur durchgeführt. Wird zum Beispiel von der \ac{ECU} über Aktorkupplungskennlinie ein Soll-Kupplungs\-moment (SollTrq) angefordert, wird die daraus berechnete Soll-Position um den Positionskorrekturwert verkleinert. Der so temperaturkorrigierte neue Positionswert wird dann dem Aktor über die entsprechende CAN-Botschaft versendet. Beim Empfang des Ist-Positionswertes wird die korrigierte Position wieder addiert. Somit kann der Einfluss von Temperaturschwankungen ohne Beeinträchtigung des Kupplungsmodells erfolgen. Die Korrektur "`nur bei Bedarf"' hat dabei den Vorteil, dass der Aktor nicht ständig sehr kleine Positionen verfahren muss. Dadurch verlängert sich seine Lebensdauer, die stark betätigungsabhängig ist.
+Ist das Kupplungssystem wieder geschlossen und überfährt der Kolben des Aktors die simulierte Position der Schnüffelbohrung wird das Ausgleichsventil geöffnet und das erwärmte oder abgekühlte Hydraulikmedium kann sich mit dem Vorratsbehälter ausgleichen. Die Positionskorrektur wir ab dem Öffnen der Schnüffelbohrung deaktiviert und mit Null bedatet.\\
+Abbildung \ref{fig:Tempkorr} zeigt dabei den schematischen Ablauf der Positionskorrektur.\\
+
+
+\begin{figure}[H]
+		\begin{center}
+		\input{parts/ModKpplAct}
+		\end{center}
+		\caption{Übersicht Temperaturkorrektur}
+		\label{fig:Tempkorr}
+\end{figure}
+
+%
+
+%\subsection{Durchschnittliche Segel- und Start/Stopp-Zeiten}
+
+\subsection{Einfluss auf das übertragene Drehmoment}
+\label{PressNm}
+
+
+
+
+%--------------------------------------
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/KKL1K.pdf}
+		\caption {Temperaturänderungen bezüglich der Kupplungsmomenten Kennlinie}
+	\label{fig:KKL1Kgrp}
+\end{center}
+\end{figure}
+%--------------------------------------
+
+Die über das Temperaturmodell (Abschnitt \ref{tempModa3} ) bestimmte Postionskorrektur ($Act_{Poscor}$) des Aktorweges wirkt sich über eine Änderung des übertragenen Drehmoments an der Kupplung aus.\\
+In der abschnittsweise definierten Kupplungskennline (Abbildung \ref{fig:KKL1Kgrp}) sind die Einflüsse einer Temperaturänderung um 1 K bezüglich des im Abschnitt übertragenen Drehmoment dargestellt. Dieses berechnet über die Aktorwegkorrektur:
+\begin{flalign}
+	Act_{Poscor1K}&=\frac{Vol_{Hyd1K}}{Aktor_{Area}}\nonumber\\
+	Act_{Poscor1K}&=\frac{11,60\;mm^3}{387,78\;mm^2}=0,0299\;mm
+	\label{eq:Hyd1KKKL}
+\end{flalign} 
+Die errechnete Positionskorrektur ($Act_{Poscor1K}$) bei 1 K Temperaturänderung kann so über die Drehmomentkennlinie\footnote{Reale Kupplungskennlinie besitzt keine Sprünge in der Steigung des übertragenen Moments} und die Aktorwegänderung in die entsprechende Drehmomentänderung umgerechnet werden. Dabei zeigt sich, dass die Einflüsse bei Temperaturänderungen, vor allem im für den Kupplungsstart relevanten Bereich ( $\leq$ 50 Nm) gering ausfallen.
+
+% 
+%
+
+\subsection{Vergleich des Geforderten- zum Ist-Drehmoment}
+
+%--------------------------------------
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=0.90\textwidth]{images/KplStNm.pdf}
+		\caption {Umgerechnete Positionen des Aktors und der Ausrückschwinge beim Kupplungsstart}
+	\label{fig:KplStNmpic}
+\end{center}
+\end{figure}
+%--------------------------------------
+In Abbildung \ref{fig:KplStNmpic} ist beispielhaft der Momentenverlauf während eines Kupplungsstarts dargestellt. Dazu wurden die Positionen des Aktors und der Ausrückschwinge in Drehmomentangaben umgerechnet, die damit an der Kupplung\footnote{Drehmoment an der Kupplung variiert. Drehmomente über die Positions-Kupplungskennline berechnet} gestellt werden. Die \textbf{\textcolor{blue}{\noindent\rule{0.5cm}{2pt}}} Linie gibt dabei das Moment an, das über die Kupplungskennlinie (Abbildung \ref{fig:A3ApplClth} auf Seite \pageref{fig:A3ApplClth}) errechnet und von der \ac{ECU} als Ist-Moment betrachtet wird. Über die Position der Ausrückschwinge wird die tatsächlich geänderte Position am Kupplungssystem erfasst. Diese ist somit ohne Druck- und Temperaturänderungen in der Hydraulikstrecke. Die \textbf{\textcolor{red}{\noindent\rule{0.5cm}{2pt}}} Messkurve zeigt, dass über die Position der Ausrückschwinge nahezu das gleiche Moment übertragen wird. Das leicht höhere Moment lässt sich durch die Abkühlung im Hydrauliksystem erklären. Durch das geringere Volumen wird mit gleicher Aktorposition mehr Kupplungsmoment gestellt. Über die Temperaturkorrektur (\textbf{\textcolor{green}{$-\;-$}} Messkurve) der Aktorposition lässt sich das Moment leicht korrigieren. Insgesamt sind dabei im Bereich des für den Kupplungsstart benötigten Moments sehr geringe Temperaturkorrekturen möglich, die aber im Bereich der Ungenauigkeit\footnote{Genauigkeit des Kupplungsmodell circa $\pm$ 10 Nm \cite{boschESC3}} des Kupplungsmodells und des Messsystems (Abschnitt \ref{unMess}) vernachlässigbar beziehungsweise nicht messbar sind.\\
+Zusätzlich ist in Abbildung \ref{fig:KplStNmpic} noch die Motordrehzahl und die absolute Motorposition während des Kupplungsstarts aufgezeigt.
+
+\newpage
+\subsection{Streuung des Messsystems}
+\label{unMess}
+Zur Auswertung der Momentengenauigkeit durch Temperaturkorrekturen wurde die Mess- beziehungsweise Positionsgenauigkeit der Aktor- und Nehmerzylinderposition untersucht. Zur Nehmerzylinderposition wurde die über den Potentiometer an der Ausrückschwinge aufgenommene Position mit der Aktorposition\footnote{Tatsächliche Aktorposition ohne Korrekturen} verglichen.\\
+Abbildung \ref{fig:StreuungMess} zeigt die Auswertung. Dabei wurde die durch das Übersetzungsverhältnis berechnete Position der Ausrückschwinge mit eingezeichnet (\textbf{\textcolor{black}{$-\;-$}} Übersetzung ideal). Deren Steigung liegt dabei im Mittel in der gemessenen Position der Ausrückschwinge und wurde so verifiziert. Dabei zeigt sich im Bereich der Aktorposition > 12 mm, dass dabei die Bewegung des Aktors nahezu keine Auswirkungen bezüglich der Position der Ausrückschwinge hat. Dies lässt sich durch Umklappen von Dichtungen im Aktor, Kompression von eingeschlossener Luft oder einer ungenauen Kolbenposition im Aktor erklären. Auch die leichte Abweichung von der idealen Übersetzung zwischen 10 und 12 mm Aktorposition lässt sich auf Luftkompression zurückführen.\\
+Zusätzlich wurde in der Abbildung die Korrekturen, die $\pm$ 2 K Temperaturänderung an Positionskorrektur bezüglich der Aktorposition betragen würden, mit eingezeichnet (\textbf{\textcolor{magenta}{\noindent\rule{0.5cm}{2pt}}} Übersetzung $\pm$ 2 K). Diese liegen deutlich innerhalb der über des Messsystem ermittelten Abweichung. Der Streuplot des Drucksignals im Hydrauliksystems (farbliche Codierung über die Colorbar Abbildung \ref{fig:StreuungMess} rechts), Aktorposition und der Ausrückschwinge zeigt die Schwankungen im Messsystem. Der Verlauf von 12 mm Aktorposition zu 0 mm zeigt dabei den Kupplungsschließvorgang. %Über den farblichen Verlauf zeigt sich sowohl das Druckmaximum (bei circa 4 mm Aktorpositon), sowie ein abgesengtes Druckniveau bei geöffneter Kupplung. 
+Die Ansicht stellt dabei das Drucksignal in der Untersicht dar. Somit sind die höheren Drücke (circa 20 Bar) im Bereich des Druckmaximums (bei circa 4 mm Aktorposition) durch die Kupplungshysterese als öffnende Kupplungsbewegung begründbar.\\\\
+%Der Verlauf von 12 mm Aktorpositon zu 0 mm stellt dabei den Kupplungsöffnungsvorgang dar. Über den farblichen Verlauf zeigt sich sowohl das Druckmaximum (bei circa 4 mm Aktorpositon), sowie ein abgesengtes Druckniveau bei geöffneter Kupplung. Die Ansicht stellt dabei das Drucksignal in der Draufsicht dar. Somit sind die niedrigeren Drücke (circa 16 Bar) im Bereich des Druckmaximums durch die Kupplungshysterese als schließende Kupplungsbewegung begründbar.\\\\
+In Abbildung \ref{fig:StreuungMessZoom} ist der Bereich um die Aktorposition 0 mm vergrößert, mit einer größeren Auflösung (Druck über die Colorbar \ref{fig:StreuungMessZoom} rechts codiert) im Drucksignal, dargestellt. Hier sind die Positionskorrekturen um $\pm$ 2 K durch die \textbf{\textcolor{blue}{\noindent\rule{0.5cm}{2pt}}} Linien dargestellt. Insgesamt zeigt dieser Bereich, vor allem nahe Aktorpoisiton 0 mm ohne Dynamik bei Aktorstillstand, dass die gemessenen Drucksignale sich nicht eindeutig zur Position der Ausrückschwinge zuordnen lassen. Beispielsweise tritt der Druckwert 19 Bar im Bereich der Ausrückschwingenposition 0.5 mm bis circa -0.2 mm auf. Für eine Druckregelung wäre hier aber ein horizontaler Anstieg der Drucksignale notwendig, damit über einen bestimmten Druck im System die Ausrückschwinge und damit, über das Hebelverhältnis der Schwinge, die Kupplung eine konstante Position aufweist. Durch diese unterschiedlichen Positionen und aufgrund der geringen Druckänderungen während der Kupplungsöffnung wäre eine Positionszuordnung über einen Drucksensor, sowie die korrigierende Positionsregelung, auch mit einem hochauflösenden Sensor, nicht realisierbar.
+
+
+
+%-----------------------
+\begin{figure}[H]
+\begin{center}
+    \subfigure[Gesamter Arbeitsbereich]{
+   \includegraphics[width=\textwidth]{images/StreuAusr2GzC.pdf}
+		\label{fig:StreuungMess}}
+		%\hspace{0.2 cm}
+    \subfigure[Ausschnitt nahe Kupplung geöffnet]{
+    \includegraphics[width=\textwidth]{images/StreuAusr2GzZooomC.pdf}
+		\label{fig:StreuungMessZoom}}	
+		\caption{Streuung der Aktorposition bezüglich der Kupplungsausrückschwinge}
+		\label{fig:Streuung}
+		\end{center}
+\end{figure}
+%--------------------------
+
+
+%\begin{figure}[H]
+%\begin{center}
+%	\includegraphics[width=\textwidth]{images/StreuAusr2Gz.pdf}
+%		\caption {Streuung der Aktorpositon bezüglich der Kupplungsausrückschwinge}
+%	\label{fig:StreuungMess}
+%\end{center}
+%\end{figure}
+%
+%
+%\begin{figure}[H]
+%\begin{center}
+%	\includegraphics[width=\textwidth]{images/StreuAusr2GzZooom.pdf}
+%		\caption {Ausschnitt Streuung der Aktorpositon bezüglich der Kupplungsausrückschwinge}
+%	\label{fig:StreuungMessZoom}
+%\end{center}
+%\end{figure}
+\newpage
+\section{Untersuchung zum "`Losbrechmoment"' des Motors}
+Als weitere Korrekturmöglichkeit wurde das "`Losbrechmoment"' des \ac{VM} im Versuchsträger untersucht. Dabei wird das über die Kupplung gestellte Moment gemessen, bei dem der \ac{VM} seinen Trägheitsmoment überwindet und zu rotieren beginnt. In Abbildung \ref{fig:KplStNmpic} sind dabei beispielhaft das Kupplungsmoment und das Motordrehzahlsignal eines Kupplungsstartes dargestellt.\\
+Dabei ist ebenso ersichtlich, dass das Drehzahlsignal des \ac{VM} von 0 auf größer 100 U/min sprunghaft ansteigt. Dies beruht darauf, dass das Drehzahlsignal durch die langsame Motorbewegung nur sehr ungenau und schwankend berechnet werden kann und bis zu einem Schwellwert mit Null angegeben wird. Der Drehzahlsensor des Motors liefert außer der Winkelgeschwindigkeit des \ac{VM} noch die Motorposition in "`Zähnen"'. Durch das Funktionsprinzip des Positionsgeberrades mit 60 - 2 Zähnen kann mit dem Sensor ein Übergang zwischen Zahn und Zahnlücke durch ein Hall- oder Induktives-Messprinzip erfasst werden. Durch die gleichmäßige Aufteilung der Zähne über eine Kurbelwellenumdrehung (360 °KW) ergibt sich so eine Positionsauflösung der Motorposition von 6 °KW pro Zahn. Zur Synchronisierung dient eine Zahnlücke bei der zwei Zähne fehlen. Beim Motorstart kann so über diese Zahnlücke und dem Positionsgeber der Nockenwelle auf die absolute Motorposition und den aktuellen Takt pro Zyliner geschlossen werden. Durch die Absolutposition wird ein Zahnzähler berechnet, der über zwei Kurbelwellenumdrehungen (ein komplettes Arbeitsspiel) mit zwei Zahnlücken\footnote{Zahnlücke im Versuchsträger: 56-59 und 116-119 bzgl. Zahnzähler}, die Motorposition angibt. Diese bleibt auch in Stoppphasen des \ac{VM} synchronisiert\footnote{Drehzahlsensor im Versuchsträger erkennt ein Rückdrehen des Motors beim auspendeln}. Durch diesen Zähler kann eine Motorpositionsänderung $\geq$ 6 °KW detektiert werden.\\
+In Tabelle \ref{tab:engAud} sind die Positionen der Zünd-\ac{OT}'s im Versuchsträger bezüglich des Zahnzählers angegeben.\\
+\begin{center}
+	\begin{table}[H]
+	\centering
+	\begin{tabular}{lrr} %\hline
+		\textbf{Zündreihenfolge}	 &\textbf{Zünd-\ac{OT} bzgl. Zahnzähler} \\%& \textbf{Position}\\
+		\hline
+		\hline
+		\textit{Zylinder 1}& 12 [-]\\%& 72 [°KW]\\
+		\textit{Zylinder 3}& 42 [-]\\%&252 [°KW]\\
+		\textit{Zylinder 4}& 72 [-]\\%& 432 [°KW]\\
+		\textit{Zylinder 2}& 102 [-]\\%& 612 [°KW]\\
+	\end{tabular}
+	\caption[Motorposposition und Zündabfolge]{Motorposposition und Zündabfolge \cite{SSP432}\cite{boschESC3}}
+	\label{tab:engAud}
+	\end{table} 
+\end{center}
+Für die Erkennung des "`Losbrechmoment"' wurde eine Änderung des Zählers um zwei Zähne verwendet. Dadurch werden frühe Momentenmessungen, bei dem der \ac{VM} kurz vor einem Zahn steht, vermieden. Zusätzlich wurde das benötigte Moment gangabhängig und über die absolute Motorposition in °\ac{KWvZOT} gemessen. Durch die Motorposition entstehen verschiedene Reibmomente\footnote{Kompressionsmomente für die Betrachtung nicht signifikant} durch die Kurbelwellengeometrie \cite{boschESC3}\cite{mueller}\\
+Das benötigte Moment wurde über den Positionssensor der Ausrückschwinge der Kupplung mit der entsprechende Kupplungskennline errechnet. Zur Auswertung wurden Kupplungsstarts einer Stuttgart-Rundkurs-Messfahrt untersucht. Abbildung \ref{fig:Zahn2} zeigt die Messergebnisse.
+
+%--------------------------------------
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=\textwidth]{images/zahn2.pdf}
+		\caption {Gangabhängiges Motorlosbrechmoment bezüglich Motorposition}
+	\label{fig:Zahn2}
+\end{center}
+\end{figure}
+%--------------------------------------
+Der nicht nutzbare Bereich (\textbf{\textcolor{gray}{\noindent\rule{0.3cm}{8pt}}}-Bereich) gibt dabei den Bereich der "`zwei Zahnlücke"' an. In diesem Bereich\footnote{Nicht nutzbarer Bereich: $Anfang_{Zahnl"ucke}-Anzahl_{Detektionsz"ahne}+1$ bis $Ende_{Zahnl"ucke}$ = 55 bis 59} ist durch die fehlenden Zähne keine Detektion des Losbrechmoments möglich. Beispielhaft befinden sich alle erkannten Losbrechmomente im 3. Gang innerhalb von 10 Nm. Ebenso lässt sich durch die höher bedateten Gradienten der Schließgeschwindigkeit der Kupplung mit aufsteigenden Gängen ein höheres Kupplungsmoment erkennen. Werden die Kupplungsstarts mit Motorabstellpositionen im Bereich der Zahnlücke vernachlässigt, dreht der \ac{VM} im Versuchsträger zwischen 21 und 32 Nm Kupplungsmoment los. Über diesen großen Bereich und durch die Ungenauigkeit im Messsystem sowie der Streuung von Serienmotoren, lässt sich so keine Verbesserung am Temperaturmodell hinsichtlich der Momentengenauigkeit erreichen. Der Bereich kann aber in größerer Ausdehnung zur Überwachung und Plausibilisierung des Kupplungssystems verwendet werden. Die hier durch die im 1 ms Raster rechnende Positionserfassung der Ausrückschwinge kann über das im 10 ms Raster arbeitende Kupplungsmomentenmodell nicht realisiert werden. Dazu müsste entweder das Momentenmodell in ein schnelleres Rechenraster verlegt werden, wodurch auch der Aktor schneller Zustandssignale bereitstellen müsste oder der Kupplungsstart könnte in diesem Bereich mit kleineren Schließgradienten nahezu 10 mal langsamer realisiert werden, um so genügend Messsignale mit geringer Momentenäderung zu erhalten.\\

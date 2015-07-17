@@ -1,0 +1,34 @@
+\BOOKMARK [1][-]{toc.1}{Table of contents}{}% 1
+\BOOKMARK [1][-]{chapter*.4}{List of Abbreviations}{}% 2
+\BOOKMARK [0][-]{chapter.1}{Task description}{}% 3
+\BOOKMARK [0][-]{chapter.2}{Environment}{}% 4
+\BOOKMARK [1][-]{section.2.1}{The chip ATMEL AT91RM9200}{chapter.2}% 5
+\BOOKMARK [1][-]{section.2.2}{WinARM}{chapter.2}% 6
+\BOOKMARK [1][-]{section.2.3}{Programmers Notepad 2}{chapter.2}% 7
+\BOOKMARK [1][-]{section.2.4}{TFTP-Server}{chapter.2}% 8
+\BOOKMARK [2][-]{subsection.2.4.1}{BDI-Configuration-File}{section.2.4}% 9
+\BOOKMARK [1][-]{section.2.5}{Telnet}{chapter.2}% 10
+\BOOKMARK [2][-]{subsection.2.5.1}{BDI2000 Telnet command's}{section.2.5}% 11
+\BOOKMARK [1][-]{section.2.6}{System overview}{chapter.2}% 12
+\BOOKMARK [0][-]{chapter.3}{Hardware abstraction}{}% 13
+\BOOKMARK [1][-]{section.3.1}{LED}{chapter.3}% 14
+\BOOKMARK [1][-]{section.3.2}{UART}{chapter.3}% 15
+\BOOKMARK [1][-]{section.3.3}{Digital Input}{chapter.3}% 16
+\BOOKMARK [2][-]{subsection.3.3.1}{Sharp sensor}{section.3.3}% 17
+\BOOKMARK [1][-]{section.3.4}{RTC}{chapter.3}% 18
+\BOOKMARK [0][-]{chapter.4}{Interrupt Latency Measurement Service}{}% 19
+\BOOKMARK [1][-]{section.4.1}{AIC}{chapter.4}% 20
+\BOOKMARK [1][-]{section.4.2}{ILMS initialization}{chapter.4}% 21
+\BOOKMARK [1][-]{section.4.3}{Interrupt concept}{chapter.4}% 22
+\BOOKMARK [2][-]{subsection.4.3.1}{Time correction}{section.4.3}% 23
+\BOOKMARK [2][-]{subsection.4.3.2}{Timestamp and result conversion}{section.4.3}% 24
+\BOOKMARK [2][-]{subsection.4.3.3}{Measurement transmission}{section.4.3}% 25
+\BOOKMARK [3][-]{subsubsection.4.3.3.1}{RS232 frame format}{subsection.4.3.3}% 26
+\BOOKMARK [2][-]{subsection.4.3.4}{Measurement scenarios}{section.4.3}% 27
+\BOOKMARK [2][-]{subsection.4.3.5}{Demo interrupt function}{section.4.3}% 28
+\BOOKMARK [0][-]{chapter.5}{Conclusion}{}% 29
+\BOOKMARK [1][-]{section.5.1}{Further improvements}{chapter.5}% 30
+\BOOKMARK [0][-]{section*.29}{List of Figures}{}% 31
+\BOOKMARK [0][-]{section*.31}{List of Tables}{}% 32
+\BOOKMARK [0][-]{section*.33}{List of Listings}{}% 33
+\BOOKMARK [0][-]{section*.35}{Bibliography}{}% 34

@@ -1,0 +1,22 @@
+\begin{tikzpicture}[
+%We set the scale and define some styles
+scale=1.5,
+axis/.style={very thick, ->, >=stealth'},
+important line/.style={thick},
+dashed line/.style={dashed, thick},
+every node/.style={color=black,}
+]
+%We make some nice shading to annotate different parts of the curve
+% Everything for x<0
+\begin{scope}
+\shade[top color=green,bottom color=green!20]
+(0,0)--(1,0) -- (3.3333,1.75)--(5,1.75) |- (0,0);
+\end{scope}
+\draw[style=help lines] (0,0) grid (4.9,1.9);
+%[step=0.25cm] (0,0) grid +(5,2);
+\fill[black] (1,0) circle (2pt) node[below] {$t_{p-rise}$};
+\fill[black] (3.33333,1.75) circle (2pt) node[above] {$p_{soll}$};
+\draw[axis] (0,0) -- (5.2,0) node(xline)[right] {$t$};
+\draw[axis] (0,0) -- (0,2.3) node(yline)[left] {$p$};
+\end{tikzpicture}
+

@@ -1,0 +1,60 @@
+\begin{thebibliography}{ATM09d}
+
+\bibitem[AG05]{BDIUSERMAN}
+Abatron AG.
+\newblock {\em bdiGDB JTAG interface for GNU Debugger - ARM7 / ARM9 - User
+  Manual}, 2005.
+\newblock Page 46, Version 1.17.
+
+\bibitem[ATM06]{AT91LED}
+ATMEL.
+\newblock {\em User Guide - AT91RM9200-EK Evaluation Board}, 2006.
+\newblock Page 25.
+
+\bibitem[ATM09a]{AT91Overview}
+ATMEL.
+\newblock {\em ARM920T-based Microcontroller}, 09-Jul-2009.
+\newblock Page 25, Rev. 1768I.
+
+\bibitem[ATM09b]{AT91RTC}
+ATMEL.
+\newblock {\em ARM920T-based Microcontroller}, 09-Jul-2009.
+\newblock \acs{RTC} - Page 305-320, Rev. 1768I.
+
+\bibitem[ATM09c]{AT91DMA}
+ATMEL.
+\newblock {\em ARM920T-based Microcontroller}, 09-Jul-2009.
+\newblock \acs{DMA} - Page 229-238, Rev. 1768I.
+
+\bibitem[ATM09d]{AT91PMC}
+ATMEL.
+\newblock {\em ARM920T-based Microcontroller}, 09-Jul-2009.
+\newblock \acs{PMC} - Page 261-291, Rev. 1768I.
+
+\bibitem[ATM09e]{AT91PIO}
+ATMEL.
+\newblock {\em ARM920T-based Microcontroller}, 09-Jul-2009.
+\newblock \acs{PIO} - Page 345-370, Rev. 1768I.
+
+\bibitem[ATM09f]{AT91AIC}
+ATMEL.
+\newblock {\em ARM920T-based Microcontroller}, 09-Jul-2009.
+\newblock \acs{AIC} - Page 239-260, Rev. 1768I.
+
+\bibitem[SHA06]{sharp}
+SHARP.
+\newblock {\em GP2Y0D02YK0F, Distance Measuring Sensor Unit, Digital output (80
+  cm) type}, 01-Dec-2006.
+\newblock Sheet No.: E4-A00501EN.
+
+\bibitem[Stu]{UNISTG}
+Ahmed Fathy Mohammed Abdelrazek~University Stuttgart.
+\newblock {\em Exception and Interrupt Handling in ARM}.
+
+\bibitem[Wik]{TFTPWIKI}
+Wikipedia.
+\newblock {\em Trivial File Transfer Protocol}.
+\newblock \url{http://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol},
+  {Date: 20.05.2014}.
+
+\end{thebibliography}

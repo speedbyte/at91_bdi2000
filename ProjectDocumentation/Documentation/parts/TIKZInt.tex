@@ -1,0 +1,187 @@
+% Time skale vektor
+\newcommand{\timingaxis}[1][]{%
+  \begin{scope}[#1]
+  \draw [timing/table/axis] (0,-\nrows) -- (\twidth+1,-\nrows);
+	\draw (\twidth+1,-\nrows-0.1)node [below,inner sep=2pt] {\scalebox{.75}{\tiny t}};
+  \foreach \n in {0,1,...,\twidth} {
+    \draw [timing/table/axis ticks]
+        (\n,-\nrows+.1) -- +(0,-0.2)
+        node [below,inner sep=2pt] {\scalebox{.75}{\tiny\n}};
+  }
+  \end{scope}
+}
+\tikzset{%
+    timing/table/axis/.style={->,>=latex},
+    timing/table/axis ticks/.style={},
+}
+% ---------------------  
+		
+		
+		
+		
+		
+		
+		\subfigure[Short measured interrupt, no timer overflow or competing other interrupts]{
+			\begin{tikztimingtable}[
+							timing/slope=0,         % no slope
+							timing/coldist=2pt,     % column distance
+							%timing/rowdist=0.34cm,
+							timing/coldist=0.25cm,
+							timing/rowdist=0.75em,
+							timing/yunit=0.75em,
+							xscale=2,yscale=1.0, % scale diagrams
+							timing/d/background/.style={fill=white},
+							thick               % set line width
+						]
+						{Timer overflow}     						& [orange]    										\\
+						{}															& [black]																	\\%Arrow
+						{System Int a)}     						& [black] 										\\
+						{}															& [black] 									\\%Arrow
+						{System Int b)}     						& [black] 										\\
+						{}															& [black] 										\\%Arrow
+						{System Int c)}     						& [black] 										\\
+						{}															& [black] 															\\%Arrow
+						{Measured Interrupt} 						& [red]  3S0U2D{Active}0U 6S 2D{Active}0U  \\
+						{}															& [black]3S 0G 2S 0G 6S 0G 2S 0G						\\%Arrow
+						{\acs{ILMS}} 										& [blue]  2S0U1D{Start}0U2S0U1D{Stop}0U4S0U1D{Start}0U2S0U1D{Stop}0U       		        \\
+						{}															& [black]2S 4A 4W 4A W																						\\%Arrow
+						{Application} 								  & [green]  0U2D{ Running }0U4S0U4D{ Running }0U4S0U4D{Running}0U              \\
+					\extracode
+					\makeatletter
+					\timingaxis%\relax
+					 \begin{pgfonlayer}{background}
+						% Draw shaded backgrounds
+						\shade [right color=orange!20,left color=orange!20](0,1.0) rectangle (\twidth+2.5,0.0);
+						\shade [right color=yellow!20,left color=yellow!20] (0,-1.0) rectangle (\twidth+2.5,-6.0);
+						\shade [right color=red!20,left color=blue!20] (0,-7.0) rectangle (\twidth+2.5,-10.0);
+						\shade [right color=green!20,left color=green!20](0,-11) rectangle (\twidth+2.5,-12);
+					 
+						% Add background grid lines
+						\begin{scope}[gray,semitransparent,semithick]
+							\horlines{1,3,...,13}
+							\foreach \x in {0,...,18}
+								\draw (\x,1) -- (\x,-\nrows);
+							% similar: \vertlines{1,...,6}
+						\end{scope}
+						% Add labels
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,0.5) {\tiny Prio: High};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-1.5) {\tiny Prio: Mid 3};						
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-3.5) {\tiny Prio: Mid 2};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-5.5) {\tiny Prio: Mid 1};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-7.5) {\tiny Prio: Low};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-11.5) {\tiny Prio: None};
+					 \end{pgfonlayer}
+					\end{tikztimingtable}%
+
+		\label{fig:IntExa}}\\
+		\vspace{0.5 cm}
+    \subfigure[Long measured interrupt, with timer overflow but no competing other interrupts]{
+    						 \begin{tikztimingtable}[
+							timing/slope=0,         % no slope
+							timing/coldist=2pt,     % column distance
+							%timing/rowdist=0.34cm,
+							timing/coldist=0.25cm,
+							timing/rowdist=0.75em,
+							timing/yunit=0.75em,
+							xscale=2,yscale=1.0, % scale diagrams
+							timing/d/background/.style={fill=white},
+							thick               % set line width
+						]
+
+
+						{Timer overflow}     						& [orange] 5.5S0U0.5D 0U2S0U0.5D0U    										\\
+						{}															& [black] 5.5S 0.5A 0G 2S 0.5A 0G 													\\%Arrow
+						{System Int a)}     						& [black] 5.5S 0G	0.5S 0G 2S 0G 0.5S 0G 										\\
+						{}															& [black] 5.5S 0G	0.5S 0G 2S 0G 0.5S 0G										\\%Arrow
+						{System Int b)}     						& [black] 5.5S 0G	0.5S 0G 2S 0G 0.5S 0G									\\
+						{}															& [black] 5.5S 0G	0.5S 0G 2S 0G 0.5S 0G 										\\%Arrow
+						{System Int c)}     						& [black] 5.5S 0G	0.5S 0G 2S 0G 0.5S 0G										\\
+						{}															& [black] 5.5S 0G	0.5S 2W 0G 0.5S W																\\%Arrow
+						{Measured Interrupt} 						& [red]  3S0U2.5D{Active}0U0.5S0U2D{Active}0U0.5S0U1.5D{Active}0U   \\
+						{}															& [black]3S 0G 7S 0G 																						\\%Arrow
+						{\acs{ILMS}} 										& [blue]  2S0U1D{Start}0U7S0U1D{Stop}0U       		        \\
+						{}															& [black]2S 9A W 																						\\%Arrow
+						{Application} 								  & [green]  0U2D{ Running }0U9S0U7D{ Running }0U              \\
+					\extracode
+					\makeatletter
+					\timingaxis%\relax
+					 \begin{pgfonlayer}{background}
+						% Draw shaded backgrounds
+						\shade [right color=orange!20,left color=orange!20](0,1.0) rectangle (\twidth+2.5,0.0);
+						\shade [right color=yellow!20,left color=yellow!20] (0,-1.0) rectangle (\twidth+2.5,-6.0);
+						\shade [right color=red!20,left color=blue!20] (0,-7.0) rectangle (\twidth+2.5,-10.0);
+						\shade [right color=green!20,left color=green!20](0,-11) rectangle (\twidth+2.5,-12);
+					 
+						% Add background grid lines
+						\begin{scope}[gray,semitransparent,semithick]
+							\horlines{1,3,...,13}
+							\foreach \x in {0,...,18}
+								\draw (\x,1) -- (\x,-\nrows);
+							% similar: \vertlines{1,...,6}
+						\end{scope}
+						% Add labels
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,0.5) {\tiny Prio: High};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-1.5) {\tiny Prio: Mid 3};						
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-3.5) {\tiny Prio: Mid 2};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-5.5) {\tiny Prio: Mid 1};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-7.5) {\tiny Prio: Low};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-11.5) {\tiny Prio: None};
+					 \end{pgfonlayer}
+					\end{tikztimingtable}%
+		\label{fig:IntExab}}\\
+		\vspace{0.5 cm}
+		\subfigure[Long measured interrupt, with timer overflow and other higher prioritized interrupts]{
+    						\begin{tikztimingtable}[
+							timing/slope=0,         % no slope
+							timing/coldist=2pt,     % column distance
+							%timing/rowdist=0.34cm,
+							timing/coldist=0.25cm,
+							timing/rowdist=0.75em,
+							timing/yunit=0.75em,
+							xscale=2,yscale=1.0, % scale diagrams
+							timing/d/background/.style={fill=white},
+							thick               % set line width
+						]
+
+
+						{Timer overflow}     						& [orange] 5.5S 0U0.5D0U2S 0U0.5D0U2S 0U0.5D0U2S 0U0.5D0U2S   \\
+						{}															& [black] 5.5S0A0.5S0G2S0A0.5S0W2S0A0.5S0G2S0A0.5S0G2S	\\%Arrow
+						{System Int a)}     						& [black] 5.5S0G0.5S0G1.5S 0U[brown]0.5D0U0.5S0U0.5D0U [black]1.5S0G0.5S0G2S0G0.5S0G\\
+						{}															& [black] 5.5S0G0.5S0G1.5S0A1.5S0W1.5S0G0.5S0G2S0G0.5SW								\\%Arrow
+						{System Int b)}     						& [black] 5.5S0G0.5S0G0.5S 0U[cyan]1D{Int B}1.5S0.5D0U [black]1S0G0.5S0G 1S 0U[cyan]1D0U0.5S0U0.5D0U			\\
+						{}															& [black] 5.5S0G0.5S0.5W 3A 1W 0G 0.5S 0G 1S 2A G						\\%Arrow
+						{System Int c)}     						& [magenta] 4S0U1.5D{Int C} 0.5S0U0.5D0U 3S0U0.5D0U	[black]0.5S0G0.5S0G1S0G2S0G \\
+						{}															& [black] 4S6A0W0.5S0G0.5S1W0G2SW															\\%Arrow
+						{Measured Interrupt} 						& [red]  3S0U1D{ACT}0U 6S0U0.5D0U 0.5S0U1D0U 2S0U1D0U  \\
+						{}															& [black]3S 0G 12S 0G 																				\\%Arrow
+						{\acs{ILMS}} 										& [blue]  2S0U1D{Start}0U12S0U1D{Stop}0U       		        \\
+						{}															& [black]2S 14A W 																						\\%Arrow
+						{Application} 								  & [green]  0U2D{ Running }0U14S0U2D{ Running }0U              \\
+					\extracode
+					\makeatletter
+					\timingaxis%\relax
+					 \begin{pgfonlayer}{background}
+						% Draw shaded backgrounds
+						\shade [right color=orange!20,left color=orange!20](0,1.0) rectangle (\twidth+2.5,0.0);
+						\shade [right color=yellow!20,left color=yellow!20] (0,-1.0) rectangle (\twidth+2.5,-6.0);
+						\shade [right color=red!20,left color=blue!20] (0,-7.0) rectangle (\twidth+2.5,-10.0);
+						\shade [right color=green!20,left color=green!20](0,-11) rectangle (\twidth+2.5,-12);
+					 
+						% Add background grid lines
+						\begin{scope}[gray,semitransparent,semithick]
+							\horlines{1,3,...,13}
+							\foreach \x in {0,...,18}
+								\draw (\x,1) -- (\x,-\nrows);
+							% similar: \vertlines{1,...,6}
+						\end{scope}
+						% Add labels
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,0.5) {\tiny Prio: High};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-1.5) {\tiny Prio: Mid 3};						
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-3.5) {\tiny Prio: Mid 2};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-5.5) {\tiny Prio: Mid 1};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-7.5) {\tiny Prio: Low};
+						\node [anchor=west,inner sep=0pt] at (\twidth+0.1,-11.5) {\tiny Prio: None};
+					 \end{pgfonlayer}
+					\end{tikztimingtable}%
+					\label{fig:IntExac}}\\
+		\vspace{0.5 cm}
