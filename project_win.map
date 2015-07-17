@@ -1,0 +1,678 @@
+Archive member included because of file (symbol)
+
+c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+                              object-files/main.o (memcpy)
+c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+                              object-files/init.o (__udivsi3)
+c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+                              object-files/mci_device.o (__umodsi3)
+c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+                              c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o) (__div0)
+
+Allocating common symbols
+Common symbol       size              file
+
+mci_sdcard          0x8               object-files/Hal.o
+USART_pt            0x4               object-files/Hal.o
+mci_sdcard_desc     0x4               object-files/Hal.o
+Bufferwechsler      0x4               object-files/Hal.o
+mci_sdcard_info     0x1c              object-files/Hal.o
+globali             0x4               object-files/Hal.o
+readytowriteonSD    0x4               object-files/Hal.o
+SDBeginBlock        0x4               object-files/Hal.o
+printBuffer         0x4               object-files/Hal.o
+Rtc_Date_Start      0x4               object-files/InterruptMeasurmentService.o
+reader              0x4               object-files/Hal.o
+rtc_time            0x4               object-files/Hal.o
+MCI_pt              0x4               object-files/Hal.o
+TIMER_CLK_USED      0x1               object-files/InterruptMeasurmentService.o
+errorstatus         0x4               object-files/Hal.o
+Rtc_Time_Start      0x4               object-files/InterruptMeasurmentService.o
+rtc_cal             0x4               object-files/Hal.o
+globalj             0x4               object-files/Hal.o
+RCR_recirculated    0x4               object-files/Hal.o
+SDBuffer1           0x200             object-files/Hal.o
+usartBuffer1        0x400             object-files/Hal.o
+writer              0x4               object-files/Hal.o
+TimerOvlComp        0x1               object-files/InterruptMeasurmentService.o
+SDBuffer2           0x200             object-files/Hal.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+DATA             0x20000000         0x00020000         rw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD object-files/cstartup_gnu.o
+LOAD object-files/isr.o
+LOAD object-files/main.o
+LOAD object-files/init.o
+LOAD object-files/mci_device.o
+LOAD object-files/usart_device.o
+LOAD object-files/st_device.o
+LOAD object-files/led_device.o
+LOAD object-files/Timer.o
+LOAD object-files/conversion.o
+LOAD object-files/InterruptMeasurmentService.o
+LOAD object-files/Hal.o
+LOAD c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libm.a
+LOAD c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a
+LOAD c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a
+START GROUP
+LOAD c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a
+LOAD c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libg.a
+LOAD c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a
+END GROUP
+
+.text           0x20000000     0x46c8
+ *(.vectrom)
+ *(.init)
+ *(.text .text.*)
+ .text          0x20000000       0xd0 object-files/cstartup_gnu.o
+                0x20000000                _start
+ .text          0x200000d0      0x190 object-files/isr.o
+                0x200001fc                Interrupt_Handler_TC0_Lowlevel
+                0x20000164                Interrupt_Handler_SysTimer_Lowlevel
+                0x200000d0                Interrupt_Handler_USART_Lowlevel
+                0x200001ac                Measured_Interrupt_Lowlevel
+                0x2000011c                Interrupt_Handler_MCI_Lowlevel
+ .text          0x20000260      0x3f4 object-files/main.o
+                0x20000260                Measured_Interrupt_Highlevel
+                0x20000368                main
+ .text          0x20000654      0xa1c object-files/init.o
+                0x200007b8                AT91F_DataAbort
+                0x200007d4                AT91F_FetchAbort
+                0x200007f0                AT91F_Undef
+                0x20000828                AT91F_LowLevelInit
+                0x20000654                DBGU_Printk
+                0x2000072c                USART_Printk
+                0x2000079c                AT91F_SpuriousHandler
+                0x2000080c                AT91F_UndefHandler
+ .text          0x20001070     0x11f0 object-files/mci_device.o
+                0x20001b38                SDcard_SetBusWidth_CMD7_R1b
+                0x20001170                SendAppCommandtoSD
+                0x20001f14                Mci_init
+                0x20001070                SendCommandtoSD
+                0x20001254                SDcard_GetStatus_CMD13_R2
+                0x20001a8c                SDcard_GetCID_CMD2_R2
+                0x200019b0                SDcard_SetBlockLength_CMD16_R1
+                0x200018f4                SDcard_GetCSD_CMD9_R2
+                0x200019f0                SDcard_GetOCR_ACMD41_R3
+                0x20001c20                SDDevice_Init_and_Cfg_Registers
+                0x20001ebc                SDcard_Poll_AT91CMCINOTBUSY_flag
+                0x20001460                SDcard_ReadBlock_CMD17_R1
+                0x200016ac                SDcard_WriteBlock_CMD24_R1
+                0x200012c4                Interrupt_Handler_SDcard_Highlevel
+ .text          0x20002260      0xc94 object-files/usart_device.o
+                0x20002260                Interrupt_Handler_USART_Highlevel
+                0x20002490                Configure_USART_TX_PDC
+                0x20002948                Usart_init
+                0x200026ec                Configure_USART_RX_PDC
+ .text          0x20002ef4      0x340 object-files/st_device.o
+                0x20003060                SetPeriodicTimerCounter
+                0x200030a8                St_init
+                0x20002ef4                GetTickCount_fromST
+                0x20002f1c                Interrupt_Handler_SysTimer_Highlevel
+ .text          0x20003234       0xf8 object-files/led_device.o
+                0x20003234                Led_init
+                0x20003274                toggleLed
+ .text          0x2000332c      0x1cc object-files/Timer.o
+                0x20003450                Time_Used_In_Timer_Int
+                0x2000341c                StopTimer
+                0x200033a4                getTimerValue
+                0x20003478                Interrupt_Handler_TC0_Highlevel
+                0x2000332c                initTimer
+                0x200033e8                StartTimer
+ .text          0x200034f8      0x6b8 object-files/conversion.o
+                0x20003644                PutDateAndTimeStamp
+                0x20003540                Dec2ASCII_Ticks
+                0x200034f8                WaitTicks
+                0x20003ab8                Convert_Ticks_To_us
+ .text          0x20003bb0      0x4ac object-files/InterruptMeasurmentService.o
+                0x20003d8c                Stop_Latency_Measurement
+                0x20003bb0                Init_Latency_Measurement
+                0x20003d34                Start_Latency_Measurement
+ .text          0x2000405c      0x464 object-files/Hal.o
+                0x20004210                InitHardware
+                0x20004248                InitDemoInterrupt
+                0x20004474                Interrupt_Handler_MCI_Highlevel
+                0x2000405c                Rtc_init
+ .text          0x200044c0       0x20 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+                0x200044c0                memcpy
+ .text          0x200044e0      0x114 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+                0x200044e0                __udivsi3
+                0x200044e0                __aeabi_uidiv
+                0x200045dc                __aeabi_uidivmod
+ .text          0x200045f4       0xd0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+                0x200045f4                __umodsi3
+ .text          0x200046c4        0x4 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+                0x200046c4                __aeabi_ldiv0
+                0x200046c4                __div0
+                0x200046c4                __aeabi_idiv0
+ *(.gnu.linkonce.t.*)
+ *(.glue_7t .glue_7)
+ .glue_7        0x200046c8        0x0 object-files/cstartup_gnu.o
+ .glue_7t       0x200046c8        0x0 object-files/cstartup_gnu.o
+ .glue_7        0x200046c8        0x0 object-files/isr.o
+ .glue_7t       0x200046c8        0x0 object-files/isr.o
+ .glue_7        0x200046c8        0x0 object-files/main.o
+ .glue_7t       0x200046c8        0x0 object-files/main.o
+ .glue_7        0x200046c8        0x0 object-files/init.o
+ .glue_7t       0x200046c8        0x0 object-files/init.o
+ .glue_7        0x200046c8        0x0 object-files/mci_device.o
+ .glue_7t       0x200046c8        0x0 object-files/mci_device.o
+ .glue_7        0x200046c8        0x0 object-files/usart_device.o
+ .glue_7t       0x200046c8        0x0 object-files/usart_device.o
+ .glue_7        0x200046c8        0x0 object-files/st_device.o
+ .glue_7t       0x200046c8        0x0 object-files/st_device.o
+ .glue_7        0x200046c8        0x0 object-files/led_device.o
+ .glue_7t       0x200046c8        0x0 object-files/led_device.o
+ .glue_7        0x200046c8        0x0 object-files/Timer.o
+ .glue_7t       0x200046c8        0x0 object-files/Timer.o
+ .glue_7        0x200046c8        0x0 object-files/conversion.o
+ .glue_7t       0x200046c8        0x0 object-files/conversion.o
+ .glue_7        0x200046c8        0x0 object-files/InterruptMeasurmentService.o
+ .glue_7t       0x200046c8        0x0 object-files/InterruptMeasurmentService.o
+ .glue_7        0x200046c8        0x0 object-files/Hal.o
+ .glue_7t       0x200046c8        0x0 object-files/Hal.o
+ .glue_7        0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+ .glue_7t       0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+ .glue_7        0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .glue_7t       0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .glue_7        0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .glue_7t       0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .glue_7        0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+ .glue_7t       0x200046c8        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+ *(.fini)
+ *(.gcc_except_table)
+                0x200046c8                . = ALIGN (0x4)
+
+.ctors          0x200046c8        0x0
+                0x200046c8                PROVIDE (__ctors_start__, .)
+ *(SORT(.ctors.*))
+ *(.ctors)
+                0x200046c8                PROVIDE (__ctors_end__, .)
+
+.dtors          0x200046c8        0x0
+                0x200046c8                PROVIDE (__dtors_start__, .)
+ *(SORT(.dtors.*))
+ *(.dtors)
+                0x200046c8                PROVIDE (__dtors_end__, .)
+
+.rodata         0x200046c8       0xf4
+ *(.rodata .rodata.*)
+ .rodata        0x200046c8       0x2c object-files/main.o
+ .rodata        0x200046f4       0xa4 object-files/init.o
+ .rodata        0x20004798       0x18 object-files/mci_device.o
+ .rodata        0x200047b0        0xc object-files/conversion.o
+ *(.gnu.linkonce.r.*)
+                0x200047bc                . = ALIGN (0x4)
+                0x200047bc                _etext = .
+                0x200047bc                PROVIDE (etext, .)
+
+.data           0x200047bc      0xc64 load address 0x200047bc
+                0x200047bc                _data = .
+ *(.vectram)
+ *(.data)
+ .data          0x200047bc      0xc30 object-files/cstartup_gnu.o
+ .data          0x200053ec        0x0 object-files/isr.o
+ .data          0x200053ec        0x0 object-files/main.o
+ .data          0x200053ec        0x0 object-files/init.o
+ .data          0x200053ec        0x0 object-files/mci_device.o
+ .data          0x200053ec        0x0 object-files/usart_device.o
+ .data          0x200053ec        0x0 object-files/st_device.o
+ .data          0x200053ec        0x0 object-files/led_device.o
+ .data          0x200053ec        0x0 object-files/Timer.o
+ .data          0x200053ec        0x0 object-files/conversion.o
+ .data          0x200053ec       0x34 object-files/InterruptMeasurmentService.o
+                0x200053ec                ASCII_Tick_Buffer
+                0x200053fc                ASCII_UART_Buffer
+ .data          0x20005420        0x0 object-files/Hal.o
+ .data          0x20005420        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+ .data          0x20005420        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .data          0x20005420        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .data          0x20005420        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+                0x20005420                . = ALIGN (0x4)
+ *(.fastrun)
+                0x20005420                . = ALIGN (0x4)
+                0x20005420                _edata = .
+                0x20005420                PROVIDE (edata, .)
+
+.bss            0x20005420      0x87c
+                0x20005420                __bss_start = .
+                0x20005420                __bss_start__ = .
+ *(.bss)
+ .bss           0x20005420        0x0 object-files/cstartup_gnu.o
+ .bss           0x20005420        0x0 object-files/isr.o
+ .bss           0x20005420        0x0 object-files/main.o
+ .bss           0x20005420        0x0 object-files/init.o
+ .bss           0x20005420        0x0 object-files/mci_device.o
+ .bss           0x20005420        0x0 object-files/usart_device.o
+ .bss           0x20005420        0x4 object-files/st_device.o
+                0x20005420                StTick
+ .bss           0x20005424        0x0 object-files/led_device.o
+ .bss           0x20005424        0x4 object-files/Timer.o
+                0x20005424                TimerOverflowCnt
+ .bss           0x20005428        0x0 object-files/conversion.o
+ .bss           0x20005428        0x4 object-files/InterruptMeasurmentService.o
+                0x20005428                InterruptTimeUsed
+ .bss           0x2000542c        0x0 object-files/Hal.o
+ .bss           0x2000542c        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+ .bss           0x2000542c        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .bss           0x2000542c        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .bss           0x2000542c        0x0 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+ *(COMMON)
+ COMMON         0x2000542c        0xd object-files/InterruptMeasurmentService.o
+                0x2000542c                Rtc_Date_Start
+                0x20005430                TIMER_CLK_USED
+                0x20005434                Rtc_Time_Start
+                0x20005438                TimerOvlComp
+ *fill*         0x20005439        0x3 00
+ COMMON         0x2000543c      0x860 object-files/Hal.o
+                0x2000543c                mci_sdcard
+                0x20005444                USART_pt
+                0x20005448                mci_sdcard_desc
+                0x2000544c                Bufferwechsler
+                0x20005450                mci_sdcard_info
+                0x2000546c                globali
+                0x20005470                readytowriteonSD
+                0x20005474                SDBeginBlock
+                0x20005478                printBuffer
+                0x2000547c                reader
+                0x20005480                rtc_time
+                0x20005484                MCI_pt
+                0x20005488                errorstatus
+                0x2000548c                rtc_cal
+                0x20005490                globalj
+                0x20005494                RCR_recirculated
+                0x20005498                SDBuffer1
+                0x20005698                usartBuffer1
+                0x20005a98                writer
+                0x20005a9c                SDBuffer2
+                0x20005c9c                . = ALIGN (0x4)
+                0x20005c9c                __bss_end__ = .
+                0x20005c9c                __bss_end__ = .
+                0x20005c9c                _end = .
+                0x20005c9c                PROVIDE (end, .)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x00000000      0x129
+ *(.comment)
+ .comment       0x00000000       0x1b object-files/main.o
+ .comment       0x0000001b       0x1b object-files/init.o
+ .comment       0x00000036       0x1b object-files/mci_device.o
+ .comment       0x00000051       0x1b object-files/usart_device.o
+ .comment       0x0000006c       0x1b object-files/st_device.o
+ .comment       0x00000087       0x1b object-files/led_device.o
+ .comment       0x000000a2       0x1b object-files/Timer.o
+ .comment       0x000000bd       0x1b object-files/conversion.o
+ .comment       0x000000d8       0x1b object-files/InterruptMeasurmentService.o
+ .comment       0x000000f3       0x1b object-files/Hal.o
+ .comment       0x0000010e       0x1b c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges  0x00000000      0x1e0
+ *(.debug_aranges)
+ .debug_aranges
+                0x00000000       0x20 object-files/cstartup_gnu.o
+ .debug_aranges
+                0x00000020       0x20 object-files/isr.o
+ .debug_aranges
+                0x00000040       0x20 object-files/main.o
+ .debug_aranges
+                0x00000060       0x20 object-files/init.o
+ .debug_aranges
+                0x00000080       0x20 object-files/mci_device.o
+ .debug_aranges
+                0x000000a0       0x20 object-files/usart_device.o
+ .debug_aranges
+                0x000000c0       0x20 object-files/st_device.o
+ .debug_aranges
+                0x000000e0       0x20 object-files/led_device.o
+ .debug_aranges
+                0x00000100       0x20 object-files/Timer.o
+ .debug_aranges
+                0x00000120       0x20 object-files/conversion.o
+ .debug_aranges
+                0x00000140       0x20 object-files/InterruptMeasurmentService.o
+ .debug_aranges
+                0x00000160       0x20 object-files/Hal.o
+ .debug_aranges
+                0x00000180       0x20 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .debug_aranges
+                0x000001a0       0x20 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .debug_aranges
+                0x000001c0       0x20 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+
+.debug_pubnames
+                0x00000000      0x760
+ *(.debug_pubnames)
+ .debug_pubnames
+                0x00000000       0x3c object-files/main.o
+ .debug_pubnames
+                0x0000003c       0xb4 object-files/init.o
+ .debug_pubnames
+                0x000000f0      0x1a8 object-files/mci_device.o
+ .debug_pubnames
+                0x00000298       0x7d object-files/usart_device.o
+ .debug_pubnames
+                0x00000315       0x86 object-files/st_device.o
+ .debug_pubnames
+                0x0000039b       0x2d object-files/led_device.o
+ .debug_pubnames
+                0x000003c8       0xa3 object-files/Timer.o
+ .debug_pubnames
+                0x0000046b       0x64 object-files/conversion.o
+ .debug_pubnames
+                0x000004cf       0xf6 object-files/InterruptMeasurmentService.o
+ .debug_pubnames
+                0x000005c5      0x19b object-files/Hal.o
+
+.debug_info     0x00000000     0x791f
+ *(.debug_info .gnu.linkonce.wi.*)
+ .debug_info    0x00000000       0x64 object-files/cstartup_gnu.o
+ .debug_info    0x00000064       0x5b object-files/isr.o
+ .debug_info    0x000000bf      0xafe object-files/main.o
+ .debug_info    0x00000bbd     0x122c object-files/init.o
+ .debug_info    0x00001de9     0x14fd object-files/mci_device.o
+ .debug_info    0x000032e6     0x1672 object-files/usart_device.o
+ .debug_info    0x00004958      0x67f object-files/st_device.o
+ .debug_info    0x00004fd7      0x12a object-files/led_device.o
+ .debug_info    0x00005101      0x1ef object-files/Timer.o
+ .debug_info    0x000052f0      0x401 object-files/conversion.o
+ .debug_info    0x000056f1      0xc47 object-files/InterruptMeasurmentService.o
+ .debug_info    0x00006338     0x148b object-files/Hal.o
+ .debug_info    0x000077c3       0x74 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .debug_info    0x00007837       0x74 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .debug_info    0x000078ab       0x74 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+
+.debug_abbrev   0x00000000      0xdff
+ *(.debug_abbrev)
+ .debug_abbrev  0x00000000       0x14 object-files/cstartup_gnu.o
+ .debug_abbrev  0x00000014       0x14 object-files/isr.o
+ .debug_abbrev  0x00000028      0x165 object-files/main.o
+ .debug_abbrev  0x0000018d      0x182 object-files/init.o
+ .debug_abbrev  0x0000030f      0x204 object-files/mci_device.o
+ .debug_abbrev  0x00000513      0x18c object-files/usart_device.o
+ .debug_abbrev  0x0000069f      0x16a object-files/st_device.o
+ .debug_abbrev  0x00000809       0x80 object-files/led_device.o
+ .debug_abbrev  0x00000889       0xa8 object-files/Timer.o
+ .debug_abbrev  0x00000931       0xf2 object-files/conversion.o
+ .debug_abbrev  0x00000a23      0x1cf object-files/InterruptMeasurmentService.o
+ .debug_abbrev  0x00000bf2      0x1d1 object-files/Hal.o
+ .debug_abbrev  0x00000dc3       0x14 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .debug_abbrev  0x00000dd7       0x14 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .debug_abbrev  0x00000deb       0x14 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+
+.debug_line     0x00000000     0x10ce
+ *(.debug_line)
+ .debug_line    0x00000000       0x77 object-files/cstartup_gnu.o
+ .debug_line    0x00000077       0x60 object-files/isr.o
+ .debug_line    0x000000d7      0x35b object-files/main.o
+ .debug_line    0x00000432      0x181 object-files/init.o
+ .debug_line    0x000005b3      0x1e0 object-files/mci_device.o
+ .debug_line    0x00000793      0x1e0 object-files/usart_device.o
+ .debug_line    0x00000973       0xf3 object-files/st_device.o
+ .debug_line    0x00000a66       0xa8 object-files/led_device.o
+ .debug_line    0x00000b0e       0xd0 object-files/Timer.o
+ .debug_line    0x00000bde       0xf1 object-files/conversion.o
+ .debug_line    0x00000ccf      0x14c object-files/InterruptMeasurmentService.o
+ .debug_line    0x00000e1b      0x15b object-files/Hal.o
+ .debug_line    0x00000f76       0x87 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .debug_line    0x00000ffd       0x71 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+ .debug_line    0x0000106e       0x60 c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+
+.debug_frame    0x00000000     0x1338
+ *(.debug_frame)
+ .debug_frame   0x00000000      0x190 object-files/main.o
+ .debug_frame   0x00000190      0x410 object-files/init.o
+ .debug_frame   0x000005a0      0x2f0 object-files/mci_device.o
+ .debug_frame   0x00000890      0x470 object-files/usart_device.o
+ .debug_frame   0x00000d00      0x150 object-files/st_device.o
+ .debug_frame   0x00000e50       0x70 object-files/led_device.o
+ .debug_frame   0x00000ec0       0xf0 object-files/Timer.o
+ .debug_frame   0x00000fb0       0x90 object-files/conversion.o
+ .debug_frame   0x00001040      0x170 object-files/InterruptMeasurmentService.o
+ .debug_frame   0x000011b0      0x130 object-files/Hal.o
+ .debug_frame   0x000012e0       0x2c c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+ .debug_frame   0x0000130c       0x2c c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+
+.debug_str      0x00000000      0x1c9
+ *(.debug_str)
+ .debug_str     0x00000000       0x48 object-files/main.o
+ .debug_str     0x00000048       0x42 object-files/init.o
+ .debug_str     0x0000008a       0x5a object-files/mci_device.o
+ .debug_str     0x000000e4       0x88 object-files/usart_device.o
+ .debug_str     0x0000016c       0x36 object-files/InterruptMeasurmentService.o
+ .debug_str     0x000001a2       0x27 object-files/Hal.o
+
+.debug_loc      0x00000000     0x17f4
+ *(.debug_loc)
+ .debug_loc     0x00000000      0x1f8 object-files/main.o
+ .debug_loc     0x000001f8      0x540 object-files/init.o
+ .debug_loc     0x00000738      0x3c6 object-files/mci_device.o
+ .debug_loc     0x00000afe      0x5be object-files/usart_device.o
+ .debug_loc     0x000010bc      0x1a4 object-files/st_device.o
+ .debug_loc     0x00001260       0x7e object-files/led_device.o
+ .debug_loc     0x000012de      0x126 object-files/Timer.o
+ .debug_loc     0x00001404       0xa8 object-files/conversion.o
+ .debug_loc     0x000014ac      0x1ce object-files/InterruptMeasurmentService.o
+ .debug_loc     0x0000167a      0x17a object-files/Hal.o
+
+.debug_macinfo  0x00000000    0xd65c2
+ *(.debug_macinfo)
+ .debug_macinfo
+                0x00000000    0x19af3 object-files/main.o
+ .debug_macinfo
+                0x00019af3    0x16733 object-files/init.o
+ .debug_macinfo
+                0x00030226    0x1675d object-files/mci_device.o
+ .debug_macinfo
+                0x00046983    0x143e8 object-files/usart_device.o
+ .debug_macinfo
+                0x0005ad6b    0x1422d object-files/st_device.o
+ .debug_macinfo
+                0x0006ef98    0x1420e object-files/led_device.o
+ .debug_macinfo
+                0x000831a6    0x14415 object-files/Timer.o
+ .debug_macinfo
+                0x000975bb    0x14394 object-files/conversion.o
+ .debug_macinfo
+                0x000ab94f    0x1441c object-files/InterruptMeasurmentService.o
+ .debug_macinfo
+                0x000bfd6b    0x16857 object-files/Hal.o
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+OUTPUT(project_win.elf elf32-littlearm)
+
+Cross Reference Table
+
+Symbol                                            File
+ASCII_Tick_Buffer                                 object-files/InterruptMeasurmentService.o
+ASCII_UART_Buffer                                 object-files/InterruptMeasurmentService.o
+                                                  object-files/conversion.o
+AT91F_DataAbort                                   object-files/init.o
+AT91F_FetchAbort                                  object-files/init.o
+AT91F_LowLevelInit                                object-files/init.o
+                                                  object-files/cstartup_gnu.o
+AT91F_SpuriousHandler                             object-files/init.o
+AT91F_Undef                                       object-files/init.o
+AT91F_UndefHandler                                object-files/init.o
+Bufferwechsler                                    object-files/Hal.o
+                                                  object-files/mci_device.o
+Configure_USART_RX_PDC                            object-files/usart_device.o
+Configure_USART_TX_PDC                            object-files/usart_device.o
+Convert_Ticks_To_us                               object-files/conversion.o
+                                                  object-files/InterruptMeasurmentService.o
+DBGU_Printk                                       object-files/init.o
+                                                  object-files/mci_device.o
+Dec2ASCII_Ticks                                   object-files/conversion.o
+                                                  object-files/InterruptMeasurmentService.o
+GetTickCount_fromST                               object-files/st_device.o
+InitDemoInterrupt                                 object-files/Hal.o
+                                                  object-files/main.o
+InitHardware                                      object-files/Hal.o
+                                                  object-files/main.o
+Init_Latency_Measurement                          object-files/InterruptMeasurmentService.o
+                                                  object-files/main.o
+InterruptTimeUsed                                 object-files/InterruptMeasurmentService.o
+Interrupt_Handler_MCI_Highlevel                   object-files/Hal.o
+                                                  object-files/isr.o
+Interrupt_Handler_MCI_Lowlevel                    object-files/isr.o
+                                                  object-files/mci_device.o
+Interrupt_Handler_SDcard_Highlevel                object-files/mci_device.o
+                                                  object-files/Hal.o
+Interrupt_Handler_SysTimer_Highlevel              object-files/st_device.o
+                                                  object-files/isr.o
+Interrupt_Handler_SysTimer_Lowlevel               object-files/isr.o
+                                                  object-files/st_device.o
+Interrupt_Handler_TC0_Highlevel                   object-files/Timer.o
+                                                  object-files/isr.o
+Interrupt_Handler_TC0_Lowlevel                    object-files/isr.o
+                                                  object-files/InterruptMeasurmentService.o
+Interrupt_Handler_USART_Highlevel                 object-files/usart_device.o
+                                                  object-files/isr.o
+Interrupt_Handler_USART_Lowlevel                  object-files/isr.o
+                                                  object-files/usart_device.o
+Led_init                                          object-files/led_device.o
+                                                  object-files/Hal.o
+MCI_pt                                            object-files/Hal.o
+Mci_init                                          object-files/mci_device.o
+Measured_Interrupt_Highlevel                      object-files/main.o
+                                                  object-files/isr.o
+Measured_Interrupt_Lowlevel                       object-files/isr.o
+                                                  object-files/Hal.o
+PutDateAndTimeStamp                               object-files/conversion.o
+                                                  object-files/InterruptMeasurmentService.o
+RCR_recirculated                                  object-files/Hal.o
+                                                  object-files/usart_device.o
+Rtc_Date_Start                                    object-files/InterruptMeasurmentService.o
+                                                  object-files/conversion.o
+Rtc_Time_Start                                    object-files/InterruptMeasurmentService.o
+                                                  object-files/conversion.o
+Rtc_init                                          object-files/Hal.o
+SDBeginBlock                                      object-files/Hal.o
+SDBuffer1                                         object-files/Hal.o
+                                                  object-files/mci_device.o
+SDBuffer2                                         object-files/Hal.o
+                                                  object-files/mci_device.o
+SDDevice_Init_and_Cfg_Registers                   object-files/mci_device.o
+SDcard_GetCID_CMD2_R2                             object-files/mci_device.o
+SDcard_GetCSD_CMD9_R2                             object-files/mci_device.o
+SDcard_GetOCR_ACMD41_R3                           object-files/mci_device.o
+SDcard_GetStatus_CMD13_R2                         object-files/mci_device.o
+SDcard_Poll_AT91CMCINOTBUSY_flag                  object-files/mci_device.o
+SDcard_ReadBlock_CMD17_R1                         object-files/mci_device.o
+SDcard_SetBlockLength_CMD16_R1                    object-files/mci_device.o
+SDcard_SetBusWidth_CMD7_R1b                       object-files/mci_device.o
+SDcard_WriteBlock_CMD24_R1                        object-files/mci_device.o
+SendAppCommandtoSD                                object-files/mci_device.o
+SendCommandtoSD                                   object-files/mci_device.o
+SetPeriodicTimerCounter                           object-files/st_device.o
+StTick                                            object-files/st_device.o
+St_init                                           object-files/st_device.o
+StartTimer                                        object-files/Timer.o
+                                                  object-files/InterruptMeasurmentService.o
+Start_Latency_Measurement                         object-files/InterruptMeasurmentService.o
+                                                  object-files/isr.o
+StopTimer                                         object-files/Timer.o
+                                                  object-files/InterruptMeasurmentService.o
+Stop_Latency_Measurement                          object-files/InterruptMeasurmentService.o
+                                                  object-files/isr.o
+TIMER_CLK_USED                                    object-files/InterruptMeasurmentService.o
+Time_Used_In_Timer_Int                            object-files/Timer.o
+                                                  object-files/InterruptMeasurmentService.o
+TimerOverflowCnt                                  object-files/Timer.o
+                                                  object-files/InterruptMeasurmentService.o
+TimerOvlComp                                      object-files/InterruptMeasurmentService.o
+USART_Printk                                      object-files/init.o
+USART_pt                                          object-files/Hal.o
+Usart_init                                        object-files/usart_device.o
+                                                  object-files/Hal.o
+WaitTicks                                         object-files/conversion.o
+__aeabi_idiv0                                     c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+__aeabi_ldiv0                                     c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+__aeabi_uidiv                                     c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+__aeabi_uidivmod                                  c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+__bss_end__                                       object-files/cstartup_gnu.o
+__bss_start__                                     object-files/cstartup_gnu.o
+__div0                                            c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_dvmd_tls.o)
+                                                  c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+                                                  c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+__udivsi3                                         c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_udivsi3.o)
+                                                  object-files/conversion.o
+                                                  object-files/usart_device.o
+                                                  object-files/init.o
+__umodsi3                                         c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/interwork\libgcc.a(_umodsi3.o)
+                                                  object-files/conversion.o
+                                                  object-files/mci_device.o
+_start                                            object-files/cstartup_gnu.o
+errorstatus                                       object-files/Hal.o
+getTimerValue                                     object-files/Timer.o
+                                                  object-files/InterruptMeasurmentService.o
+globali                                           object-files/Hal.o
+globalj                                           object-files/Hal.o
+                                                  object-files/mci_device.o
+initTimer                                         object-files/Timer.o
+                                                  object-files/InterruptMeasurmentService.o
+main                                              object-files/main.o
+                                                  object-files/cstartup_gnu.o
+mci_sdcard                                        object-files/Hal.o
+mci_sdcard_desc                                   object-files/Hal.o
+mci_sdcard_info                                   object-files/Hal.o
+memcpy                                            c:/winarm/bin/../lib/gcc/arm-elf/4.1.1/../../../../arm-elf/lib/interwork\libc.a(memcpy.o)
+                                                  object-files/main.o
+printBuffer                                       object-files/Hal.o
+                                                  object-files/mci_device.o
+reader                                            object-files/Hal.o
+                                                  object-files/mci_device.o
+readytowriteonSD                                  object-files/Hal.o
+                                                  object-files/mci_device.o
+rtc_cal                                           object-files/Hal.o
+rtc_time                                          object-files/Hal.o
+toggleLed                                         object-files/led_device.o
+                                                  object-files/InterruptMeasurmentService.o
+usartBuffer1                                      object-files/Hal.o
+                                                  object-files/usart_device.o
+writer                                            object-files/Hal.o
+                                                  object-files/mci_device.o
