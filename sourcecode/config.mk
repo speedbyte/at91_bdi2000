@@ -11,7 +11,7 @@ VECTOR_LOCATION=VECTORS_IN_RAM  ## - Exception vectors in RAM:
 FORMAT = binary
 
 # target file name
-TARGET = project_win
+TARGET = at91_bdi2000
 
 
 MCU      = arm920t
