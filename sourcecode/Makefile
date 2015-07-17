@@ -126,8 +126,8 @@ clean_list :
 	$(REMOVE) $(TARGET).sym
 	$(REMOVE) $(TARGET).obd
 	$(REMOVE) $(addprefix $(SRCTREE)/,$(LST))
-	#$(REMOVE) -r .dep
-	#$(REMOVE) -r $(OBJTREE)
+#	$(REMOVE) -r .dep
+#	$(REMOVE) -r $(OBJTREE)
 
 # Listing of phony targets.
 .PHONY : all makevariables begin gccversion sizebefore build sizeafter finished end elf bin obd sym clean clean_list
