@@ -1,15 +1,23 @@
 # Define programs and commands.
-
+INSTALLPATH = c:/winarm-20060606/WinARM/bin/
+INSTALLPATH = 
 TOOLCHAIN = elf
 # Define programs and commands.
 SHELL 	= sh
-CC 		= arm-$(TOOLCHAIN)-gcc
-OBJCOPY = arm-$(TOOLCHAIN)-objcopy
+CC 		= $(INSTALLPATH)arm-$(TOOLCHAIN)-gcc
+OBJCOPY = $(INSTALLPATH)arm-$(TOOLCHAIN)-objcopy
+
+#objdump has a problem with the full windows path somehow and hence throws an error with
+#invalid argument.
 OBJDUMP = arm-$(TOOLCHAIN)-objdump
-SIZE 	= arm-$(TOOLCHAIN)-size
-NM 		= arm-$(TOOLCHAIN)-nm
+
+
+SIZE 	= $(INSTALLPATH)arm-$(TOOLCHAIN)-size
+NM 		= $(INSTALLPATH)arm-$(TOOLCHAIN)-nm
 REMOVE 	= rm -f
 COPY 	= cp
+
+OBJDUMP_EXE = c:/winarm-20060606/WinARM/arm-elf/bin/objdump.exe
 
 
 

@@ -1,4 +1,3 @@
-
 TOPDIR 		= $(CURDIR)
 OBJECT_DIR 	= object-files
 SOURCE_DIR 	= source
@@ -26,7 +25,11 @@ COBJARM   	= $(addprefix $(OBJTREE)/,$(SRCARM:.c=.o))
 LST 		= $(ASRCARM:.S=.lst) $(SRCARM:.c=.lst)
 
 # Default target.
-all: makevariables begin gccversion sizebefore build sizeafter finished end
+all: makevariables defaultshell begin makeversion gccversion sizebefore build sizeafter finished end
+
+defaultshell:
+	@echo
+	@sh --version
 
 
 begin:
@@ -37,6 +40,11 @@ begin:
 gccversion : 
 	@$(CC) --version
 	
+# Display make version information.
+makeversion : 
+	@make --version
+
+
 # Display size of file.
 BINSIZE 	= $(SIZE) --target=$(FORMAT) $(TARGET).bin
 ELFSIZE 	= $(SIZE) -A $(TARGET).elf
@@ -60,7 +68,7 @@ sym: $(TARGET).sym
 	@echo
 	@echo $(MSG_LINKING) $@
 	$(CC) $(ALL_CFLAGS) $(AOBJARM) $(COBJARM) --output $@ $(LDFLAGS)
-#	$(OBJCOPY) --strip-debug  $@ $@
+	$(OBJCOPY) --strip-debug  $@ $@
 
 # Compile: create object files from C source files. ARM-only
 $(COBJARM) : $(OBJTREE)/%.o : $(SRCTREE)/%.c
