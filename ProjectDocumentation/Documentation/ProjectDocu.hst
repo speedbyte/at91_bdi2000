@@ -1,0 +1,3 @@
+\def \vhCurrentVersion {1.1}
+\def \vhCurrentDate {18.07.15}
+\newsetsimple \vhAllAuthorsSet {Christian Wörz|Vikas Agrawal}
