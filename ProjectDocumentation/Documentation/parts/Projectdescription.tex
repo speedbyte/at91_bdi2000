@@ -70,17 +70,21 @@ The WinARM-package is collection of GNU and other ARM developing tools. It is su
 To get started with the WinARM package download an actual version (used one: \href{http://www.siwawi.arubi.uni-kl.de/avr_projects/arm_projects/WinARM-20060606.exe}{WinARM-20060606}) of the package, extract and install it. For best practice locate the files in system root (C:\textbackslash WinARM).\\
 Then the following lines needs to be added to the system variable "Path":
 \begin{itemize}
-	\item C:\textbackslash WinARM\textbackslash utils\textbackslash bin;
-	\item C:\textbackslash WinARM\textbackslash arm-elf\textbackslash bin;
-	\item C:\textbackslash WinARM\textbackslash bin;
+	\item C:\textbackslash WinARM\textbackslash utils\textbackslash bin; 	This inclusion would help to run make itself. There are also other executables such as sh, rm and cp.
+%	\item C:\textbackslash WinARM\textbackslash arm-elf\textbackslash bin;
+	\item C:\textbackslash WinARM\textbackslash bin; The below inclusion includes the binary files for the cross compiling of the arm microcontroller.
 \end{itemize}
 
 \section{Programmers Notepad 2}
-To be able to compile a program the \ac{PN2} need to be \textbf{run as Administrator}, otherwise the software does not have the right privileges to pass parameters to the compiler. Therefor right click on the \ac{PN2}.exe and select "Run as administrator". For the actual build the make-file hast to be opened inside the \ac{PN2} and then select "Tools" from the menu bar and click "Make all". This will generate all, by the make-file specified, files. The actual file-name for the output files is declared inside the "config.mk"-file as TARGET (in this project: {\textcolor{black}{TARGET}}= project\_win).\\
+The Programmers Notepad is nice to have to be able to run the make utility. However, it is advised to use the shell to invoke the make command. This can be done using Cygwin in the Windows environment. To understand how it can be run, please look at the description below.
+To be able to compile a program the \ac{PN2} need to be \textbf{run as Administrator}, otherwise the software does not have the right privileges to pass parameters to the compiler. Therefor right click on the \ac{PN2}.exe and select "Run as administrator". For the actual build the make-file hast to be opened inside the \ac{PN2} and then select "Tools" from the menu bar and click "Make all". This will generate all, by the make-file specified, files. The actual file-name for the output files is declared inside the "config.mk"-file as TARGET (in this project: {\textcolor{black}{TARGET}}= at91\_bdi2000).\\
+
+\section{Cygwin}
+Cygwin is the linux emulation. The arm-elf files are still present in the WinARM directory. As soon as the Windows Environment variable \textbf{PATH} is updated with the location of the binary files, the cygwin shell recognises it and all the arm commands can be run from inside there. In the project x86 has been used although the underlying chipset is x86\_64. The mirrors that has been used is \href{http://ftp-stud.hs-esslingen.de/pub/Mirrors/sources.redhat.com/cygwin/x86/}{FTP-HS-ESSLINGEN}. \\
 
 \section{TFTP-Server} 
 The \ac{TFTP} is a file transfer protocol and is used in the project to transfer the core configuration file to the BDI2000. One characteristic compared to a FTP-Server is, that the \ac{UDP} based \ac{TFTP} does not provide mechanism for authentication.\cite{TFTPWIKI}\\
-The \ac{TFTP}-Server is also used to transfer the compiled runnable to the Microcontroller. Therefor the \ac{TFTP}-Server should contain the flash and also the configuration file.\\
+The \ac{TFTP}-Server is also used to transfer the compiled runnable to the Microcontroller. Therefore the \ac{TFTP}-Server should contain the flash and also the configuration file. Cygwin has a built in \ac{TFTP}-Server and that has been used. \\
 
 \subsection{BDI-Configuration-File}
 Besides the initialization of flash, clocks and \ac{RAM}, the configuration file contains information about the target e.g. the \ac{CPU}-type.\\
@@ -89,13 +93,27 @@ The [HOST]-section (Listening \ref{CFGFile}) comprises the Host-IP. The \ac{TFTP
 [HOST]
 
 IP          10.0.0.100
-FILE	    	project_win.bin	
+FILE	    	at91_bdi2000.bin	
 FORMAT	    BIN 0x20000000
 LOAD        MANUAL      		;<AGENT> load VxWorks code MANUAL
 PROMPT      Chris@BDI>      ;new Telnet prompt
 DEBUGPORT   2001
 START	    	0x20000000
 \end{lstlisting}
+
+\section{Static IP} 
+Since the development environment is in the PC, the PC and the BDI2000 should be inside the same subnet to be able to transfer the files. Therefore both of them are provided an IP address that is in the same subnet i.e only the last digit varies. The PC has the subnet of 10.0.0.100. The gateway is 10.0.0.1 and the subnet is 255.255.255.0. These values have already been transferred to the BDI2000 using the serial port. In the projects case, the BDI2000 expects a file rm92000dk.cfg in the root directory of the TFPT server. \\
+
+\pagebreak
+
+\section{TFTP Configuration}
+The TFTP server or tftpd ( TFTP Daemon ) can be configured also using the cygwin tool. Following file needs to be edited with the following command \\
+\\
+\begin{tikzpicture}
+\node (rect) at (0,0) [draw, text width=10 cm, minimum height=10 cm]{};
+\node [below right, text width=10 cm] at (rect.north west)
+{ Sourcecode };
+\end{tikzpicture}
 
 
 
