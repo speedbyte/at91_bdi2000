@@ -1,0 +1,245 @@
+;Register definition for AT91x4
+;==============================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+sp		GPR	13
+lr		GPR	14
+pc		GPR	15
+;
+; User watchpoint register
+;
+wav0		ICEB    100
+wam0		ICEB    101
+wdv0		ICEB    102
+wdm0		ICEB    103
+wcv0		ICEB    104
+wcm0		ICEB    105
+;
+wav1		ICEB    110
+wam1		ICEB    111
+wdv1		ICEB    112
+wdm1		ICEB    113
+wcv1		ICEB    114
+wcm1		ICEB    115
+;
+; EBI: External Bus Interface
+;
+ebi_csr0	MM	0xFFE00000	32      ;Chip Select Register 0
+ebi_csr1	MM	0xFFE00004	32      ;Chip Select Register 1
+ebi_csr2	MM	0xFFE00008	32      ;Chip Select Register 2
+ebi_csr3	MM	0xFFE0000c	32      ;Chip Select Register 3
+ebi_csr4	MM	0xFFE00010	32      ;Chip Select Register 4
+ebi_csr5	MM	0xFFE00014	32      ;Chip Select Register 5
+ebi_csr6	MM	0xFFE00018	32      ;Chip Select Register 6
+ebi_csr7	MM	0xFFE0001c	32      ;Chip Select Register 7
+ebi_rcr 	MM	0xFFE00020	32      ;Remap Control Register
+ebi_mcr 	MM	0xFFE00024	32      ;Memory ControlRegister
+;
+; PS: Power-saving
+;
+ps_cr   	MM	0xFFFF4000	32      ;Control Register
+ps_pcer 	MM	0xFFFF4004	32      ;Peripheral Clock Enable Register
+ps_pcdr 	MM	0xFFFF4008	32      ;Peripheral Clock Disable Register
+ps_pcsr 	MM	0xFFFF400C	32      ;Peripheral Clock Status Register
+;
+; AIC: Advanced Interrupt Controller
+;
+aic_smr0   	MM	0xFFFFF000	32      ;Source Mode Registers
+aic_smr1   	MM	0xFFFFF004	32
+aic_smr2   	MM	0xFFFFF008	32
+aic_smr3   	MM	0xFFFFF00C	32
+aic_smr4   	MM	0xFFFFF010	32
+aic_smr5   	MM	0xFFFFF014	32
+aic_smr6   	MM	0xFFFFF018	32
+aic_smr7   	MM	0xFFFFF01C	32
+aic_smr8   	MM	0xFFFFF020	32
+aic_smr9   	MM	0xFFFFF024	32
+aic_smr10  	MM	0xFFFFF028	32
+aic_smr11  	MM	0xFFFFF02C	32
+aic_smr12  	MM	0xFFFFF030	32
+aic_smr13  	MM	0xFFFFF034	32
+aic_smr14  	MM	0xFFFFF038	32
+aic_smr15  	MM	0xFFFFF03C	32
+aic_smr16  	MM	0xFFFFF040	32
+aic_smr17  	MM	0xFFFFF044	32
+aic_smr18  	MM	0xFFFFF048	32
+aic_smr19  	MM	0xFFFFF04C	32
+aic_smr20  	MM	0xFFFFF050	32
+aic_smr21  	MM	0xFFFFF054	32
+aic_smr22  	MM	0xFFFFF058	32
+aic_smr23  	MM	0xFFFFF05C	32
+aic_smr24  	MM	0xFFFFF060	32
+aic_smr25  	MM	0xFFFFF064	32
+aic_smr26  	MM	0xFFFFF068	32
+aic_smr27  	MM	0xFFFFF06C	32
+aic_smr28  	MM	0xFFFFF070	32
+aic_smr29  	MM	0xFFFFF074	32
+aic_smr30  	MM	0xFFFFF078	32
+aic_smr31  	MM	0xFFFFF07C	32
+;
+aic_svr0   	MM	0xFFFFF080	32      ;Source Vector Registers
+aic_svr1   	MM	0xFFFFF084	32
+aic_svr2   	MM	0xFFFFF088	32
+aic_svr3   	MM	0xFFFFF08C	32
+aic_svr4   	MM	0xFFFFF090	32
+aic_svr5   	MM	0xFFFFF094	32
+aic_svr6   	MM	0xFFFFF098	32
+aic_svr7   	MM	0xFFFFF09C	32
+aic_svr8   	MM	0xFFFFF0A0	32
+aic_svr9   	MM	0xFFFFF0A4	32
+aic_svr10  	MM	0xFFFFF0A8	32
+aic_svr11  	MM	0xFFFFF0AC	32
+aic_svr12  	MM	0xFFFFF0B0	32
+aic_svr13  	MM	0xFFFFF0B4	32
+aic_svr14  	MM	0xFFFFF0B8	32
+aic_svr15  	MM	0xFFFFF0BC	32
+aic_svr16  	MM	0xFFFFF0C0	32
+aic_svr17  	MM	0xFFFFF0C4	32
+aic_svr18  	MM	0xFFFFF0C8	32
+aic_svr19  	MM	0xFFFFF0CC	32
+aic_svr20  	MM	0xFFFFF0D0	32
+aic_svr21  	MM	0xFFFFF0D4	32
+aic_svr22  	MM	0xFFFFF0D8	32
+aic_svr23  	MM	0xFFFFF0DC	32
+aic_svr24  	MM	0xFFFFF0E0	32
+aic_svr25  	MM	0xFFFFF0E4	32
+aic_svr26  	MM	0xFFFFF0E8	32
+aic_svr27  	MM	0xFFFFF0EC	32
+aic_svr28  	MM	0xFFFFF0F0	32
+aic_svr29  	MM	0xFFFFF0F4	32
+aic_svr30  	MM	0xFFFFF0F8	32
+aic_svr31  	MM	0xFFFFF0FC	32
+;
+aic_ivr    	MM	0xFFFFF100	32      ;IRQ Vector Register
+aic_fvr    	MM	0xFFFFF104	32      ;FIQ Vector Register
+aic_isr    	MM	0xFFFFF108	32      ;Interrupt Status Register
+aic_ipr    	MM	0xFFFFF10C	32      ;Interrupt Pending Register
+aic_imr    	MM	0xFFFFF110	32      ;Interrupt Mask Register
+aic_cisr   	MM	0xFFFFF114	32      ;Core Interrupt Status Register
+aic_iecr   	MM	0xFFFFF120	32      ;Interrupt Enable Command Register
+aic_idcr   	MM	0xFFFFF124	32      ;Interrupt Disable Command Register
+aic_iccr   	MM	0xFFFFF128	32      ;Interrupt Clear Command Register
+aic_iscr   	MM	0xFFFFF12C	32      ;Interrupt Set Command Register
+aic_eoicr  	MM	0xFFFFF130	32      ;End of Interrupt Command Register
+aic_spu    	MM	0xFFFFF134	32      ;Spurious Vector Register
+;
+; PIO: Parallel I/O Controller
+;
+pio_per  	MM	0xFFFF0000	32      ;PIO Enable Register
+pio_pdr  	MM	0xFFFF0004	32      ;PIO Disable Register
+pio_psr  	MM	0xFFFF0008	32      ;PIO Status Register
+pio_oer  	MM	0xFFFF0010	32      ;Output Enable Register
+pio_odr  	MM	0xFFFF0014	32      ;Output Disable Register
+pio_osr  	MM	0xFFFF0018	32      ;Output Status Register
+pio_ifer 	MM	0xFFFF0020	32      ;Input Filter Enable Register
+pio_ifdr 	MM	0xFFFF0024	32      ;Input Filter Disable Register
+pio_ifsr 	MM	0xFFFF0028	32      ;Input Filter Status Register
+pio_sodr 	MM	0xFFFF0030	32      ;Set Output Data Register
+pio_codr 	MM	0xFFFF0034	32      ;Clear Output Data Register
+pio_odsr 	MM	0xFFFF0038	32      ;Output Data Status Register
+pio_pdsr 	MM	0xFFFF003C	32      ;Pin Data Status Register
+pio_ier  	MM	0xFFFF0040	32      ;Interrupt Enable Register
+pio_idr  	MM	0xFFFF0044	32      ;Interrupt Disable Register
+pio_imr  	MM	0xFFFF0048	32      ;Interrupt Mask Register
+pio_isr  	MM	0xFFFF004C	32      ;Interrupt Status Register
+;
+; WD: Watchdog Timer
+;
+wd_omr   	MM	0xFFFF8000	32      ;Overflow Mode Register
+wd_cmr   	MM	0xFFFF8004	32      ;Clock Mode Register
+wd_cr    	MM	0xFFFF8008	32      ;Control Register
+wd_sr    	MM	0xFFFF800C	32      ;Status Register
+;
+; SF: Special Function Registers
+;
+sf_cidr  	MM	0xFFF00000	32      ;Chip ID Register
+sf_exid  	MM	0xFFF00004	32      ;Chip ID Extension Register
+sf_rsr   	MM	0xFFF00008	32      ;Reset Status Register
+sf_mmr   	MM	0xFFF0000C	32      ;Memory Mode Register
+sf_pmr   	MM	0xFFF00018	32      ;Protect Mode Register
+;
+; USART: Universal Synchronous/Asynchronous Receiver/Transmitter
+;
+us0_cr   	MM	0xFFFD0000	32      ;Control Register
+us0_mr   	MM	0xFFFD0004	32      ;Mode Register
+us0_ier  	MM	0xFFFD0008	32      ;Interrupt Enable Register
+us0_idr  	MM	0xFFFD000C	32      ;Interrupt Disable Register
+us0_imr  	MM	0xFFFD0010	32      ;Interrupt Mask Register
+us0_csr  	MM	0xFFFD0014	32      ;Channel Status Register
+us0_rhr  	MM	0xFFFD0018	32      ;Receiver Holding Register
+us0_thr  	MM	0xFFFD001C	32      ;Transmitter Holding Register
+us0_brgr 	MM	0xFFFD0020	32      ;Baud Rate Generator Register
+us0_rtor 	MM	0xFFFD0024	32      ;Receiver Time-out Register
+us0_ttgr 	MM	0xFFFD0028	32      ;Transmitter Time-guard Register
+us0_rpr  	MM	0xFFFD0030	32      ;Receive Pointer Register
+us0_rcr  	MM	0xFFFD0034	32      ;Receive Counter Register
+us0_tpr  	MM	0xFFFD0038	32      ;Transmit Pointer Register
+us0_tcr  	MM	0xFFFD003C	32      ;Transmit Counter Register
+;
+us1_cr   	MM	0xFFFCC000	32      ;Control Register
+us1_mr   	MM	0xFFFCC004	32      ;Mode Register
+us1_ier  	MM	0xFFFCC008	32      ;Interrupt Enable Register
+us1_idr  	MM	0xFFFCC00C	32      ;Interrupt Disable Register
+us1_imr  	MM	0xFFFCC010	32      ;Interrupt Mask Register
+us1_csr  	MM	0xFFFCC014	32      ;Channel Status Register
+us1_rhr  	MM	0xFFFCC018	32      ;Receiver Holding Register
+us1_thr  	MM	0xFFFCC01C	32      ;Transmitter Holding Register
+us1_brgr 	MM	0xFFFCC020	32      ;Baud Rate Generator Register
+us1_rtor 	MM	0xFFFCC024	32      ;Receiver Time-out Register
+us1_ttgr 	MM	0xFFFCC028	32      ;Transmitter Time-guard Register
+us1_rpr  	MM	0xFFFCC030	32      ;Receive Pointer Register
+us1_rcr  	MM	0xFFFCC034	32      ;Receive Counter Register
+us1_tpr  	MM	0xFFFCC038	32      ;Transmit Pointer Register
+us1_tcr  	MM	0xFFFCC03C	32      ;Transmit Counter Register
+;
+; TC: Timer Counter
+;
+tc0_ccr  	MM	0xFFFE0000	32      ;Channel Control Register
+tc0_cmr  	MM	0xFFFE0004	32      ;Channel Mode Register
+tc0_cv   	MM	0xFFFE0010	32      ;Counter Value
+tc0_ra   	MM	0xFFFE0014	32      ;Register A
+tc0_rb   	MM	0xFFFE0018	32      ;Register B
+tc0_rc   	MM	0xFFFE001C	32      ;Register C
+tc0_sr   	MM	0xFFFE0020	32      ;Status Register
+tc0_ier  	MM	0xFFFE0024	32      ;Interrupt Enable Register
+tc0_idr  	MM	0xFFFE0028	32      ;Interrupt Disable Register
+tc0_imr  	MM	0xFFFE002C	32      ;Interrupt Mask Register
+;
+tc1_ccr  	MM	0xFFFE0040	32      ;Channel Control Register
+tc1_cmr  	MM	0xFFFE0044	32      ;Channel Mode Register
+tc1_cv   	MM	0xFFFE0050	32      ;Counter Value
+tc1_ra   	MM	0xFFFE0054	32      ;Register A
+tc1_rb   	MM	0xFFFE0058	32      ;Register B
+tc1_rc   	MM	0xFFFE005C	32      ;Register C
+tc1_sr   	MM	0xFFFE0060	32      ;Status Register
+tc1_ier  	MM	0xFFFE0064	32      ;Interrupt Enable Register
+tc1_idr  	MM	0xFFFE0068	32      ;Interrupt Disable Register
+tc1_imr  	MM	0xFFFE006C	32      ;Interrupt Mask Register
+;
+tc2_ccr  	MM	0xFFFE0080	32      ;Channel Control Register
+tc2_cmr  	MM	0xFFFE0084	32      ;Channel Mode Register
+tc2_cv   	MM	0xFFFE0090	32      ;Counter Value
+tc2_ra   	MM	0xFFFE0094	32      ;Register A
+tc2_rb   	MM	0xFFFE0098	32      ;Register B
+tc2_rc   	MM	0xFFFE009C	32      ;Register C
+tc2_sr   	MM	0xFFFE00A0	32      ;Status Register
+tc2_ier  	MM	0xFFFE00A4	32      ;Interrupt Enable Register
+tc2_idr  	MM	0xFFFE00A8	32      ;Interrupt Disable Register
+tc2_imr  	MM	0xFFFE00AC	32      ;Interrupt Mask Register
+;
+tc_bcr   	MM	0xFFFE00C0	32      ;TC Block Control Register
+tc_bmr   	MM	0xFFFE00C4	32      ;TC Block Mode Register
+

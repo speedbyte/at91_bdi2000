@@ -1,0 +1,57 @@
+;Register definition for LPC2100
+;===============================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+sp		GPR	13
+lr		GPR	14
+pc		GPR	15
+;
+; User watchpoint register
+;
+wav0		ICEB    100
+wam0		ICEB    101
+wdv0		ICEB    102
+wdm0		ICEB    103
+wcv0		ICEB    104
+wcm0		ICEB    105
+;
+wav1		ICEB    110
+wam1		ICEB    111
+wdv1		ICEB    112
+wdm1		ICEB    113
+wcv1		ICEB    114
+wcm1		ICEB    115
+;
+; Watchdog
+;
+wdmod   	MM	0xE0000000	8
+wdtc    	MM	0xE0000004	32
+wdtv    	MM	0xE000000C	32
+;
+; System Control Block
+;
+extint  	MM	0xE01FC140	8
+extwake 	MM	0xE01FC144	8
+memmap  	MM	0xE01FC040	8
+pllcon  	MM	0xE01FC080	8
+pllcfg  	MM	0xE01FC084	8
+pllstat 	MM	0xE01FC088	16
+pllfeed 	MM	0xE01FC08C	8
+pcon    	MM	0xE01FC0C0	8
+pconp   	MM	0xE01FC0C4	32
+vpbdiv  	MM	0xE01FC100	8
+;
+

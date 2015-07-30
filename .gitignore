@@ -8,3 +8,15 @@
 *.sym
 *.map
 *.elf
+
+# LATEX
+*.aux
+*.hst
+*.lof
+*.lol
+*.lot
+*.nlo
+*.out
+*.toc
+*.ver
+*.synctex

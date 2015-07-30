@@ -1,0 +1,100 @@
+#--------------------------------------------------------------------------------------
+#      ATMEL Microcontroller Software Support  -  ROUSSET  -
+#--------------------------------------------------------------------------------------
+# The software is delivered "AS IS" without warranty or condition of any
+# kind, either express, implied or statutory. This includes without
+# limitation any warranty or condition with respect to merchantability or
+# fitness for any particular purpose, or against the infringements of
+# intellectual property rights of others.
+#--------------------------------------------------------------------------------------
+# File Name           : mpserv_9200_dk-ek_PLLdbs
+# Object              : Setup script for the Atmel AT91RM9200 board (Green Hills probes) 
+#			with specifc board  and PLL initialisation
+#
+# 1.1 05/Mars/05 NC   : Creation
+#--------------------------------------------------------------------------------------
+# This is an empty place holder Setup Script for setting up an AT91RM9200 board
+# for running programs.
+
+# Set target need only the first connection for Green Hills probes setting
+set target arm9tdmi
+set
+
+# Reset the processor
+print Reset JTAG
+jr
+rst run
+halt
+
+# Disable wchdog timers?
+
+# Disable the cache?
+
+
+Print Setup memory
+# REMAP memories, Internal SRAM => 0x000000000 and Internal ROM => 0X00100000
+m 0xFFFFFF00=0x00000001
+
+# EBI chip select Assignement SDRAM and Flash
+m FFFFFF60=0x00000002
+
+# Print set PIOC as peripheral
+m 0xFFFFF804=0xFFFF0000
+# Print set EBI cs for sdram and Flash
+m 0xFFFFFF60=0x00000002
+m 0xFFFFFF70=0x00003285
+
+# Print Init SDRAM
+m 0xFFFFFF98=0x2188c155
+m 0xFFFFFF90=0x00000002
+m 0x20000000=0x00000000
+m 0xFFFFFF90=0x00000004
+m 0x20000000=0x00000000
+m 0x20000000=0x00000000
+m 0x20000000=0x00000000
+m 0x20000000=0x00000000
+m 0x20000000=0x00000000
+m 0x20000000=0x00000000
+m 0x20000000=0x00000000
+m 0x20000000=0x00000000
+m 0xFFFFFF90=0x00000003
+m 0x20000080=0x00000000
+m 0xFFFFFF94=0x000002e0
+m 0x20000000=0x00000000
+m 0xFFFFFF90=0x00000000
+m 0x20000000=0x00000000
+
+
+#PLL initialisation
+m 0xFFFFFC20=0x0000FF01
+m 0xFFFFFC64=0xFFFFFFFF
+# 18.432Mhz quartz
+m 0xFFFFFC28=0x2026BE04
+
+#Master Clock is  PLLA/3 
+m 0xFFFFFC30=0x00000202
+
+sleep 1
+#set EBI cs for sdram
+m 0xFFFFFF60=0x00000002
+m 0xFFFFFF70=0x00003284
+
+# Set All register for RESET
+print Reset Register
+reg r0 0x0
+reg r1 0x0
+reg r2 0x0
+reg r3 0x0
+reg r4 0x0
+reg r5 0x0
+reg r6 0x0
+reg r7 0x0
+reg r8 0x0
+reg r9 0x0
+reg r10 0x0
+reg r11 0x0
+reg r12 0x0
+reg sp 0x0
+reg lr 0x0
+reg pc 0x0200000
+reg cpsr 0xd3

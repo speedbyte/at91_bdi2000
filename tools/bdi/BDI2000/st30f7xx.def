@@ -1,0 +1,70 @@
+;Register definition for ST30F7xx
+;================================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+sp		GPR	13
+lr		GPR	14
+pc		GPR	15
+r0		GPR     0
+r1		GPR     1
+r2		GPR     2
+r3		GPR     3
+r4		GPR     4
+r5		GPR     5
+r6		GPR     6
+r7		GPR     7
+r8		GPR     8
+r9		GPR     9
+r10		GPR     10
+r11		GPR     11
+r12		GPR     12
+;
+;
+; Configuration Registers
+;
+tor   		MM	0x20000000	32
+prior 		MM	0x20000004	32
+ctlr  		MM	0x2000000C	32
+cfgr0 		MM	0x40000000	32
+eipr  		MM	0x40000004	32
+prcg0 		MM	0x40000008	32
+prcg1 		MM	0x4000000C	32
+pecg0 		MM	0x40000010	32
+pecg1 		MM	0x40000014	32
+;
+;
+; Reset and Clock Control Unit (RCCU)
+;
+clkctl 		MM	0x60000000	32
+vrctl  		MM	0x60000004	32
+clk_flag	MM	0x60000008	32
+pllconf		MM	0x60000018	32
+sysmode		MM	0x60000020	32
+rtcp   		MM	0x60000028	32
+;
+;
+; On-chip flash memory registers
+;
+fcr0 		MM	0x80100000	32
+fcr1 		MM	0x80100004	32
+fdr0 		MM	0x80100008	32
+fdr1 		MM	0x8010000C	32
+far  		MM	0x80100010	32
+fer  		MM	0x80100014	32
+fnvwpar 	MM	0x8010DFB0	32
+fnvapr0 	MM	0x8010DFB8	32
+fnvapr1 	MM	0x8010DFBC	32
+

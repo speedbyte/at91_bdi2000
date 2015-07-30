@@ -1,0 +1,64 @@
+;Register definition for AT91SAM7S
+;=================================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+sp		GPR	13
+lr		GPR	14
+pc		GPR	15
+;
+;
+; Embedded Flash Controller
+;
+mc_fmr  	MM	0xFFFFFF60	32
+mc_fcr  	MM	0xFFFFFF64	32
+mc_fsr  	MM	0xFFFFFF68	32
+;
+; Watchdog Timer
+;
+wdt_cr  	MM	0xFFFFFD40	32
+wdt_mr  	MM	0xFFFFFD44	32
+wdt_sr  	MM	0xFFFFFD48	32
+;
+; Reset Controller
+;
+rstc_cr 	MM	0xFFFFFD00	32
+rstc_sr 	MM	0xFFFFFD04	32
+rstc_mr 	MM	0xFFFFFD08	32
+;
+; Power Management Controller
+;
+pmc_scer	MM	0xFFFFFC00	32
+pmc_scdr	MM	0xFFFFFC04	32
+pmc_scsr	MM	0xFFFFFC08	32
+pmc_pcer	MM	0xFFFFFC10	32
+pmc_pcdr	MM	0xFFFFFC14	32
+pmc_pcsr	MM	0xFFFFFC18      32
+ckgr_mor	MM	0xFFFFFC20	32
+ckgr_mcfr       MM	0xFFFFFC24	32
+ckgr_pllr       MM	0xFFFFFC2C	32
+pmc_mckr	MM	0xFFFFFC30	32
+pmc_pck0	MM	0xFFFFFC40	32
+pmc_pck1	MM	0xFFFFFC44	32
+pmc_ier 	MM	0xFFFFFC60	32
+pmc_idr 	MM	0xFFFFFC64	32
+pmc_sr          MM	0xFFFFFC68	32
+pmc_imr 	MM	0xFFFFFC6C	32
+
+
+
+
+
+

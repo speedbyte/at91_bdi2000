@@ -1,1 +1,0 @@
-tftpsrv.exe p w

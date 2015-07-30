@@ -1,0 +1,24 @@
+#!/bin/sh
+echo Hello
+
+if [ $1 == "show" ]
+then echo running
+	./bdisetup -v -s
+
+else 
+	if test $1 == 'reconfigure'
+		then 
+		./bdisetup -c  -p/dev/ttyS0 -b115 -i192.168.111.202 -h192.168.111.132 -frm9200dk.cfg
+		./bdisetup -v -p/dev/ttyS0 -b115 -s
+	else
+		if test $1 == 'scratch'
+			then 
+			./bdisetup -e
+			./bdisetup -u  -p/dev/ttyS0 -b115 -aGDB -tARM
+			./bdisetup -c  -p/dev/ttyS0 -b115 -i192.168.111.202 -h192.168.111.132 -frm9200dk.cfg
+			./bdisetup -v -p/dev/ttyS0 -b115 -s
+		else 
+			echo  'commands available are reconfigure, scratch'
+fi
+fi
+fi

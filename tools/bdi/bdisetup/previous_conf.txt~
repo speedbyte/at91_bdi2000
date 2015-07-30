@@ -1,0 +1,11 @@
+guitar@debian:~/Current/bdisetup$ ./bdisetup -v
+BDI Type : BDI2000 Rev.C (SN: 97890410)
+Loader   : V1.05
+Firmware : V1.18 bdiGDB for ARM
+Logic    : V1.06 ARM
+MAC      : 00-0c-01-97-89-04
+IP Addr  : 192.168.111.250
+Subnet   : 255.255.255.0
+Gateway  : 255.255.255.255
+Host IP  : 255.255.255.255
+Config   :

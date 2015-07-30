@@ -1,0 +1,89 @@
+;Register definition for ARM920T
+;===============================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	CP15	CP15 register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;
+; CP15 Registers Numbers for 920T:
+;
+; Via JTAG, CP15 registers are accessed either direct (physical access mode)
+; or via interpreted MCR/MRC instructions.
+; Read also ARM920T manual, part "Debug Support - Scan Chain 15".
+;
+; Register number for physical access mode (bit 12 = 0):
+;
+;       +-----+-+-----+-+-----+-+-------+
+;       |0 0 0|0|0 0 0|i|0 0 0|x|  nbr  |
+;       +-----+-+-----+-+-----+-+-------+
+;
+; The bit "i" selects the instruction cache (scan chain bit 33), the bit "x" extends access to register 15
+; (scan chain bit 38).
+;
+; Register number for interpreted access mode (bit 12 = 1):
+;       +-----+-+-------+-----+-+-------+
+;       |opc_2|1|  CRm  |opc_1|0|  nbr  |
+;       +-----+-+-------+-----+-+-------+
+; The 16bit register number is used to build the appropriate MCR/MRC instruction.
+;
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+id		CP15    0x0000          32      ;ID code
+cache   	CP15    0x0100          32      ;Cache type
+control 	CP15    0x0001          32      ;Control
+dlock   	CP15    0x0009          32      ;data lockdown register
+ilock   	CP15    0x0109          32      ;instruction lockdown register
+process   	CP15    0x000d          32      ;process ID
+;
+;wittb     	CP15    0x51af          32      ;write inst TTB
+rittb     	CP15    0x51af          32      ;read  inst TTB
+;wdttb     	CP15    0x52af          32      ;write data TTB
+rdttb     	CP15    0x12a2          32      ;read  data TTB
+;
+;widac     	CP15    0x71af          32      ;write inst DAC
+ridac     	CP15    0x71af          32      ;read  inst DAC
+;wddac     	CP15    0x72af          32      ;write data DAC
+rddac     	CP15    0x1003          32      ;read  data DAC
+;
+ifsr     	CP15    0x3005          32      ;read/write inst FSR
+dfsr     	CP15    0x1005          32      ;read/write data FSR
+;
+ifar     	CP15    0x3006          32      ;read/write inst FAR
+dfar     	CP15    0x1006          32      ;read/write data FAR
+;
+;
+;       Memory controller
+;
+bwscon          MM      0x14000000
+bankcon0        MM      0x14000004
+bankcon1        MM      0x14000008
+bankcon2        MM      0x1400000c
+bankcon3        MM      0x14000010
+bankcon4        MM      0x14000014
+bankcon5        MM      0x14000018
+bankcon6        MM      0x1400001c
+bankcon7        MM      0x14000020
+refresh         MM      0x14000024
+banksize        MM      0x14000028
+mrsrb6          MM      0x1400002c
+mrsrb7          MM      0x14000030
+;
+;
+;       Watch-Dog Timer
+;
+wtcon           MM      0x15300000
+wtdat           MM      0x15300004
+wtcnt           MM      0x15300008
+;
+

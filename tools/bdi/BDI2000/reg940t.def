@@ -1,0 +1,59 @@
+;Register definition for ARM940T
+;===============================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	CP15	CP15 register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+;
+; CP15 Registers
+;
+;  Numbers for 940T:
+;  +-------+-------+-------+-------+
+;  | | | | | | | | | | | | | | | | |
+;  +-------+-----+-+-----+-+-------+ i = instruction (bit 32)
+;  |0 0 0 0|0 0 0|i|0 0 0|x|  nbr  | x = reg 6 extension (bit 37)
+;  +-------+-----+-+-----+-+-------+
+;
+;
+id		CP15    0x0000          32      ;ID code
+cache   	CP15    0x0100          32      ;Cache type
+control 	CP15    0x0001          32      ;Control
+dcen    	CP15    0x0002          32      ;data cacheable register
+icen    	CP15    0x0102          32      ;instruction cacheable register
+wben    	CP15    0x0003          32      ;write buffer control register
+dprot   	CP15    0x0005          32      ;data protection register
+iprot   	CP15    0x0105          32      ;instruction protection register
+dlock   	CP15    0x0009          32      ;data lockdown register
+ilock   	CP15    0x0109          32      ;instruction lockdown register
+;
+dpr0    	CP15    0x0010          32      ;data protection region 0
+dpr1    	CP15    0x0011          32      ;data protection region 1
+dpr2    	CP15    0x0012          32      ;data protection region 2
+dpr3    	CP15    0x0013          32      ;data protection region 3
+dpr4    	CP15    0x0014          32      ;data protection region 4
+dpr5    	CP15    0x0015          32      ;data protection region 5
+dpr6    	CP15    0x0016          32      ;data protection region 6
+dpr7    	CP15    0x0017          32      ;data protection region 7
+;
+ipr0    	CP15    0x0110          32      ;instruction protection region 0
+ipr1    	CP15    0x0111          32      ;instruction protection region 1
+ipr2    	CP15    0x0112          32      ;instruction protection region 2
+ipr3    	CP15    0x0113          32      ;instruction protection region 3
+ipr4    	CP15    0x0114          32      ;instruction protection region 4
+ipr5    	CP15    0x0115          32      ;instruction protection region 5
+ipr6    	CP15    0x0116          32      ;instruction protection region 6
+ipr7    	CP15    0x0117          32      ;instruction protection region 7
+
+

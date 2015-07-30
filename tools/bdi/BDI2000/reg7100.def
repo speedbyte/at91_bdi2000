@@ -1,0 +1,155 @@
+;Register definition for MAC7100
+;===============================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+sp		GPR	13
+lr		GPR	14
+pc		GPR	15
+;
+; User watchpoint register
+;
+wav0		ICEB    100
+wam0		ICEB    101
+wdv0		ICEB    102
+wdm0		ICEB    103
+wcv0		ICEB    104
+wcm0		ICEB    105
+;
+wav1		ICEB    110
+wam1		ICEB    111
+wdv1		ICEB    112
+wdm1		ICEB    113
+wcv1		ICEB    114
+wcm1		ICEB    115
+;
+; CFM: Common Flash Module
+;
+cfmmcr  	MM	0xFC0F0000	16
+cfmclkd 	MM	0xFC0F0002	8
+cfmsec  	MM	0xFC0F0008	32
+cfmprot 	MM	0xFC0F0010	32
+cfmsacc 	MM	0xFC0F0014	32
+cfmdacc 	MM	0xFC0F0018	32
+cfmustat	MM	0xFC0F0020	8
+cfmcmd  	MM	0xFC0F0024	8
+cfmdfprot       MM	0xFC0F0044	8
+cfmdfsacc       MM	0xFC0F0045	8
+cfmdfdacc       MM	0xFC0F0046	8
+;
+; External Interface Module (EIM)
+;
+csar0     	MM	0xFC008080	16
+csmr0     	MM	0xFC008084	32
+cscr0     	MM	0xFC00808A	16
+csar1     	MM	0xFC00808C	16
+csmr1     	MM	0xFC008090	32
+cscr1     	MM	0xFC008096	16
+csar2     	MM	0xFC008098	16
+csmr2     	MM	0xFC00809C	32
+cscr2     	MM	0xFC0080A2	16
+;
+; Clock and Reset Generator (CRG)
+;
+synr      	MM	0xFC088000	8
+refdv     	MM	0xFC088001	8
+crgflg    	MM	0xFC088003	8
+crgint    	MM	0xFC088004	8
+clksel    	MM	0xFC088005	8
+pllctl    	MM	0xFC088006	8
+sdmctl    	MM	0xFC088007	8
+bdmctl    	MM	0xFC088008	8
+;
+; Interrupt Controller (INTC)
+;
+iprh     	MM	0xFC048000	32
+iprl     	MM	0xFC048004	32
+imrh     	MM	0xFC048008	32
+imrl     	MM	0xFC04800c	32
+intfrch  	MM	0xFC048010	32
+intfrcl  	MM	0xFC048014	32
+iconfig  	MM	0xFC04801B	8
+simr  	        MM	0xFC04801C	8
+cimr  	        MM	0xFC04801D	8
+clmask  	MM	0xFC04801E	8
+slmask  	MM	0xFC04801E	8
+;
+icr0            MM	0xFC048040	8
+icr1            MM	0xFC048041	8
+icr2            MM	0xFC048042	8
+icr3            MM	0xFC048043	8
+icr4            MM	0xFC048044	8
+icr5            MM	0xFC048045	8
+icr6            MM	0xFC048046	8
+icr7            MM	0xFC048047      8
+icr8            MM	0xFC048048	8
+icr9            MM	0xFC048049      8
+icr10           MM	0xFC04804A	8
+icr11           MM	0xFC04804B	8
+icr12           MM	0xFC04804C	8
+icr13           MM	0xFC04804D	8
+icr14           MM	0xFC04804E	8
+icr15           MM	0xFC04804F	8
+icr16           MM	0xFC048050	8
+icr17           MM	0xFC048051	8
+icr18           MM	0xFC048052	8
+icr19           MM	0xFC048053	8
+icr20           MM	0xFC048054	8
+icr21           MM	0xFC048055	8
+icr22           MM	0xFC048056	8
+icr23           MM	0xFC048057	8
+icr24           MM	0xFC048058	8
+icr25           MM	0xFC048059	8
+icr26           MM	0xFC04805A	8
+icr27           MM	0xFC04805B	8
+icr28           MM	0xFC04805C	8
+icr29           MM	0xFC04805D	8
+icr30           MM	0xFC04805E	8
+icr31           MM	0xFC04805F	8
+icr32           MM	0xFC048060	8
+icr33           MM	0xFC048061	8
+icr34           MM	0xFC048062	8
+icr35           MM	0xFC048063	8
+icr36           MM	0xFC048064	8
+icr37           MM	0xFC048065	8
+icr38           MM	0xFC048066	8
+icr39           MM	0xFC048067	8
+icr40           MM	0xFC048068	8
+icr41           MM	0xFC048069	8
+icr42           MM	0xFC04806A	8
+icr43           MM	0xFC04806B	8
+icr44           MM	0xFC04806C	8
+icr45           MM	0xFC04806D	8
+icr46           MM	0xFC04806E	8
+icr47           MM	0xFC04806F	8
+icr48           MM	0xFC048070	8
+icr49           MM	0xFC048071	8
+icr50           MM	0xFC048072	8
+icr51           MM	0xFC048073	8
+icr52           MM	0xFC048074	8
+icr53           MM	0xFC048075	8
+icr54           MM	0xFC048076	8
+icr55           MM	0xFC048077	8
+icr56           MM	0xFC048078	8
+icr57           MM	0xFC048079	8
+icr58           MM	0xFC04807A	8
+icr59           MM	0xFC04807B	8
+icr60           MM	0xFC04807C	8
+icr61           MM	0xFC04807D	8
+icr62           MM	0xFC04807E	8
+icr63           MM	0xFC04807F	8
+;
+irqiack         MM	0xFC0480EC	8
+fiqiack         MM	0xFC0480F0	8

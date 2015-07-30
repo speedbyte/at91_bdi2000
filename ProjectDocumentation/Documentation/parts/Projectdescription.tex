@@ -84,7 +84,20 @@ Cygwin is the linux emulation. The arm-elf files are still present in the WinARM
 
 \section{TFTP-Server} 
 The \ac{TFTP} is a file transfer protocol and is used in the project to transfer the core configuration file to the BDI2000. One characteristic compared to a FTP-Server is, that the \ac{UDP} based \ac{TFTP} does not provide mechanism for authentication.\cite{TFTPWIKI}\\
-The \ac{TFTP}-Server is also used to transfer the compiled runnable to the Microcontroller. Therefore the \ac{TFTP}-Server should contain the flash and also the configuration file. Cygwin has a built in \ac{TFTP}-Server and that has been used. \\
+The \ac{TFTP}-Server is also used to transfer the compiled runnable to the Microcontroller. Therefore the \ac{TFTP}-Server should contain the flash and also the configuration file. Cygwin has a built in \ac{TFTP}-Server and that has been used. The default port of TFTP Server is 69.\\
+To test if the TFTP server is running on your computer, you need to install the tftp client packet under Cygwin. It is simply known as tftp. If you do man tftp, then a man page should open with all the options and in the man page you will see that its a client.
+There is also a tftp-server which runs as a daemon ( tftpd ). The configuration file can be found under inet.d/tftp or xinet.d/tftp. The one under inet.d is for the user and the other is for the superuser i.e parameters under inet.d can be overridden.\\
+However we will use another server. This can be installed by clicking on the exe file TFTPGui. This is written in python and has a very nice interface. \\
+Once TFTPGui is started, start the server at 10.0.0.100 and you will see in the log windows that the server has started listening on the port 69. From Cygwin read any data. Type tftp and then connect 10.0.0.100 and then get readme.txt. You should now see a readme.txt in the same folder.\\
+This worked great because the transfer is done internally i.e the files doesnt have to leave the computer. However, if we are using an ethernet port, then we need to configure the firewall as well so that the TFTPGui.exe although listening on the port 69, receives a command to get the file from its tftproot folder.\\
+There are various ways to check if the port is being blocked by the firewall. First of all check if the port is up and running i.e there must be any program which have started to listen on the port. To test this run TFTPGui.exe and run netstat -an. You will see an entry with the port 69 under the UDP section i.e 0.0.0.0:69 as local address and *.* as foreign address. This means that this port is open and can invite any foreign address. If you stop TFTPGui.exe this line should disappear.\\
+The next is start the logging option. The can be done by going to the Windows Firewall Advanced Security and then click on Firewall Properties. Over there, under the option Logging, you have to enable Dropped packets. The log file can be found under System32->LogFiles->Firewall->plogifle.log. The BDI2000 stores the configuration file internally. Hence to test the behaviour of a unsuccessful connection after a connection has been established once, you have to power off the BDI2000.\\
+Also it is important to note, that if you are using a USB Ethernet or any other device, the profile of that device is not the same as the Ethernet port. It means, you might be connected to the companys network and the profile is either Domain or Private. Changing the firewall settings of the program for the private network wont work as the request for a connection is being received on the USB Ethernet and that is configured to be public.\\
+
+tftp\\
+connect 10.0.0.100\\
+get readme.txt\\
+
 
 \subsection{BDI-Configuration-File}
 Besides the initialization of flash, clocks and \ac{RAM}, the configuration file contains information about the target e.g. the \ac{CPU}-type.\\

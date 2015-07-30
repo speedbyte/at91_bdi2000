@@ -1,0 +1,41 @@
+;Register definition for ARM925T
+;===============================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	CP15	CP15 register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;
+; CP15 Registers Numbers for 925T:
+;
+; Via JTAG, CP15 registers are accessed via scan chain 15.
+; There are special register numbers needed for this access.
+;
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+id		CP15    0x0030          32      ;ID code
+control 	CP15    0x0031          32      ;Control
+ttb     	CP15    0x0032          32      ;Translation table base
+dac    	        CP15    0x0033          32      ;Domain access control
+fstatus 	CP15    0x0035          32      ;Fault status
+faddress	CP15    0x0036          32      ;Fault address
+cache           CP15    0x0038          32      ;Cache information
+pid             CP15    0x003d          32      ;Process ID
+;
+status   	CP15    0x0010          32      ;925T status
+config  	CP15    0x0011          32      ;925T configuration
+imax    	CP15    0x0012          32      ;925T I-max
+imin    	CP15    0x0013          32      ;925T I-min
+thread  	CP15    0x0014          32      ;925T Thread ID
+;
+

@@ -1,0 +1,224 @@
+;Register definition for OMAP5912
+;================================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	CP15	CP15 register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+;
+; CP15 Registers
+;
+;  Register Numbers for 926E:
+;  +-------+-------+-------+-------+
+;  | | | | | | | | | | | | | | | | |
+;  +-+-----+-+-----+-------+-------+
+;  |-|opc_1|-|opc_2|  CRm  |  nbr  |
+;  +-+-----+-+-----+-------+-------+
+;
+;
+id		CP15    0x0000          32      ;ID code
+cache   	CP15    0x0100          32      ;Cache type
+tcm             CP15    0x0200          32      ;TCM status
+control 	CP15    0x0001          32      ;Control
+ttb     	CP15    0x0002          32      ;Translation table base
+dac     	CP15    0x0003          32      ;Domain access control
+dfsr      	CP15    0x0005          32      ;Data fault status
+ifsr    	CP15    0x0105          32      ;Inst fault status
+far       	CP15    0x0006          32      ;Fault address
+;
+fcsr      	CP15    0x000d          32      ;Fast context switch PID
+context 	CP15    0x010d          32      ;Context ID
+;
+;
+; Memory maped registers
+; ======================
+;
+; MPU Level 2 Interrupt Handler Registers
+;
+mpu_l2_itr      MM      0xFFFE0000
+mpu_l2_mir      MM      0xFFFE0004
+mpu_l2_sir_irq  MM      0xFFFE0010
+mpu_l2_sir_fiq  MM      0xFFFE0014
+mpu_l2_control  MM      0xFFFE0018
+mpu_l2_ilr0     MM      0xFFFE001C
+mpu_l2_ilr1     MM      0xFFFE0020
+mpu_l2_ilr2     MM      0xFFFE0024
+mpu_l2_ilr3     MM      0xFFFE0028
+mpu_l2_ilr4     MM      0xFFFE002C
+mpu_l2_ilr5     MM      0xFFFE0030
+mpu_l2_ilr6     MM      0xFFFE0034
+mpu_l2_ilr7     MM      0xFFFE0038
+mpu_l2_ilr8     MM      0xFFFE003C
+mpu_l2_ilr9     MM      0xFFFE0040
+mpu_l2_ilr10    MM      0xFFFE0044
+mpu_l2_ilr11    MM      0xFFFE0048
+mpu_l2_ilr12    MM      0xFFFE004C
+mpu_l2_ilr13    MM      0xFFFE0050
+mpu_l2_ilr14    MM      0xFFFE0054
+mpu_l2_ilr15    MM      0xFFFE0058
+mpu_l2_ilr16    MM      0xFFFE005C
+mpu_l2_ilr17    MM      0xFFFE0060
+mpu_l2_ilr18    MM      0xFFFE0064
+mpu_l2_ilr19    MM      0xFFFE0068
+mpu_l2_ilr20    MM      0xFFFE006C
+mpu_l2_ilr21    MM      0xFFFE0070
+mpu_l2_ilr22    MM      0xFFFE0074
+mpu_l2_ilr23    MM      0xFFFE0078
+mpu_l2_ilr24    MM      0xFFFE007C
+mpu_l2_ilr25    MM      0xFFFE0080
+mpu_l2_ilr26    MM      0xFFFE0084
+mpu_l2_ilr27    MM      0xFFFE0088
+mpu_l2_ilr28    MM      0xFFFE008C
+mpu_l2_ilr29    MM      0xFFFE0090
+mpu_l2_ilr30    MM      0xFFFE0094
+mpu_l2_ilr31    MM      0xFFFE0098
+mpu_l2_isr      MM      0xFFFE009C
+mpu_l2_status   MM      0xFFFE00A0
+mpu_l2_ocp_cfg  MM      0xFFFE00A4
+mpu_l2_inth_rev MM      0xFFFE00A8
+;
+; LCD Controller Registers
+;
+lcd_control     MM      0xFFFEC000
+lcd_timing0     MM      0xFFFEC004
+lcd_timing1     MM      0xFFFEC008
+lcd_timing2     MM      0xFFFEC00C
+lcd_status      MM      0xFFFEC010
+lcd_subpanel    MM      0xFFFEC014
+lcd_lineint     MM      0xFFFEC018
+lcd_displaystat MM      0xFFFEC01C
+;
+; MPU Timer Registers
+;
+mpu_cntl_timer1 MM      0xFFFEC500
+mpu_load_timer1 MM      0xFFFEC504
+mpu_read_timer1 MM      0xFFFEC508
+mpu_cntl_timer2 MM      0xFFFEC600
+mpu_load_timer2 MM      0xFFFEC604
+mpu_read_timer2 MM      0xFFFEC608
+mpu_cntl_timer3 MM      0xFFFEC700
+mpu_load_timer3 MM      0xFFFEC704
+mpu_read_timer3 MM      0xFFFEC708
+;
+; MPU Watchdog Timer Registers
+;
+mpu_wdt_cntl    MM      0xFFFEC800
+mpu_wdt_load    MM      0xFFFEC804
+mpu_wdt_read    MM      0xFFFEC804
+mpu_wdt_mode    MM      0xFFFEC808
+;
+; MPU Level 1 Interrupt Handler Registers
+;
+mpu_l1_itr      MM      0xFFFECB00
+mpu_l1_mir      MM      0xFFFECB04
+mpu_l1_sir_irq  MM      0xFFFECB10
+mpu_l1_sir_fiq  MM      0xFFFECB14
+mpu_l1_control  MM      0xFFFECB18
+mpu_l1_ilr0     MM      0xFFFECB1C
+mpu_l1_ilr1     MM      0xFFFECB20
+mpu_l1_ilr2     MM      0xFFFECB24
+mpu_l1_ilr3     MM      0xFFFECB28
+mpu_l1_ilr4     MM      0xFFFECB2C
+mpu_l1_ilr5     MM      0xFFFECB30
+mpu_l1_ilr6     MM      0xFFFECB34
+mpu_l1_ilr7     MM      0xFFFECB38
+mpu_l1_ilr8     MM      0xFFFECB3C
+mpu_l1_ilr9     MM      0xFFFECB40
+mpu_l1_ilr10    MM      0xFFFECB44
+mpu_l1_ilr11    MM      0xFFFECB48
+mpu_l1_ilr12    MM      0xFFFECB4C
+mpu_l1_ilr13    MM      0xFFFECB50
+mpu_l1_ilr14    MM      0xFFFECB54
+mpu_l1_ilr15    MM      0xFFFECB58
+mpu_l1_ilr16    MM      0xFFFECB5C
+mpu_l1_ilr17    MM      0xFFFECB60
+mpu_l1_ilr18    MM      0xFFFECB64
+mpu_l1_ilr19    MM      0xFFFECB68
+mpu_l1_ilr20    MM      0xFFFECB6C
+mpu_l1_ilr21    MM      0xFFFECB70
+mpu_l1_ilr22    MM      0xFFFECB74
+mpu_l1_ilr23    MM      0xFFFECB78
+mpu_l1_ilr24    MM      0xFFFECB7C
+mpu_l1_ilr25    MM      0xFFFECB80
+mpu_l1_ilr26    MM      0xFFFECB84
+mpu_l1_ilr27    MM      0xFFFECB88
+mpu_l1_ilr28    MM      0xFFFECB8C
+mpu_l1_ilr29    MM      0xFFFECB90
+mpu_l1_ilr30    MM      0xFFFECB94
+mpu_l1_ilr31    MM      0xFFFECB98
+mpu_l1_isr      MM      0xFFFECB9C
+mpu_l1_enh_cntl MM      0xFFFECBA0
+;
+; Traffic Controller EMIFS Registers
+;
+emifs_config    MM      0xFFFECC0C
+emifs_cs0       MM      0xFFFECC10
+emifs_cs1       MM      0xFFFECC14
+emifs_cs2       MM      0xFFFECC18
+emifs_cs3       MM      0xFFFECC1C
+emifs_timeout1  MM      0xFFFECC28
+emifs_timeout2  MM      0xFFFECC2C
+emifs_timeout3  MM      0xFFFECC30
+endianism       MM      0xFFFECC34
+emifs_cfg_dyn_w MM      0xFFFECC40
+emifs_abort_add MM      0xFFFECC44
+emifs_abort_typ MM      0xFFFECC48
+emifs_abort_tim MM      0xFFFECC4C
+emifs_adv_cs0   MM      0xFFFECC50
+emifs_adv_cs1   MM      0xFFFECC54
+emifs_adv_cs2   MM      0xFFFECC58
+emifs_adv_cs3   MM      0xFFFECC5C
+;
+; Traffic Controller EMIFF Registers
+;
+emiff_prio_reg  MM      0xFFFECC08
+emiff_sdram     MM      0xFFFECC20
+emiff_mrs       MM      0xFFFECC24
+emiff_sdram_2   MM      0xFFFECC3C
+dll_wrt_ctl     MM      0xFFFECC64
+dll_wrt_stat    MM      0xFFFECC68
+emiff_mrs_new   MM      0xFFFECC70
+emiff_emrs0     MM      0xFFFECC74
+emiff_emrs1     MM      0xFFFECC78
+emiff_op        MM      0xFFFECC80
+emiff_mcmd      MM      0xFFFECC84
+emiff_timeout1  MM      0xFFFECC8C
+emiff_timeout2  MM      0xFFFECC90
+emiff_timeout3  MM      0xFFFECC94
+emiff_abort_add MM      0xFFFECC98
+emiff_abort_typ MM      0xFFFECC9C
+dll_urd_ctl     MM      0xFFFECCC0
+dll_urd_stat    MM      0xFFFECCC4
+emiff_emrs2     MM      0xFFFECCC8
+dll_lrd_ctl     MM      0xFFFECCCC
+dll_lrd_stat    MM      0xFFFECCBC
+;
+; MPU Clock/Reset/Power Mode Control Registers
+;
+arm_ckctl       MM      0xFFFECE00
+arm_idlect1     MM      0xFFFECE04
+arm_idlect2     MM      0xFFFECE08
+arm_ewupct      MM      0xFFFECE0C
+arm_rstct1      MM      0xFFFECE10
+arm_rstct2      MM      0xFFFECE14
+arm_sysst       MM      0xFFFECE18
+arm_ckout1      MM      0xFFFECE1C
+arm_ckout2      MM      0xFFFECE20
+arm_idlect3     MM      0xFFFECE24
+;
+; DPLL1 Configuration Register
+;
+dpll1_ctl       MM      0xFFFECF00
+;
+

@@ -1,0 +1,35 @@
+;Register definition for AT91M55800
+;==================================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+sp		GPR	13
+lr		GPR	14
+pc		GPR	15
+;
+;
+; External Bus Interface (EBI) Registers
+;
+csr0	MM	0xFFE00000	32
+csr1	MM	0xFFE00004	32
+csr2	MM	0xFFE00008	32
+csr3	MM	0xFFE0000c	32
+csr4	MM	0xFFE00010	32
+csr5	MM	0xFFE00014	32
+csr6	MM	0xFFE00018	32
+csr7	MM	0xFFE0001c	32
+rcr		MM	0xFFE00020	32
+mcr		MM	0xFFE00024	32
+

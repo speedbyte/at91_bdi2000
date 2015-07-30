@@ -1,0 +1,214 @@
+;Register definition for ADuC7020
+;================================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+;
+; IRQ
+;
+irqsta		DMM1	0x0000          32
+irqsig		DMM1	0x0004          32
+irqen 		DMM1	0x0008          32
+irqclr		DMM1	0x000C          32
+swicfg		DMM1	0x0010          32
+fiqsta		DMM1	0x0100          32
+fiqsig		DMM1	0x0104          32
+fiqen 		DMM1	0x0108          32
+fiqclr		DMM1	0x010C          32
+;
+; System Control
+;
+remap 		DMM1	0x0220          8
+rststa		DMM1	0x0230          8
+rstclr		DMM1	0x0234          8
+;
+; Timer
+;
+t0ld  		DMM1	0x0300          16
+t0val 		DMM1	0x0304          16
+t0con 		DMM1	0x0308          16
+t0clri		DMM1	0x030C          8
+t1ld  		DMM1	0x0320          32
+t1val 		DMM1	0x0324          32
+t1con 		DMM1	0x0328          16
+t1clri		DMM1	0x032C          8
+t1cap 		DMM1	0x0330          32
+t2ld  		DMM1	0x0340          32
+t2val 		DMM1	0x0344          32
+t2con 		DMM1	0x0348          16
+t2clri		DMM1	0x034C          8
+t3ld  		DMM1	0x0360          16
+t3val 		DMM1	0x0364          16
+t3con 		DMM1	0x0368          16
+t3clri		DMM1	0x036C          8
+;
+; PLL / PSM  / Reference
+;
+powky1		DMM1	0x0404          8
+powcon		DMM1	0x0408          8
+powky2		DMM1	0x040C          8
+pllky1		DMM1	0x0410          8
+pllcon		DMM1	0x0414          8
+pllky2		DMM1	0x0418          8
+psmcon		DMM1	0x0440          16
+cmpcon		DMM1	0x0444          16
+refcon		DMM1	0x048C          8
+;
+; ADC
+;
+adccon		DMM1	0x0500          8
+adccp 		DMM1	0x0504          8
+adccn 		DMM1	0x0508          8
+adcsta		DMM1	0x050C          8
+adcdat		DMM1	0x0510          32
+adcrst		DMM1	0x0514          8
+adcgn 		DMM1	0x0530          16
+adcof 		DMM1	0x0534          16
+;
+; ADC
+;
+dac0con		DMM1	0x0600          8
+dac0dat		DMM1	0x0604          32
+dac1con		DMM1	0x0608          8
+dac1dat		DMM1	0x060C          32
+dac2con		DMM1	0x0610          8
+dac2dat		DMM1	0x0614          32
+dac3con		DMM1	0x0618          8
+dac3dat		DMM1	0x061C          32
+;
+; UART
+;
+comtx  		DMM1	0x0700          8
+comrx  		DMM1	0x0700          8
+comdiv0		DMM1	0x0700          8
+comien0		DMM1	0x0704          8
+comdiv1		DMM1	0x0704          8
+comiid0		DMM1	0x0708          8
+comcon0		DMM1	0x070C          8
+comcon1		DMM1	0x0710          8
+comsta0		DMM1	0x0714          8
+comsta1		DMM1	0x0718          8
+comscr 		DMM1	0x071C          8
+comien1		DMM1	0x0720          8
+comiid1		DMM1	0x0724          8
+comadr 		DMM1	0x0728          8
+comdiv2		DMM1	0x072C          16
+;
+; I2C0
+;
+i2c0msta	DMM1	0x0800          8
+i2c0ssta	DMM1	0x0804          8
+i2c0srx 	DMM1	0x0808          8
+i2c0stx 	DMM1	0x080C          8
+i2c0mrx 	DMM1	0x0810          8
+i2c0mtx 	DMM1	0x0814          8
+i2c0cnt 	DMM1	0x0818          8
+i2c0adr 	DMM1	0x081C          8
+i2c0byte	DMM1	0x0824          8
+i2c0alt 	DMM1	0x0828          8
+i2c0cfg 	DMM1	0x082C          8
+i2c0divh	DMM1	0x0830          8
+i2c0divl	DMM1	0x0834          8
+i2c0id0 	DMM1	0x0838          8
+i2c0id1 	DMM1	0x083C          8
+i2c0id2 	DMM1	0x0840          8
+i2c0id3 	DMM1	0x0844          8
+;
+; I2C1
+;
+i2c1msta	DMM1	0x0900          8
+i2c1ssta	DMM1	0x0904          8
+i2c1srx 	DMM1	0x0908          8
+i2c1stx 	DMM1	0x090C          8
+i2c1mrx 	DMM1	0x0910          8
+i2c1mtx 	DMM1	0x0914          8
+i2c1cnt 	DMM1	0x0918          8
+i2c1adr 	DMM1	0x091C          8
+i2c1byte	DMM1	0x0924          8
+i2c1alt 	DMM1	0x0928          8
+i2c1cfg 	DMM1	0x092C          8
+i2c1divh	DMM1	0x0930          8
+i2c1divl	DMM1	0x0934          8
+i2c1id0 	DMM1	0x0938          8
+i2c1id1 	DMM1	0x093C          8
+i2c1id2 	DMM1	0x0940          8
+i2c1id3 	DMM1	0x0944          8
+;
+; SPI
+;
+spista 	        DMM1	0x0A00          8
+spirx  	        DMM1	0x0A04          8
+spitx  	        DMM1	0x0A08          8
+spidiv 	        DMM1	0x0A0C          8
+spicon 	        DMM1	0x0A10          16
+;
+; PLA
+;
+plaelm0         DMM1	0x0B00          16
+plaelm1         DMM1	0x0B04          16
+plaelm2         DMM1	0x0B08          16
+plaelm3         DMM1	0x0B0C          16
+plaelm4         DMM1	0x0B10          16
+plaelm5         DMM1	0x0B14          16
+plaelm6         DMM1	0x0B18          16
+plaelm7         DMM1	0x0B1C          16
+plaelm8         DMM1	0x0B20          16
+plaelm9         DMM1	0x0B24          16
+plaelm10        DMM1	0x0B28          16
+plaelm11        DMM1	0x0B2C          16
+plaelm12        DMM1	0x0B30          16
+plaelm13        DMM1	0x0B34          16
+plaelm14        DMM1	0x0B38          16
+plaelm15        DMM1	0x0B3C          16
+placlk          DMM1	0x0B40          8
+plairq          DMM1	0x0B44          32
+plaadc          DMM1	0x0B48          32
+pladin          DMM1	0x0B4C          32
+pladout         DMM1	0x0B50          32
+;
+; GPIO
+;
+gp0con          DMM1	0xF400          32
+gp1con          DMM1	0xF404          32
+gp2con          DMM1	0xF408          32
+gp3con          DMM1	0xF40C          32
+gp4con          DMM1	0xF410          32
+gp0dat          DMM1	0xF420          32
+gp0set          DMM1	0xF424          8
+gp0clr          DMM1	0xF428          8
+gp1dat          DMM1	0xF430          32
+gp1set          DMM1	0xF434          8
+gp1clr          DMM1	0xF438          8
+gp2dat          DMM1	0xF440          32
+gp2set          DMM1	0xF444          8
+gp2clr          DMM1	0xF448          8
+gp3dat          DMM1	0xF450          32
+gp3set          DMM1	0xF454          8
+gp3clr          DMM1	0xF458          8
+gp4dat          DMM1	0xF460          32
+gp4set          DMM1	0xF464          8
+gp4clr          DMM1	0xF468          8
+;
+; Flash/EE
+;
+feesta          DMM1	0xF800          8
+feemod          DMM1	0xF804          8
+feecon          DMM1	0xF808          8
+feedat          DMM1	0xF80C          16
+feeadr          DMM1	0xF810          16
+feesign         DMM1	0xF818          32
+feepro          DMM1	0xF81C          32
+;
+

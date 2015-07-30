@@ -1,0 +1,117 @@
+;Register definition for MC9328MX1
+;=================================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	CP15	CP15 register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;
+; CP15 Registers Numbers for 920T:
+;
+; Via JTAG, CP15 registers are accessed either direct (physical access mode)
+; or via interpreted MCR/MRC instructions.
+; Read also ARM920T manual, part "Debug Support - Scan Chain 15".
+;
+; Register number for physical access mode (bit 12 = 0):
+;
+;       +-----+-+-----+-+-----+-+-------+
+;       |0 0 0|0|0 0 0|i|0 0 0|x|  nbr  |
+;       +-----+-+-----+-+-----+-+-------+
+;
+; The bit "i" selects the instruction cache (scan chain bit 33), the bit "x" extends access to register 15
+; (scan chain bit 38).
+;
+; Register number for interpreted access mode (bit 12 = 1):
+;       +-----+-+-------+-----+-+-------+
+;       |opc_2|1|  CRm  |opc_1|0|  nbr  |
+;       +-----+-+-------+-----+-+-------+
+; The 16bit register number is used to build the appropriate MCR/MRC instruction.
+;
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+id		CP15    0x0000          32      ;ID code
+cache   	CP15    0x0100          32      ;Cache type
+control 	CP15    0x0001          32      ;Control
+dlock   	CP15    0x0009          32      ;data lockdown register
+ilock   	CP15    0x0109          32      ;instruction lockdown register
+process   	CP15    0x000d          32      ;process ID
+;
+;wittb     	CP15    0x51af          32      ;write inst TTB
+rittb     	CP15    0x51af          32      ;read  inst TTB
+;wdttb     	CP15    0x52af          32      ;write data TTB
+rdttb     	CP15    0x12a2          32      ;read  data TTB
+;
+;widac     	CP15    0x71af          32      ;write inst DAC
+ridac     	CP15    0x71af          32      ;read  inst DAC
+;wddac     	CP15    0x72af          32      ;write data DAC
+rddac     	CP15    0x1003          32      ;read  data DAC
+;
+ifsr     	CP15    0x3005          32      ;read/write inst FSR
+dfsr     	CP15    0x1005          32      ;read/write data FSR
+;
+ifar     	CP15    0x3006          32      ;read/write inst FAR
+dfar     	CP15    0x1006          32      ;read/write data FAR
+;
+;
+;       Memory maped registers
+;
+wcr             MM      0x00201000
+wsr             MM      0x00201004
+wstr            MM      0x00201008
+;
+tctl1           MM      0x00202000
+tprer1          MM      0x00202004
+tcmp1           MM      0x00202008
+tcr1            MM      0x0020200c
+tcn1            MM      0x00202010
+tstat1          MM      0x00202014
+tctl2           MM      0x00203000
+tprer2          MM      0x00203004
+tcmp2           MM      0x00203008
+tcr2            MM      0x0020300c
+tcn2            MM      0x00203010
+tstat2          MM      0x00203014
+;
+hourmin         MM      0x00204000
+seconds         MM      0x00204004
+alrm_hm         MM      0x00204008
+alrm_sec        MM      0x0020400c
+rcctl           MM      0x00204010
+rtcisr          MM      0x00204014
+rtcienr         MM      0x00204018
+stpwch          MM      0x0020401c
+dayr            MM      0x00204020
+dayalarm        MM      0x00204024
+;
+cs0u            MM      0x00220000
+cs0l            MM      0x00220004
+cs1u            MM      0x00220008
+cs1l            MM      0x0022000c
+cs2u            MM      0x00220010
+cs2l            MM      0x00220014
+cs3u            MM      0x00220018
+cs3l            MM      0x0022001c
+cs4u            MM      0x00220020
+cs4l            MM      0x00220024
+cs5u            MM      0x00220028
+cs5l            MM      0x0022002c
+weim            MM      0x00220030
+;
+sdctl0          MM      0x00221000
+sdctl1          MM      0x00221004
+sdmisc          MM      0x00221014
+sdrst           MM      0x00221018
+;
+
+
+

@@ -1,0 +1,59 @@
+;Register definition for ARM946E
+;===============================
+;
+; name: user defined name of the register
+; type: the type of the register
+;	GPR	general purpose register
+;	CP15	CP15 register
+;	MM	memory mapped register
+;	DMMx	direct memory mapped register with offset
+;		x = 1..4
+;		the base is defined in the configuration file
+;		e.g. DMM1 0x02200000
+; addr:	the number, adddress or offset of the register
+; size	the size of the register (8,16 or 32)
+;
+;name		type	addr		size
+;-------------------------------------------
+;
+;
+; CP15 Registers
+;
+;  Numbers for 946E:
+;  +-------+-------+-------+-------+
+;  | | | | | | | | | | | | | | | | |
+;  +-------+-----+-+-----+-+-------+ i = instruction (bit 32)
+;  |0 0 0 0|0 0 0|i|0 0 0|x|  nbr  | x = reg 6 extension (bit 37)
+;  +-------+-----+-+-----+-+-------+
+;
+;
+id		CP15    0x0000          32      ;ID code
+cache   	CP15    0x0100          32      ;Cache type
+tcmsize 	CP15    0x0004          32      ;Tightly-coupled memor size
+control 	CP15    0x0001          32      ;Control
+dcen    	CP15    0x0002          32      ;data cacheable bits
+icen    	CP15    0x0102          32      ;inst cacheable bits
+wben    	CP15    0x0003          32      ;write buffer control
+daccess   	CP15    0x0005          32      ;data space access permission
+iaccess 	CP15    0x0105          32      ;inst space access permission
+dlock   	CP15    0x0009          32      ;data cache lock-down
+ilock   	CP15    0x0109          32      ;inst cache lock-down
+;dtcm       	CP15    0x0019          32      ;data TCM size/location ?????
+;itcm       	CP15    0x0119          32      ;inst TCM size/location ?????
+dtcm       	CP15    0x0118          32      ;data TCM size/location ?????
+itcm       	CP15    0x0119          32      ;inst TCM size/location ?????
+traceid   	CP15    0x010d          32      ;trace process identifier
+dsize     	CP15    0x0118          32      ;data SRAM size/location
+isize     	CP15    0x0119          32      ;inst SRAM size/location
+;
+region0 	CP15    0x0010          32      ;protection region base/size 0
+region1 	CP15    0x0011          32      ;protection region base/size 1
+region2 	CP15    0x0012          32      ;protection region base/size 2
+region3 	CP15    0x0013          32      ;protection region base/size 3
+region4 	CP15    0x0014          32      ;protection region base/size 4
+region5 	CP15    0x0015          32      ;protection region base/size 5
+region6 	CP15    0x0016          32      ;protection region base/size 6
+region7 	CP15    0x0017          32      ;protection region base/size 7
+;
+
+
