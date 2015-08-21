@@ -1,0 +1,4 @@
+echo == Test Script == 
+echo  == command to invoke was ==
+echo == mkimage -T script -C none -n 'Demo Script' -d setenv-commands setenv.img===
+echo == from setenv-commands to setenv.img ===

@@ -1,0 +1,153 @@
+Switch to INT : CCCCCC
+The u-boot is built with CONFIG_SKIP_LOW_LEVEL_INIT to 1 in u-boot main directory.
+
+
+The next step is to download the loader.bin application. This application is used to
+download a binary file from a HyperTerminal session through the Serial Debug Port
+using the Xmodem protocol. The loader.bin file to download is available in the the software
+package extracted at the beginning of the procedure and available in the directory
+C:\UBootFlashProgramming\AT91RM9200-GettingStarted-GHS3_6-1_1\AT91RM9200-
+GettingStarted\Flash. See “Launching the MULTI2000” on page 4.
+14. Download the loader.bin application in the internal RAM at address 0x200000 by
+writing the following command in the command pane window (prompt MULTI>):
+MULTI> memload raw C:\UBootFlashProgramming\AT91RM9200-
+GettingStarted-GHS3_6-1_1\AT91RM9200-GettingStarted\Flash\loader.bin
+0x200000
+15. Set the Program Counter (pc) at the beginning of the downloaded loader.bin
+application and run from here:
+MULTI> target reg pc 0x200000
+MULTI> target run
+Loading U-Boot The loader application is now running on the AT91RM9200DK and is ready to download
+a binary application file through the Serial Debug Port using the Xmodem protocol on a
+HyperTerminal session.
+16. Download the u_boot.bin binary file using the Xmodem protocol. This file is
+available in the UBootFlashProgramming.zip file provided with this Application
+Note under the directory path C:\UBootFlashProgramming\binary.
+7
+AT91RM9200DK U-Boot Application Note
+6041A–ATARM–01/04
+In the HyperTerminal session, send the file u_boot.bin using the Xmodem protocol.
+At the end of the Xmodem transfer, a new prompt is displayed in the HyperTerminal
+window:
+Uboot>
+The U-Boot is now running on the AT91RM9200DK.
+This Boot program can now be used to download files to the SDRAM through the
+Serial Debug Port using the Kermit protocol with a HyperTerminal session. It is then
+copied to the Flash.
+Downloading U-Boot Binary
+Files
+The last step is to download the primary bootstrap, boot.bin, and the gzip-compressed
+U-Boot image, u-boot.gz. These two files are available in the UBootFlashProgramming.
+zip file provided with this Appl i c a t ion Note in the d i rectory
+C:\UBootFlashProgramming\binary.
+17. The first file to load is the boot image “boot.bin”.
+Uboot> loadb 20000000
+## Ready for binary (Kermit) download …
+## Start Addr =0x20000000
+The boot image is now loaded in SDRAM. The following command copies the
+SDRAM (0x20000000) to Flash(0x10000000):
+Uboot> protect off 10000000 10005fff
+Unprotect 3 sectors
+Uboot> erase 10000000 10005fff
+Erase Flash from 0x10000000 to 0x10005fff...
+Erasing sector 0 ... ok.
+Erasing sector 1 ... ok.
+Erasing sector 2 ... ok.
+done.
+Erased 3 sectors.
+Uboot> cp.b 20000000 10000000 5FFF
+Copy to flash… done.
+Uboot> protect on 10000000 10005FFF
+Protected 3 sectors
+Uboot>
+18. Once the primary bootstrap has been loaded, the U-Boot gzipped image can be
+copied into Flash. The file to load is the uboot gzipped image “u-boot.gz”:
+Uboot> loadb 20000000
+## Ready for binary (Kermit) download …
+## Start Addr =0x20000000
+Uboot> protect off 10010000 1001ffff
+Unprotect 1 sectors
+Uboot> erase 10010000 1001ffff
+Erase Flash from 0x10010000 to 0x1001ffff...
+8 AT91RM9200DK U-Boot Application Note
+6041A–ATARM–01/04
+Erasing sector 8 ... ok.
+done.
+Erased 1 sectors.
+Uboot> cp.b 20000000 10010000 FFFF
+Copy to flash… done.
+Uboot> protect on 10010000 1001FFFF
+Protected 1 sectors
+Uboot>
+19. The U-Boot has been upgraded. Reboot your board.
+
+
+
+      Uboot>setenv ethaddr 12:34:56:78:99:aa
+      /* set up of the Ethernet address, more usually called MAC address*/
+
+      Uboot>setenv ipaddr 10.159.245.180
+      /* the board ip address */
+
+      Uboot>setenv serverip 10.159.245.186
+      /* the server ip address where the TFTP server is running, need to be on the same submask as the board */
+
+      Uboot>setenv bootdelay 3
+      /* time in seconds, can not be set ot value 0*/
+
+      Uboot>setenv bootargs root=/dev/ram rw initrd=0x21100000,6000000 ramdisk_size=15360 console=ttyS0,115200,mem=32M
+      /* this command is very important, be careful to type it without adding space */
+
+      Uboot>saveenv
+      Saving Environment to Flash...
+      Un-Protected 1 sectors
+      Erasing Flash...Erasing sector 7 ... ok.
+      Erased 1 sectors
+      Writing to Flash... done
+      Protected 1 sectors
+      Uboot>
+    * U-Boot script capability
+      You can create script, which avoid you to type commands.
+      Uboot>setenv kernel tftp 21000000 linux-ek
+      Uboot>saveenv
+      Saving Environment to Flash...
+      Un-Protected 1 sectors
+      Erasing Flash...Erasing sector 7 ... ok.
+      Erased 1 sectors
+      Writing to Flash... done
+      Protected 1 sectors
+      Uboot>
+      /* this script is the equivalent of typing: tftp 21000000 uImage. But once stored in the flash, it allows you to save time, and automate. For execute the script, type " run kernel" (run your_script name).*/
+      Uboot>setenv ramdisk tftp 21100000 ramdisk
+      Uboot> saveenv
+      Saving Environment to Flash...
+      Un-Protected 1 sectors
+      Erasing Flash...Erasing sector 7 ... ok.
+      Erased 1 sectors
+      Writing to Flash... done
+      Protected 1 sectors
+      Uboot>
+
+      For launch linux, type the following command:
+      Uboot>run ramdisk
+      TFTP from server 10.159.245.186; our IP address is 10.159.245.180
+      Filename 'ramdisk'.
+      Load address: 0x21100000
+      Loading: #################################################################
+      #################################################################
+      #################################################################
+      #######################
+      done
+      Bytes transferred = 1112544 (10f9e0 hex)
+      Uboot>
+      Uboot>run kernel
+      TFTP from server 10.159.245.186; our IP address is 10.159.245.180
+      Filename 'linux-ek'.
+      Load address: 0x21000000
+      Loading: #################################################################
+      #################################################################
+      ########################
+      done
+      Bytes transferred = 783992 (bf678 hex)
+      Uboot>
+      Uboot>bootm 21000000
